@@ -1,0 +1,13 @@
+writting from terminal into note using echo >file name
+five teminal commands
+mkdir -- this creates a directory inside the place you are or folder inside the folder you are in.
+cd -- this helps you navigates through directories as its known as change directory by which you give it the name of the directory you want to go to after cd and if you want t go back you add two dots(..).
+pwd -- we use this to know exacly where we are as in the directory we are in and can oprate within.
+ls --this is used to list every thing that is in the current working directory if we want to list hidden files we add (-la) after ls .
+touch --if we said that mkdir creates direcories (folders) touch is used to create the files that reside in those directories.
+  
+Three git commands
+git init -- this turns the current folder into git repository which we are ables to save changes and contol the versions of
+git add -- this command prepares the repository or files to be commited into the repository
+git commit -- is used to save the added parts of whatever you are wprking on currently like a snapshot which is going to help with version control to add a message of what is commited we use -m message goes here.
+
