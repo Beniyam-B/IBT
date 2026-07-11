@@ -122,20 +122,21 @@ temp_in_celcius = input("input tempreture in celcius")
 temp = int(temp_in_celcius)
 
 if temp >= 15 :
- print ("Cold")
- elif 15 < temp <28:
- print ("Warm")
- else  :
- print ("Hot")
+    if temp < 15:
+        print("Cold")
+    elif 15 <= temp < 28:
+        print("Warm")
+    else:
+        print("Hot")
 
 #excercise 2 recipt loop on each line from 1 to 10 using for loop with range
 
 for i in range(1, 11):
     print(f"recipt #{i}")
 #excercise 3 every even number from 0 to 20 using loop with modulo
-for i in range (1,21)
-    if i%2 == 0 ;
-    print(i)
+for i in range(1, 21):
+    if i % 2 == 0:
+        print(i)
 #excercise 4 Discount function. Write apply_discount(price, percent=10) that returns the price after the discount. Test it with and without the default.
 price = input("insert the price of item")
 price = int(price)

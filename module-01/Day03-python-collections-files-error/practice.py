@@ -38,9 +38,9 @@ lat , lon = location
 
 #eg 
 students = {
-    "name" = "Ben"
-    "grade" = 3.0
-    "department" = "computer science"
+    "name": "Ben",
+    "grade": 3.0,
+    "department": "computer science"
 }
 
 # to acess this values 
@@ -93,5 +93,5 @@ add_amount =[n + 5 for n in numbers ]  # for loop used inside the csess method o
 small = [n for n in numbers if n<15]  #samll is now small=[20,60]
 #this always have the same way of being written [minimization ...]
 #you just use '{}' for dictonary 
-minimized = {num: n-5 for num in numbers, n in numbers.num()}
+minimized = {num: num - 5 for num in numbers}
 
