@@ -7,7 +7,7 @@ stock = {}
 # This starts a block of code that might fail if the file is missing.
 try:
     # This opens the file named stock.txt for reading.
-    with open("stock.txt", "r", encoding="utf-8") as s:
+    with open("stock.txt", "r") as s:
         # This loops through every line in the file.
         for line in s:
             # This removes the newline and splits the line into two parts: item and quantity.

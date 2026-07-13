@@ -11,23 +11,22 @@
 try:
     transactions = {}
 
-    with open("transaction.txt", "r", encoding="utf-8") as file:
+    with open("transaction.txt", "r") as file:
         for line in file:
-            parts = line.strip().split()
-            if len(parts) == 2:
-                name, amount = parts[0], float(parts[1])
-                transactions[name] = transactions.get(name, 0) + amount
+            line = line.strip()
+            if not line:
+                continue
+            name, amount = line.split()
+            transactions[name] = transactions.get(name, 0) + float(amount)
 
     # Example: sort the dictionary items by total spending from highest to lowest.
-    sorted_transactions = sorted(transactions.items(), key=lambda item: item[1], reverse=True)
+    sorted_transactions = sorted(transactions.items(), reverse=True)
 
     print("Customer Transaction Summary:")
     for customer, total in sorted_transactions:
         print(f"{customer}: {total} ETB")
 
-    with open("report.txt", "w", encoding="utf-8") as report:
-        report.write("Customer Transaction Summary\n")
-        report.write("=" * 30 + "\n")
+    with open("report.txt", "w") as report:
         for customer, total in sorted_transactions:
             report.write(f"{customer}: {total} ETB\n")
 

@@ -1,3 +1,7 @@
-"abebe" ,3000,20,700,
-"kebede" ,400,24
-"bemnet" ,40000,500
+abebe 3000
+abebe 20
+abebe 700
+kebede 400
+kebede 24
+bemnet 40000
+bemnet 500
