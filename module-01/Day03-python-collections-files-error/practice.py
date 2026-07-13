@@ -73,17 +73,17 @@ print(dt.date.today())     # Example: use datetime to get today's date
 
 # 7. Files
 # Files are used to save and read data from disk.
-with open("names.txt", "w", encoding="utf-8") as file:
+with open("names.txt", "w") as file:
     file.write("Abebe Kebede\n")
     file.write("Chala Gemechu\n")
     file.write("Samuel Girum\n")
 
-with open("names.txt", "r", encoding="utf-8") as file:
+with open("names.txt", "r") as file:
     for line in file:
         print(line.strip())  # Example: read one line at a time
 
 # Example: write to a file using append mode.
-with open("report.txt", "a", encoding="utf-8") as file:
+with open("report.txt", "a") as file:
     file.write("This line was added with append mode.\n")
 
 # 8. Error handling
@@ -132,12 +132,12 @@ cheap_items = [price for price in prices if price < 200]
 print(cheap_items)
 
 # Exercise 5: Write three names to names.txt and read them back.
-with open("names.txt", "w", encoding="utf-8") as file:
+with open("names.txt", "w") as file:
     file.write("Abebe Kebede\n")
     file.write("Chala Gemechu\n")
     file.write("Samuel Girum\n")
 
-with open("names.txt", "r", encoding="utf-8") as file:
+with open("names.txt", "r") as file:
     for line in file:
         print(line.strip())
 
