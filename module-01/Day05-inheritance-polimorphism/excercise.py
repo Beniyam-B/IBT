@@ -11,10 +11,7 @@ class SavingsAccount(Account):
         self.deposit(interest)
 
     def statement(self):
-        print(
-            f"Savings Account: {self.owner}, account number {self.account_number}, "
-            f"balance {self.balance} ETB."
-        )
+        print( f"Savings Account: {self.owner}, account number {self.account_number}, balance {self.balance} ETB.")
 
 
 class CurrentAccount(Account):
@@ -29,10 +26,7 @@ class CurrentAccount(Account):
         print(f"You have withdrawn {amount} ETB from your account.")
 
     def statement(self):
-        print(
-            f"Current Account: {self.owner}, account number {self.account_number}, "
-            f"balance {self.balance} ETB."
-        )
+        print(f"Current Account: {self.owner}, account number {self.account_number}, balance {self.balance} ETB.")
 
 
 # Example usage
