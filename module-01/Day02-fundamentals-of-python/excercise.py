@@ -7,5 +7,22 @@ def tier(balance):
         return "Standard"
     else:
         return "Basic"
-for name, balance in customers:
-    print(f"{name} has a balance of {balance} ETB and is a {tier(balance)} customer.")
+basic = 0
+standard = 0
+premium = 0
+
+for coustomer , balance in customers:
+     
+     coustomer_tier = tier(balance)
+    
+     print (f"coustomer:{coustomer} is {coustomer_tier} customer Balance: {balance} ETB\n")
+     if coustomer_tier == "Basic":
+         basic +=1
+     elif coustomer_tier == "Premium":
+         premium += 1
+     else:
+         standard += 1
+
+print(f"basic users number is : {basic}")
+print (f"standard users number is : {standard}")
+print (f"premium users number is : {premium}")
