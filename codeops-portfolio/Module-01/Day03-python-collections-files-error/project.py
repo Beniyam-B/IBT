@@ -23,13 +23,22 @@ except FileNotFoundError:
     # This shows a helpful error message to the user.
     print("stock.txt file does not exist")
 
+def save_stock():
+    with open("stock.txt", "w") as save:
+        for item, quantity in stock.items():
+            save.write(f"{item} , {quantity}")
+
 # This defines a function that updates the stock for a given item.
 def adjust(item, amount):
     # This adds or subtracts the amount from the item quantity.
     stock[item] = stock.get(item, 0) + amount
+    save_stock()
 
 # This creates a list of items whose quantity is less than 10.
 less_quantity = [item for item, quantity in stock.items() if quantity < 10]
 
 # This prints the items that are running low.
 print(f"Low quantity items: {less_quantity}")
+
+adjust("paracetamol" , 25)
+adjust("amoxcilin" , 25)
