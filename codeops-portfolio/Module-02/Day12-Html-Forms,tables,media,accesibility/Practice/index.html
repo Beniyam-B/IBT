@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Day 12 - HTML Forms, Tables, Media, Accesibility</title>
+    </head>
+    <! Forms :are used to collect user input !>
+    <! uses two attributes to decide what to do with the input !>
+    <! GET sends the data to the url as a query string can be used for searches ,bookmarks ,filters but its visible in url so never put password here !>
+    <! POST data goes to the request body this is used for private collection of data like login ,payment because its not visible in the url !>
+    <body>
+        <!the name attribute is used to tell the server what the data is and it becomes the key ,if it   does not have a name its not recognized by the server!>
+         <form action="/apply" method="post">
+            <label for="fullname">Full Name</label>
+            <input id="fullname" name="fullname" type="text" required>
+
+            <input id="note" type="text">
+          <!takes full name and makes it a must fill catagory ,and also a note part thet is just thre for fun and is not recognized by the server!>
+        <!label is used to tell users what to fill inside the box , its like an indicator and a place holder is as the name suggests placed there to show what to fill in the box (form)!>
+        <!lets add a form to put a phone number in with a label phone !>
+
+        <label for="phone">Phone</label>
+        <input id="phone" name=""phone" type="tel" required placeholder="+251 9XX XXX XXX">
+        <!input is the one that actually takes the data from the user !>
+        <! there are several input types that we use for different purposes !>
+        <! for example text is for text input , number is for number input , email is for email input ,tel is for telephone input , date shows us a calendar input  select is a drop down menu !>
+        <input id="email" name="email" type="email" required placeholder="example@example.com">
+        <input id="date" name="date" type="date" required placeholder="YYYY-MM-DD">
+        <input id="number" name="number" type="number" required placeholder="123456789">
+        <input id="password" name="password" type="password" required placeholder="********">
+        <input id="search" name="search" type="search" required placeholder="Search">
+        <input id="url" name="url" type="url" required placeholder="https://example.com">
+        <input id="time" name="time" type="time" required placeholder="HH:MM:SS">
+        <input id="week" name="week" type="week" required placeholder="YYYY-Www">
+
+     
+        <!validation this runs before the form is submitted and it allows us to catch errors before the form is submitted!>
+        <!are attributes eg: required -- makes a field a must fill catagory , minlength/maxlength -- makes sure the field is not empty and has a certain length , min/max -- makes sure the field is not empty and has a certain value ,type="email" is for email input ,pattern -- is for a regular expression that must be met !>
+        <label for="tel">Tel</label>
+        <input id="tel" name="tel" type="tel" 
+            required
+            pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+            placeholder="123-456-7890"
+            aria-describedby="tel-help">
+        <p id="tel-help">format: +251 followed by 9-digits</p>
+        <label for="size">Party Size</label>
+        <input id="size"name="size" type="number" min="1" max="12" required>
+    <!we use a button to submit this form at the end !>
+    <button type="submit">Submit</button>
+        </form>  
+<! Tables :are used to display data in a structured way !>
+<!use it for a genuine table or list of data , do not use it to position that is for css flexbox and grid !>
+
+<! there are diffrent elements used ton make a table !>
+<! thead is used to make the header of the table !>
+<! tbody is used to make the body of the table !>
+<!tfoot is used to make the footer of the table !>
+<!tr is used to make a row !>
+<!th is used to make a header !>
+<!caption is used to announce the whole table !>
+<!scope attribute is used to tell the table what column it is in !>
+
+<table>
+    <caption>Addis branch opening hours</caption>
+    <thead>
+        <th scope="col" >Branch</th>
+        <th scope="col">Opening Hours</th>
+        <th scope="col">Closing Hours</th>
+    </thead>
+    <tbody>
+        <tr>
+            <th scope="row">Addis</th>
+            <td>8:30</td>
+            <td>17:00</td>
+        </tr>
+    </tbody>
+</table>
+
+<! Media :are used to display images and videos !>
+<! use it for images and videos !>
+<!images -responsivness,accesibility!>
+<img src="https://picsum.photos/200/300" alt="image" width="200" height="300" loading="lazy">
+<!the are diffrent attributes used above to make image responsive alt is used if pictuer is not visible for ssome reason to hold its place and also tales screen reader what it is loading attribute does not load the image untill it is in the viewport !>
+<!video and audio are used to put  videos and audio inside our websites !>
+<!eg>
+<video src="https://www.w3schools.com/html/mov_bbb.mp4" controls width="320" height="240" poster="poster-image.jpg"></video>
+<!controls is used to make the video playable !>
+<!width and height are used to set the size of the video !>
+<!poster is used to set a poster image !>
+<audio cotrols>
+    <source src="https://www.w3schools.com/html/horse.ogg" type="audio/ogg">
+</audio>
+<!audio controls are used to play audio !>
+
+
+<! iframes are used to embed other websites inside our websites !>
+<!eg>
+<iframe 
+src=""https://maps.example/?q=Bole"
+title="map of Bole"
+width="600"
+height="450"
+loading="lazy"
+sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock allow-top-navigation allow-modals allow-popups-to-escape-sandbox"></iframe>
+</iframe>
+<!iframe is used to embed other websites inside our websites !>
+<!src is used to set the url of the website to be embedded !>
+<!title is used to set the title of the website to be embedded !>
+<!width and height are used to set the size of the website to be embedded !>
+<!loading is used to tell the browser to load the iframe when it is in the viewport !>
+<!sandbox is used to tell the browser to allow the website to be embedded inside our website !> 
+
+<!accesibility and semantic html are used to make our websites more accessible and easy to use !>
+<!this are useful to users who have disabilities !>
+<! the main idea is to make our websites more accessible and easy to use !>
+<!alt text & ARIA  makes our website more accesible by telling reader what everything is and also by making our websites more easy to use !>\
+<!alt text is used to tell screen reader what the image is !>
+<!ARIA is used to tell screen reader what the image is !>
+<! can also be used to skip decorative images !>
+
