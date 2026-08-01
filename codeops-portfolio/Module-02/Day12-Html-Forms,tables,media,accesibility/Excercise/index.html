@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habesha Eatery</title>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Reservations</a> . <a href="contact.html">Contact</a>
+    <header><h1>Habesha Eatery</h1></header>
+    <form action="/reservation" method="post">
+        <label for="name">Name</label>
+        <input id="name" type="text" required><br><br>
+        <label for="tel">Tel</label>
+        <input id="tel" type="tel" pattern="09XXXXXXXX"  required><br><br>
+        <label for="guest" >Guests</label>
+        <input id="guest" type="number" min="1" max="20" required><br><br>
+        <label for="date">Date</label>
+        <input id="date" type="date" required><br><br>
+        <button type="submit">Reserve</button>
+    </form><br><br>
+    <table>
+        <caption><strong>Menu</strong></caption>
+        <thead>
+            <th>Foods</th>
+            <th>prices(ETB)</th>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row" >Doro wot</th>
+                <td>650</td>
+            </tr>
+            <tr>
+                <th scope="row">Agelgel</th>
+                <td>1200</td>
+            </tr>
+            <tr>
+                <th scope="row">Kitfo</th>
+                <td>1500</td>
+            </tr>
+            <tr>
+                <th scope="row">Tibs</th>
+                <td>1000</td>
+            </tr>
+            <tr>
+                <th scope="row">Shiro</th>
+                <td>500</td>
+        </tbody>
+    </table><br><br>
+    <img src="./images/mlk.jpg" alt="Hero" loading="lazy">
+    <iframe
+        src="https://maps.example/?q=Bole"
+        title="map of Bole"
+        width="600"
+        height="450"></iframe>
+<footer>Bole, Addis Ababa, Ethiopia | Phone: +251 9XXXXXXXX | Email:Habesha@eatery</footer>
+
+</body>
+</html>
