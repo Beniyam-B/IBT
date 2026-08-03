@@ -1,0 +1,67 @@
+/* exercises
+1, Write a :root block with at least four custom properties — two colors, one spacing value, one font stack — then build a styled button that uses all four via var().  */
+:root{
+    --color: black;
+    --background-color: red;
+    --spacing: 1rem;
+    --font-stack: Arial, sans-serif;
+}
+button{
+    background-color: var(--background-color);
+    color: var(--color);
+    font-size: var(--spacing);
+    font-family: var(--font-stack);
+    padding: var(--spacing);
+    border: none;
+    border-radius: 5px;
+}
+
+/* 2. Take a 300px-wide card with 24px padding and a 2px border. Show its rendered width with 
+content-box, then fix it to exactly 300px with border-box.  */
+div.box{
+    width: 300px;
+    padding: 24px;
+    border: 2px solid rgb(219, 84, 84);
+    box-sizing: border-box;
+}
+div.card{
+    width: 300px;
+    padding: 24px;
+    border: 2px solid rgb(219, 84, 84);
+    box-sizing: content-box;
+}
+/* 3. Given a paragraph that is targeted by an element, a class and an ID rule all setting color, 
+predict which wins and explain the specificity score for each. */
+#HP{
+    color: red; /* ID selector specificity: 100 */
+}
+.hparagraph{
+    color: blue; /* Class selector specificity: 10 */
+}
+p{
+    color: green; /* Element selector specificity: 1 */
+
+}
+/* 4. Style a five-row table for an Ethiopian Airlines schedule: zebra rows with tr:nth-child(even), a 
+styled header row, and comfortable cell padding.  */
+table{
+    border-collapse: collapse;
+}
+thead tr{
+    background-color: green;
+    background-color: rgb(0,255,0);
+    color: white;
+}
+tr:nth-child(even){
+    background-color:gray;
+    background-color: hsl(120,100%,50%);
+}
+td{
+    padding: 5px;
+}       
+th{
+    padding: 5px;
+}
+/* 5. Convert a three-color hex palette into both rgb() and hsl(). For the hsl version, produce a lighter 
+hover shade of each by changing only the lightness.  */
+

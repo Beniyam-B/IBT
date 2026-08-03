@@ -1,0 +1,231 @@
+Css -cascading style sheet is used dto change the apperance of a webpage or an html page.
+you should remember separationg each part of html into diffrent scopes (eg : nav,header,footer,...) because they are used to style those parts , but also elements names can be used aswell(table,form,figure,heading...)
+
+Selectors,speecificity and cascade
+there is three ways to apply style into webpage
+
+inline --which is using the style attribute inside the elements
+
+internal - we add a <style> </style> block insid ethe page in <head></head> element that will affect thata page 
+
+external - a .css file that has the style sheet will be linked to the page 
+use <link relation = atylesheet href="./style.css">inside the head  
+
+there are diffrent kinds of Selectors
+h1 {} -- is a type selector all h1 will be affected 
+.price {} -- class Selector
+#nav {} -- is an id Selector
+a[target] {} -- attribute Selector
+input:focus {} --this is a state selectro
+
+Combinators:selects in some context
+you use it to style when that element appears
+there are diffrent types(decendant,child,adjecent,general/sibling,group)
+eg:decendant selects all the elements that are decendants of the element
+.price+p {} -- selects all the p elements that are decendants of the .price element
+sibling selects all the elements that are siblings of the element
+.price~p {} -- selects all the p elements that are siblings of the .price element
+child selects all the elements that are children of the element
+h1 p {} -- selects all the p elements that are children of the h1 element
+h1 > p {} -- selects all the p elements that are children of the h1 element
+h1 + p {} -- selects all the p elements that are siblings of the h1 element
+adjecent selects all the elements that are adjecent to the element
+h1 + p {} -- selects all the p elements that are adjecent to the h1 element
+general sibling selects all the elements that are general siblings of the element
+p ~ p {} -- selects all the p elements that are general siblings of the p element
+group selects all the elements that are group of the element
+p, a {} -- selects all the p and a elements that are group of the p and a element
+
+order matters:0-1-0 rule of tumb is used to put which one first when combinig diffrent selectors (id-class-type)
+eg:h1.price {} will be applied to h1 elements that have a class of price
+if there is diffrent order like h1.price {} and .price h1 {} then the last one will be applied  
+if we want to use id the order should be #id.class type
+eg:#nav.active nav {} will be applied to nav elements that have a class of active and an id of nav
+
+
+Cascade & Inheritance
+
+cascade resolves conflicts in order
+cascading is when several rules target the same element what decides which rule is applied?
+-it is decided by the importance of the rules
+-the more important the rule the higher it is in the cascade
+-then its decided on specifity
+-specifity is the number of selectors in the rule
+-the more selectors the higher the specifity
+-and the last one that would affect them is the last one in the cascade
+-if there is no conflict then the last one is applied
+-inheretance is when the same property is applied to different elements
+-eg:h1 {color:red} and h2 {color:red} then the color will be red for h1 and h2 elements
+using inheritance we can use the same property for different elements
+-eg: h2{inherit} will make the color red for h2 elements insted of rewriting its
+
+first we have the origin  eg:the origin is : h1 {}
+then we have the speficities eg:the speficities is : h1.price {}
+then we have the inline styles eg:the inline styles is : h1.price {color:red;}
+then we have the internal styles eg:the internal styles is : h1 {color:red;}
+then we have the external styles eg:the external styles is : @import url(style.css);
+
+inheritance is the process of passing down the cascade
+eg:h1 will inherit the cascade from h1.price
+then source order eg:the source order is : h1.price {color:red;} then h1 {color:red;}
+
+selector specificity
+the more specific the selector the higher the specifity
+h1 will have the highest specifity
+h1.price will have the second highest specifity
+h1.price.active will have the third highest specifity
+which means that h1.price.active will have the highest specifity and will affect the exact element that has the class price and the id nav
+
+
+
+The Box Model
+every element in a browser renders in a rectangular box that has four layers 
+content,padding,border,margin
+
+content-is the content of the element
+
+padding-is the space between the border and the content
+
+border-is the space between the content and the margin
+
+margin-is the space between the border and the edge of the browser or other elements
+
+Box-sizing --is a property that is used to change the box model of an element
+
+by default the content box width is sets only the content box padding and border are added on top.
+so when you try to change the padding and border of an element the content box width will not change
+so to change the content box width you have to use box-sizing property
+eg:{box-sizing:border-box;} this will change the content box width
+
+dissplay- how an element is displayed inside a box:
+
+block , inline ,inline-block,list-item,table,inline-table
+
+block is the most common display type it behaves like a paragraph, new line, fullwidth eg:div,p,h1,section
+
+inline is the display type that behaves like a line eg:span,a,b,i,strong,em
+
+inline-block is the display type that behaves like a block but in the same line eg:img,input,button
+
+list-item is the display type that behaves like a list item eg:li
+
+table is the display type that behaves like a table eg:table
+
+inline-table is the display type that behaves like a table but in the same line eg:table
+
+spacing shorthand property
+padding and margin accept shorthand property they run clockwise top,right,bottom,left eg:margin:10px 20px; is the same as margin:10px 20px 10px 20px;
+
+
+toptography :this makes page feel more professional and organized by making it readable
+comes down to font size and line height
+
+fonts and font stacks
+font is the property that is used to change the font eg:font:arial;
+a stack is a group of fonts that are used to change the font eg:font-family:arial,helvetica,sans-serif;
+
+sizing units - px,em,rem,%
+px is the unit of length in css
+em is the unit of length in css relative to the font size
+rem is the unit of length in css relative to the font size of the root element
+% is the unit of length in css relative to the parent element
+eg:font-size:2em; is the same as font-size:32px; some of this positionigs are not optimal based on the conditions:
+eg:px might not be good if devices change the resolution
+eg:em might not be good if the font size changes
+eg:rem might not be good if the font size changes
+eg:% might not be good if the font size changes
+
+positioning shorthand property
+top,right,bottom,left,z-index,float
+top,right,bottom,left are the positioning properties
+z-index is the stacking order of the element
+float is the way the element moves inside the box
+
+clear property
+clear:both; clears the floats
+clear:left; clears the left float
+clear:right; clears the right float 
+clear:none; doesnt clear the floats     
+
+color system
+color is the property that is used to change the color eg:color:red;
+
+color keywords
+black,silver,gray,white,maroon,red,purple,fuchsia,green,lime,olive,yellow,navy,blue,teal,aqua
+
+color codes
+#000,#111,#222,#333,#444,#555,#666,#777,#888,#999,#aaa,#bbb,#ccc,#ddd,#eee,#fff
+
+hexadecimal notation
+hexadecimal notation is used to write the color codes
+the first two digits are for the red color
+the third two digits are for the green color
+the forth two digits are for the blue color
+the fifth two digits are for the alpha channel
+eg:#f00 is the same as #ff0000
+
+rgb notation
+rgb notation is used to write the color codes
+the first three digits are for the red color
+the second three digits are for the green color
+the third three digits are for the blue color
+eg:rgb(255,0,0) is the same as #ff0000
+
+rgba notation
+rgba notation is used to write the color codes
+the first three digits are for the red color
+the second three digits are for the green color
+the third three digits are for the blue color
+the forth three digits are for the alpha channel
+eg:rgba(255,0,0,0.5) is the same as #ff000080
+
+hsl notation
+hsl notation is used to write the color codes
+the first three digits are for the hue
+the second three digits are for the saturation
+the third three digits are for the lightness
+eg:hsl(120,100%,50%) is the same as #ff8000
+
+hsla notation
+hsla notation is used to write the color codes
+the first three digits are for the hue  
+the second three digits are for the saturation
+the third three digits are for the lightness
+the forth three digits are for the alpha channel
+eg:hsla(120,100%,50%,0.5) is the same as #ff800080              
+
+where color is applied
+color is applied to the text color,background color,border color,outline color
+
+background shorthand property
+background-color,background-image,background-repeat,background-attachment,background-position,background-size
+
+background-color is the property that is used to change the background color eg:background-color:red;
+background-image is the property that is used to change the background image eg:background-image:url(image.jpg);
+background-repeat is the property that is used to change the background repeat eg:background-repeat:no-repeat;
+background-attachment is the property that is used to change the background attachment eg:background-attachment:fixed;
+background-position is the property that is used to change the background position eg:background-position:center;
+background-size is the property that is used to change the background size eg:background-size:cover;
+
+psuedo classes
+:link,:visited,:hover,:active,:focus,:first-child,:last-child,:only-child,:nth-child,:nth-last-child,:first-of-type,:last-of-type,:only-of-type,:nth-of-type,:nth-last-of-type
+
+:link is the property that is used to change the color of the links when they are not visited
+:visited is the property that is used to change the color of the links when they are visited
+:hover is the property that is used to change the color of the links when they are hovered
+:active is the property that is used to change the color of the links when they are active
+:focus is the property that is used to change the color of the links when they are focused
+:first-child is the property that is used to change the color of the links when they are the first child
+:last-child is the property that is used to change the color of the links when they are the last child
+:only-child is the property that is used to change the color of the links when they are the only child
+:nth-child is the property that is used to change the color of the links when they are the nth child
+:nth-last-child is the property that is used to change the color of the links when they are the nth last child
+:first-of-type is the property that is used to change the color of the links when they are the first of type
+:last-of-type is the property that is used to change the color of the links when they are the last of type
+:only-of-type is the property that is used to change the color of the links when they are the only of type
+:nth-of-type is the property that is used to change the color of the links when they are the nth of type     
+:nth-last-of-type is the property that is used to change the color of the links when they are the nth last of type  
+
+pseudo elements
+::before and ::after are pseudo elements that are used to add content before or after an element
+::first-letter and ::first-line are pseudo elements that are used to add content before or after an element 
