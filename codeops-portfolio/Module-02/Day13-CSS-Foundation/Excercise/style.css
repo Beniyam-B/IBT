@@ -1,0 +1,41 @@
+:root{
+    --brand:hsl(212,68%,33%);
+    --brand-hover:hsl(212,68%,20%);
+    --space:15px;
+    --radius:10px;
+}
+* {
+    box-sizing:border-box;
+}
+body {
+    font-family:"Inter", sans-serif;
+    line-height:1.89;
+}
+.card {
+    max-width:360px;
+    margin:40px auto;
+    padding:var (--radius);
+    border:3px solid darkblue;
+    background: lightblue
+}
+.btn:hover{background:var(--brand-hover);}
+.btn:active{background:var(--brand);}
+.form{
+    display:flex;
+    flex-direction:column;
+    gap:var(--space);
+    padding:var(--space);
+}
+#name{
+    background:rgba(216, 234, 245, 0.466)
+
+}
+#name:hover{background:rgb(0, 255, 255)}
+#email{
+    background:rgba(216, 234, 245, 0.466)
+}
+#email:hover{background:rgb(0, 255, 255)}
+#message{
+    background:rgba(216, 234, 245, 0.466)
+}
+#message:hover{background:rgb(0, 255, 255)}
