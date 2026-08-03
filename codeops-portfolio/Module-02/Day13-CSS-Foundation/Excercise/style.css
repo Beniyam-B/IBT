@@ -1,3 +1,16 @@
+h1{
+    color:var(--brand);
+    font-size:2rem;
+    text-align:center;
+    font-family:"fantasy", Papyrus;
+}
+
+h4{
+    color:var(--brand);
+    font-size:1rem;
+    text-align:center;
+}
+
 :root{
     --brand:hsl(212,68%,33%);
     --brand-hover:hsl(212,68%,20%);
