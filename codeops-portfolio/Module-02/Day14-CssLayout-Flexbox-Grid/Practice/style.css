@@ -1,0 +1,121 @@
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0.5rem;
+    gap:1rem;
+    background-color:rgb(23, 26, 27);
+    color:white;
+    margin-bottom: 1rem;
+}
+.navbar a{
+    text-decoration:none;
+    color:Gray;
+    font-size:1.2rem;
+}
+.navbar a:hover{
+    color:rgb(0, 191, 255);
+}
+.logo{
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;      /* Makes the rectangular image perfectly circular */
+  object-fit: cover;       /* Ensures image fills the circle without distortion */
+  border: 2px solid #38bdf8; /* Optional border accent */
+  text-align: center;
+  padding: 0.5rem;
+}
+.btn:hover{
+    background-color:rgb(0, 191, 255);
+    color:rgb(45, 10, 243);
+}
+.btn{
+    padding:0.5rem 1rem;
+    background-color:rgb(38, 38, 38);
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+.cards{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    gap:1rem;
+    
+}
+.card{
+    width:30%;
+    height:200px;
+    background-color:lightblue;
+    
+}
+.gallery{
+    display:grid;
+    grid-template-columns:repeat( autofit, minmax(200px,1fr));
+    grid-template-rows:repeat(auto-fill,minmax(200px,1fr));
+    grid-gap:10px;
+    border:1px solid black;
+    padding:1rem;
+    width:100%;
+}
+.pdtCard{
+    display:flex;
+    justify-content:center;
+    background-color:rgb(88, 189, 155);
+    color:rgb(0, 0, 0);
+    padding:1rem;
+    margin-top:1rem;
+    flex-wrap: wrap;
+
+}
+.pdtCard{
+    display:flex;
+    justify-content:center;
+    position:relative;
+    width:100%;
+    align-items:center;
+    background-colour:#3e5c8d;
+    border-radius:0.75rem;
+    overflow:hidden;
+    color:#f8fafc;
+    
+}
+.sale{
+    position:absolute;
+    top:-8px;
+    left: -1px;
+
+width: 54px;
+height: 54px;
+border-radius: 50%;
+background-color: rgb(134, 248, 68);
+color: rgb(3, 63, 30);
+font-weight: 700;
+display: flex;
+justify-content: center;
+align-items: center;
+font-size: 1rem;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+z-index: 10;
+}
+.product-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+.product-body {
+  padding: 1.25rem;
+}
+
+.product-title {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+.product-price {
+  color: #b7f3a5;
+  font-size: 1rem;
+  font-weight: 600;
+}

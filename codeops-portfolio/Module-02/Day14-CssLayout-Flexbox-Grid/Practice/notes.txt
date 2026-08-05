@@ -1,0 +1,126 @@
+Flexbox is a one-dimensional layout system. When a parent uses display: flex, it becomes a flex container and its direct children become flex items.
+
+The main axis is the direction of flex-direction, which is row by default. The cross axis is perpendicular to the main axis. If you set flex-direction to column, the axes swap, but alignment behaves the same way.
+
+Example of a nav container:
+.nav { display: flex; flex-direction: row; gap: 16px; }
+
+Container properties:
+- flex-direction controls whether the main axis is a row or a column.
+- flex-wrap decides whether items stay on one line or wrap to a new line.
+- justify-content aligns items along the main axis.
+- align-items aligns items along the cross axis.
+- align-self overrides align-items for a single item.
+- gap adds spacing between items without extra margins.
+
+Possible justify-content values include flex-start, center, flex-end, space-between, space-around, and space-evenly.
+
+To center content on both axes, use:
+.hero { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+
+Item sizing in flex layout uses flex-grow, flex-shrink, and flex-basis.
+- flex-grow defaults to 0 and controls how much an item takes from extra space.
+- flex-shrink defaults to 1 and lets an item shrink when the container is too small. Setting it to 0 prevents shrinking.
+- flex-basis defaults to auto and is the starting size before growing or shrinking.
+
+Shorthand flex: grow shrink basis makes these values easier to write.
+- flex: 1 means the item grows equally with other flexible items.
+- flex: 0 0 200px means the item is fixed at 200px and does not grow or shrink.
+- flex: auto means the item sizes itself to its content and then grows if there is extra space.
+- flex: 2 means the item receives twice the extra space compared to flex: 1.
+
+When both width and flex-basis are set on a flex item, flex-basis takes precedence. Prefer using flex-basis inside flex layouts.
+
+A common sidebar pattern is:
+.sidebar { flex: 0 0 240px; }
+.main { flex: 1; }
+
+The order property changes only the visual order, not the HTML order, so do not use it to fix reading order or accessibility.
+
+For a responsive navbar, allow wrapping:
+.navbar { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 12px 24px; }
+.navbar .links { display: flex; gap: 16px; }
+
+Using flex-wrap: wrap lets items move to a new line instead of overflowing.
+
+---
+
+CSS Grid is a two-dimensional layout system, letting you define rows and columns.
+
+Example grid container:
+.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+The fr unit represents a fraction of the available space. repeat(N, track) reduces repetition when defining columns.
+
+Some common column definitions are:
+- 1fr 1fr 1fr for three equal columns.
+- 2fr 1fr for a first column that is twice as wide as the second.
+- 250px 1fr for a fixed sidebar with a flexible main column.
+
+Grid placement uses lines, not cells. A three-column grid has four vertical grid lines numbered 1 through 4.
+
+For example:
+.feature { grid-column: 1 / 3; grid-row: 1; }
+.tall { grid-row: span 2; }
+
+Tracks you define are explicit. Extra items beyond those tracks create implicit tracks, which are sized by grid-auto-rows or grid-auto-columns.
+
+Named template areas let you describe layout like a map.
+.page { display: grid; grid-template-columns: 240px 1fr; grid-template-areas: "header header" "sidebar main" "footer footer"; }
+.site-header { grid-area: header; }
+.side { grid-area: sidebar; }
+.main { grid-area: main; }
+.foot { grid-area: footer; }
+
+This approach makes layout easier to read. To make it responsive, redefine the grid in a media query, for example at smaller widths change the grid-template-columns to 1fr.
+
+A powerful adaptive grid pattern is:
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+
+auto-fit packs as many columns as fit and lets cards stretch to fill the row. auto-fill keeps empty tracks and may leave gaps. minmax(220px, 1fr) means each column is at least 220px and can grow.
+
+---
+
+Positioning changes how elements participate in layout.
+
+static is the default. The element stays in the normal document flow and top/right/bottom/left do nothing.
+relative keeps the element in flow while allowing it to be shifted by offset properties, and it still reserves its original space.
+absolute removes the element from the normal flow and positions it relative to the nearest ancestor with position other than static.
+fixed removes the element from flow and pins it to the viewport, so it stays visible while scrolling.
+sticky acts like a normal element until it reaches a scroll threshold, then it sticks in place.
+
+Top, right, bottom, and left only work when position is relative, absolute, fixed, or sticky.
+
+A common badge pattern uses a relative parent and an absolute child:
+.card { position: relative; }
+.card .badge { position: absolute; top: 8px; right: 8px; }
+
+If the parent has no positioning set, the absolute child will anchor to the page instead of the parent.
+
+fixed is useful for a persistent top bar, back-to-top button, or chat widget. It is removed from flow and can overlap content, so body padding should match the bar height if needed.
+sticky is useful for section headers and table headings. It requires a scrollable parent and no overflow: hidden on ancestor elements.
+
+z-index controls stacking order for positioned elements. Higher values appear on top. Each positioned ancestor can create a new stacking context.
+.modal-backdrop { z-index: 100; }
+.modal { z-index: 101; }
+.tooltip { z-index: 200; }
+
+Use a simple scale such as 10, 100, 200. If z-index seems not to work, check for missing position or an ancestor that created a new stacking context.
+
+---
+
+Choose Flexbox when layout is one-dimensional, like a row or a column. Flexbox is best for aligning items in a line such as navbars, toolbars, or button groups. It is also helpful when content size drives spacing and when items should wrap naturally.
+
+Choose Grid when layout is two-dimensional, with both rows and columns. Grid is best for page structure or card galleries, especially when items need to align across rows and columns and the layout determines placement.
+
+Grid is for the page skeleton, and Flexbox is for components inside it. One axis means Flexbox. Two axes means Grid.
+
+A combined page structure example uses grid for the page and flexbox for the navbar and card interiors:
+.page { display: grid; grid-template-rows: auto 1fr auto; min-height: 100vh; }
+.navbar { display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; }
+.menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.card { display: flex; flex-direction: column; }
+
+Grid defines the page skeleton, Flexbox aligns items inside the header and cards, and sticky keeps the navbar visible while scrolling.
+
+
