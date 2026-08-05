@@ -1,0 +1,191 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:Arial,sans-serif;
+background:white;
+}
+
+.top-bar{
+height:55px;
+background:#14d303;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 70px;
+}
+
+.top-links{
+display:flex;
+align-items:center;
+gap:30px;
+}
+.top-links a:hover{
+    color:blue;
+}
+
+.top-links a,
+.dropbtn{
+text-decoration:none;
+color:white;
+font-size:14px;
+font-family:Arial,sans-serif;
+background:none;
+border:none;
+cursor:pointer;
+padding:0;
+display:block;
+}
+
+.dropbtn:hover{
+color:white;
+}
+
+.top-right{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.top-right select{
+height:30px;
+width:90px;
+border:none;
+padding:5px;
+}
+
+.top-right input{
+height:30px;
+width:160px;
+border:none;
+padding-left:10px;
+}
+
+.navbar{
+height:85px;
+background:white;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 70px;
+}
+
+.logo{
+display:flex;
+align-items:center;
+}
+
+.logo-image img{
+width:195px;
+height:55px;
+object-fit:contain;
+}
+
+.nav-menu{
+list-style:none;
+display:flex;
+align-items:center;
+gap:25px;
+}
+
+.nav-menu li{
+position:relative;
+}
+
+.nav-menu li a{
+text-decoration:none;
+color:#222;
+font-size:15px;
+padding:30px 5px;
+display:block;
+}
+
+.nav-menu li a:hover{
+color:#00a908;
+}
+
+.dropdown{
+position:relative;
+}
+
+.dropdown-content{
+display:none;
+position:absolute;
+top:70px;
+left:0;
+background:white;
+width:200px;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+z-index:100;
+}
+
+.dropdown-content a{
+display:block;
+padding:12px 15px;
+color:#222;
+font-size:14px;
+text-decoration:none;
+border-bottom:1px solid #ddd;
+}
+
+.dropdown-content a:hover{
+background:#14d303;
+color:white;
+}
+
+.dropdown:hover .dropdown-content{
+display:block;
+}
+
+.hero{
+height:calc(100vh - 140px);
+overflow:hidden;
+}
+
+.hero-grid{
+display:grid;
+grid-template-columns:45% 55%;
+height:100%;
+}
+
+.hero-left{
+background:#03ff0f;
+position:relative;
+overflow:hidden;
+}
+
+.green-shape{
+width:100%;
+height:100%;
+position:relative;
+}
+
+.curve{
+position:absolute;
+right:-180px;
+top:-100px;
+width:500px;
+height:800px;
+background:#14d303;
+border-radius:50%;
+}
+
+.hero-right{
+height:100%;
+overflow:hidden;
+}
+
+.image{
+width:100%;
+height:100%;
+}
+
+.image img{
+width:100%;
+height:100%;
+object-fit:cover;
+display:block;
+}
