@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Habesha Eatery</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <header>
+        <nav class="navbar">
+            <a href="#" class="logo">Habesha <span>Eatery</span></a>
+            <nav class="navbar-nav">
+                <a href="#About" class="nav-link">About</a>
+                <a href="#menu" class="nav-link">Menu</a>
+                <a href="#reserve" class="nav-link">Reserve</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </nav>
+        </nav>
+    </header>
+    <body>
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1 class="hero-title">Habesha Eatery</h1>
+            <p class="hero-text">Location: Bole,Addis Ababa</p>
+            <h2>Respect , Represent and Serve <em>Authenticlly Ethiopian!</em></h2>
+            <p class="hero-sub">A family kitchen plating the recipes we grew up on — slow-simmered, shared from one plate.</p>
+            <a href="#reserve" class="hero-btn hero-btn-primary">Reserve Table</a>
+        </div>
+    </section>
+    <section class="about" id="About">
+        <div class="about-content">
+            <h2>Our story</h2>
+    <p>Habesha Eatery opened in 2014 ETC from a single family recipe book. Every wot simmers for hours in our own berbere blend, and the injera is fermented fresh each morning. We serve food the way it's shared at home — from one plate, with your hands, together.</p>
+        </div>
+
+    </section>
+    <section class="menu" id="menu">
+        <h2>Our Menu</h2>
+        <div class="menu-grid">
+    <article class="card">
+    <span class="badge">Popular</span>
+    <h3>Doro Wat</h3>
+    <p class="desc">Slow-simmered chicken in berbere sauce, hard-boiled egg, served with injera.</p>
+    <p class="price">ETB 320</p>
+    </article>
+    <article class="card">
+    <h3>Tibs</h3>
+    <p class="desc">Pan-seared beef with onion, rosemary and jalapeño.</p>
+    <p class="price">ETB 1200</p>
+    </article>
+        
+    <article class="card">
+    <h3>Kitfo</h3>
+    <p class="desc">Minced beef warmed in spiced butter, served leb leb with ayib and gomen.</p>
+    <p class="price">ETB 1360</p>
+    </article>
+    <article class="card">
+    <h3>Shiro Wat</h3>
+    <p class="desc">Ground chickpea stew simmered with garlic, ginger and berbere.</p>
+    <p class="price">ETB 220</p>
+    </article>
+    <article class="card">
+    <h3>Gomen</h3>
+    <p class="desc">Collard greens sautéed with garlic and green chili.</p>
+    <p class="price">ETB 250</p>
+    </article>
+    <article class="card">
+    <h3>Beyaynetu</h3>
+    <p class="desc">A vegetarian sampler platter — five stews on fresh injera.</p>
+    <p class="price">ETB 500</p>
+    </article>
+        </div>
+
+    </section>
+    <section class="reserve" id="reserve">
+        <h2>Reserve a table</h2>
+        <form class="reserve-form" action="#" method="post">
+            <div class="field full">
+                <label for="name">Name</label>
+                <input type="text" name="name" id="name" placeholder="Your name" required>
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" placeholder="Your email" required>
+            </div>
+            <div class="field">
+                <label for="phone">Phone</label>
+                <input type="tel" name="phone" id="phone" placeholder="Your phone" pattern="[+251 9]{XXXXXXXX}" required>   
+                </div>
+            <div class="field">
+                <label for="date" class="date">Date</label>
+                <input type="date" name="date" id="date" required>
+                </div>
+            <div class="field">
+                <label for="time" class="time">Time</label>
+                <input type="time" name="time" id="time" required>
+                </div>
+            </div>
+            <div class="field">
+                <label for="guest">Guests</label>
+                    <input type="number" name="guest" id="guest" placeholder="Guests" min="1" max="12" required>
+            </div>
+            <button type="submit" class="hero-btn hero-btn-primary">Reserve</button>
+        </form>
+    </section>
+    <footer class="footer">
+        <div class="footer-col">
+            <h3>Habesha Eatery</h3>
+            <p>Location: Bole,Addis Ababa</p>
+        </div>
+        <div class="footer-col">
+            <h3 id="contact">Contact</h3>
+            <p>+251 911121314</p>
+        </div>
+        <div class="footer-col">
+            <h3>Hours</h3>
+            <p>Mon-Sat 5:00 AM-4:00 PM (LT)</p>
+            <p>Sun 6:00 AM-9:00 PM (LT)</p>
+        </div>
+    </footer>
+    </body>
+</html>

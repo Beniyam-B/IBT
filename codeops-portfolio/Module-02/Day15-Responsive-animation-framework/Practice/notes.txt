@@ -1,0 +1,126 @@
+Day 15 — Responsive Design, Animation & Frameworks
+
+Responsive Design
+
+Viewport meta tag tells the browser to use the real device width. Without it phones pretend to be ~980px wide and shrink the page to unreadable text. Goes in the head:
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+Mobile-first: write the base CSS for the smallest screen, then add media queries that enhance for larger ones — build up, not down. Most Ethiopian traffic is on phones over mobile data, so this keeps the base lightweight and layers richness on top.
+
+.menu { grid-template-columns: 1fr; }  /* base: phone */
+
+@media (min-width: 768px) {
+  .menu { grid-template-columns: 1fr 1fr; }
+}
+
+Media queries apply CSS only when a condition is true. min-width queries fit mobile-first — add rules as the screen grows. Common breakpoints: 640px, 768px, 1024px, 1280px. Pick breakpoints where your layout actually breaks, not by device names — widen the window slowly, the moment it looks awkward is a breakpoint.
+
+Fluid units:
+- % — fluid widths inside a parent
+- rem — font sizes that respect user prefs
+- vw / vh — full-screen heroes, hero text
+- clamp(min, ideal, max) — one value covering min/ideal/max
+- max-width — caps a container on big screens
+
+h1 { font-size: clamp(1.5rem, 5vw, 3rem); }
+img { max-width: 100%; height: auto; }
+
+Golden image rule: max-width 100% plus height auto stops images overflowing and keeps proportions. srcset lets the browser pick a small image on phone, large on desktop — faster pages, less data:
+
+<img src="small.jpg" srcset="small.jpg 480w, large.jpg 1200w" sizes="(max-width:600px) 480px, 1200px">
+
+Responsive layout patterns:
+- Stack → Row — columns stack on mobile, sit side by side on desktop
+- Fluid Grid — auto-fit + minmax reflows cards with no breakpoints
+- Off-canvas Nav — hamburger menu slides in on small screens
+- Content Cap — max-width on the body so text never gets too wide
+- Priority +/– — hide secondary content on mobile, show on desktop
+- Fluid Type — clamp() scales headings smoothly between sizes
+
+Transitions & Animation
+
+A transition animates a property between two states — name the property, a duration, an easing curve. Triggered by :hover, :focus, or a class toggle. transition: all is tempting but slow — name the actual properties.
+
+.btn {
+  background: #0A1F3D;
+  transition: background 200ms ease, transform 200ms ease;
+}
+.btn:hover {
+  background: #1B4D8E;
+  transform: translateY(-2px);
+}
+
+Easing options:
+- ease — natural, default
+- linear — constant, mechanical
+- ease-in-out — gentle both ends
+- cubic-bezier() — fully custom
+
+UI transitions feel best at 150–300ms — slower feels sluggish, faster gets missed.
+
+Transforms move, scale and rotate without triggering layout reflow:
+- translate(x, y) — move without reflow
+- scale(1.05) — grow/shrink
+- rotate(5deg) — spin around centre
+- skew(deg) — slant
+
+translate and scale are GPU-accelerated. Animating transform and opacity is smooth at 60fps; animating width, height or margin is janky — stick to transform/opacity. Combine several in one declaration, order matters left to right:
+
+transform: translateY(-4px) scale(1.02);
+
+Keyframes define stages of an animation — from/to, or percentages like 0%, 50%, 100%. The animation property applies it: name, duration, easing, optionally iteration-count and direction. infinite + alternate makes a looping pulse.
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.toast { animation: fade-in 300ms ease-out; }
+
+Respect prefers-reduced-motion — some users feel dizzy or ill from motion, the browser exposes their preference, honoring it is an accessibility requirement not a nicety:
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+Animate only transform/opacity, keep durations short, don't animate many elements at once, motion needs a purpose — feedback, focus, or continuity — and never block content behind an animation.
+
+Tailwind — Utility-First CSS
+
+Utility-first means each class does one thing — padding, colour, radius — composed directly in the HTML instead of a separate stylesheet. No naming things, no hunting for which file styles an element, and a constrained value set keeps spacing and colour consistent.
+
+Traditional: <button class="btn">Reserve</button> plus a .btn rule elsewhere.
+Tailwind: <button class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800">Reserve</button>
+
+Core utilities:
+- p-4, px-2, mt-6 — padding & margin, on a 4px scale (p-1=4px, p-4=16px, p-8=32px)
+- flex, grid, gap-4 — layout
+- bg-navy-900, text-white — colour
+- text-lg, font-bold — typography
+- rounded, shadow, border — surface
+- w-full, max-w-md — sizing
+
+Responsive and state variants, applied as prefixes:
+- sm: md: lg: — applies at that breakpoint and up
+- hover: — on pointer hover
+- focus: — on keyboard focus
+- dark: — in dark mode
+
+An unprefixed class is the mobile base, prefixes layer on for larger screens or states — same mobile-first model as before, expressed inline.
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<h1 class="text-2xl lg:text-4xl">
+
+Repeating the same class list means extract a component — in React, a Button component holds the classes once. tailwind.config.js extends the theme with brand colours, fonts, spacing:
+
+theme: { extend: {
+  colors: {
+    navy: { 900: "#0A1F3D" },
+    gold: "#D4A027",
+  }
+}}
+
+Tailwind is a shortcut over CSS, not a replacement for understanding it — every utility maps to a property already known, px-4 is padding, flex is display:flex.
