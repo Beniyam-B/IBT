@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day19 DOM Practice</title>
+</head>
+<body>
+<header id="header" class="header-footer">
+    <div id="logo">Adiss Market</div>
+    <h1>This is Header</h1>
+    <nav id="nav-bar">
+        <a href="#">Home</a>
+        <a href="#">Contacts</a>
+    </nav>
+</header>
+<main id="main">
+    <section>
+        <h1>Addis Market</h1>
+        <ul id="list">
+            <li class="item">Teff</li>
+            <li class="item">Berbere</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Cities</h2>
+        <ul id="cities"></ul>
+    </section>
+    <section>
+        <h2>Event Bubbling</h2>
+        <div id="wrapper">
+            <button id="myBtn">Click me</button>
+        </div>
+    </section>
+    <section>
+        <h2>Task List</h2>
+        <ul id="taskList">
+            <li>Buy coffee <button class="del">x</button></li>
+            <li>Buy sugar <button class="del">x</button></li>
+        </ul>
+    </section>
+    <section>
+        <h2>Add an item</h2>
+        <form id="quickForm">
+            <input id="quickInput" placeholder="Type something" />
+            <button type="submit">Add</button>
+        </form>
+        <ul id="quickList"></ul>
+    </section>
+</main>
+<footer id="footer" class="header-footer">
+    <h2>This is a footer</h2>
+</footer>
+<script src="./JS/script.js"></script>
+</body>
+</html>
