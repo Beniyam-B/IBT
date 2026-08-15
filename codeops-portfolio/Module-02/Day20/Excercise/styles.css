@@ -1,0 +1,33 @@
+body {
+    font-family: sans-serif;
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 0 16px;
+}
+
+#facts {
+    margin-top: 20px;
+}
+
+.fact {
+    margin: 6px 0;
+}
+
+.fact strong {
+    display: inline-block;
+    width: 110px;
+}
+
+.loading, .error {
+    color: #666;
+}
+
+.error {
+    color: #b00020;
+}
+
+img.flag {
+    width: 120px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+}
