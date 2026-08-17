@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birr Watch</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <h1>Birr Watch</h1>
+        <p class="tagline">Live Exchange Rate For ETB</p>
+    </header>
+    <main>
+        <p id="status" class="status">Loading Rates...</p>
+        <section class="converter card">
+            <h2>Converter</h2>
+            <form id="converter-form">
+                <div class="field">
+                    <label for="amount">Amount(selected currency):</label>
+                    <input id="amount" type="number" value="100" min="0" step="0.01"/>
+
+                </div>
+                <div class="field">
+                    <label for="currency">Currency:</label>
+                    <select id="currency"></select>
+                </div>
+                <div class="action">
+                    <button type="submit" id="watch" class="btn btn-primary">Convert</button>
+                    <!-- <button type="button"  class="btn btn-secondary">Add to Watchlist</button> -->
+                </div>
+
+            </form>
+            <p id="result" class="result"></p>
+        </section>
+        <section class="watchlist-section card">
+            <h2>Watchlist</h2>
+            <ul id="watchlist" class="watchlist"></ul>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
