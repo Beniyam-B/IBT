@@ -2,6 +2,15 @@
 const menuEl = document.querySelector("#menu"); // container for dish cards
 const cartEl = document.querySelector("#cart"); // sidebar cart element
 const searchEl = document.querySelector("#search"); // search input
+const checkoutEl = document.querySelector("#checkout");
+const nameEl = document.querySelector("#name");
+const phoneEl = document.querySelector("#phone");
+const areaEl = document.querySelector("#area");
+const errEl = document.querySelector("#form-error");
+const confirmEl = document.querySelector("#confirmation");
+
+const STORAGE_KEY = "addiseats";
+const PHONE = /^(?:\+251|0)9\d{8}$/;
 
 // Application state object that holds menu data, cart items and UI filter
 const state = {
@@ -11,35 +20,31 @@ const state = {
 };
 
 // Render the visible menu based on `state.dishes` and `state.search`
+
 function render() {
-    // Prepare the search term for case-insensitive matching
-    const term = state.search.toLowerCase();
+  renderMenu();
+  renderCart();
+}
 
-    // Filter dishes whose name includes the search term
-    const shown = state.dishes.filter(d =>
-        d.name.toLowerCase().includes(term)
-    );
+function renderMenu() {
+  const term = state.search.toLowerCase();
+  const shown = state.dishes.filter(d =>
+    d.name.toLowerCase().includes(term));
 
-    // If no results, show an empty state message
-    if (shown.length === 0) {
-        menuEl.innerHTML = `<p class="empty">No dishes found.</p>`;
-    } else {
-        // Map each dish to its HTML card. `join("")` concatenates the array
-        // into a single string to assign to innerHTML efficiently.
-        menuEl.innerHTML = shown.map(d => `
-    <article class="dish" data-id="${d.id}">
+  if (shown.length === 0) {
+    menuEl.innerHTML = `<p class="empty">No dishes found.</p>`;
+  } else {
+    menuEl.innerHTML = shown.map(d => `
+      <article class="dish" data-id="${d.id}">
         ${d.spicy ? '<span class="badge">Spicy</span>' : ''}
         <img src="${d.image}" alt="${d.name}">
         <h3>${d.name}</h3>
         <p class="category">${d.category}</p>
         <p class="desc">${d.desc}</p>
         <p class="price">${d.price} ETB</p>
-        <button class="add">Order</button>
-    </article>`).join("");
-    }
-
-    // Re-render the cart area after updating the menu (keeps totals in sync)
-    renderCart();
+        <button class="add">Add</button>
+      </article>`).join("");
+  }
 }
 
 // Render the cart sidebar: list items and total price
@@ -74,13 +79,12 @@ function cartTotal() {
 
 // Persist only the cart lines to localStorage so the user's order survives reloads
 function save() {
-    localStorage.setItem("addiseats", JSON.stringify(state.cart));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.cart));
 }
 
-// Load persisted cart from localStorage (if present)
 function load() {
-    const s = localStorage.getItem("addiseats");
-    if (s) state.cart = JSON.parse(s);
+  const s = localStorage.getItem(STORAGE_KEY);
+  if (s) state.cart = JSON.parse(s);
 }
 
 // Fetch menu JSON and populate `state.dishes`. Shows basic loading/error UI.
@@ -106,28 +110,19 @@ searchEl.addEventListener("input", (e) => {
     render();
 });
 
-// Event delegation on the menu: handle clicks on any "order" button
 menuEl.addEventListener("click", (e) => {
-    // Only proceed if the clicked element matches the `.add` selector
-    if (!e.target.matches(".add")) return;
-
-    // Find the dish id from the closest ancestor `.dish` element
-    const id = Number(e.target.closest(".dish").dataset.id);
-    // Lookup the dish data and any existing cart line
-    const dish = state.dishes.find(d => d.id === id);
-    const line = state.cart.find(i => i.id === id);
-
-    if (line) {
-        // If already in cart, increment quantity
-        line.qty++;
-    } else {
-        // Otherwise clone dish properties into a new cart line with qty:1
-        state.cart.push({ ...dish, qty: 1 });
-    }
-
-    // Persist and refresh UI
-    save();
-    render();
+  if (!e.target.matches(".add")) return;
+  const id = Number(e.target.closest(".dish").dataset.id);
+  const dish = state.dishes.find(d => d.id === id);
+  if (!dish) return;               // guard: dish not found, do nothing
+  const line = state.cart.find(i => i.id === id);
+  if (line) {
+    line.qty++;
+  } else {
+    state.cart.push({ ...dish, qty: 1 });
+  }
+  save();
+  render();
 });
 
 // Event delegation in the cart: handle remove button clicks
@@ -138,6 +133,43 @@ cartEl.addEventListener("click", (e) => {
     state.cart = state.cart.filter(i => i.id !== id);
     save();
     render();
+});
+function validate({ name, phone }) {
+  if (!name.trim()) return "Please enter your name.";
+  if (!PHONE.test(phone)) return "Enter a valid Ethiopian phone.";
+  if (state.cart.length === 0) return "Your cart is empty.";
+  return "";
+}
+
+function placeOrder(data) {
+  const order = {
+    ...data,
+    items: state.cart,
+    total: cartTotal(),
+    placedAt: new Date().toISOString(),
+  };
+  console.log("Order placed:", order);
+  state.cart = [];
+  save();
+  render();
+  showConfirmation(order);
+}
+
+function showConfirmation(order) {
+  confirmEl.textContent =
+    `Order placed — ${order.total} ETB, delivering to ${order.area}.`;
+  confirmEl.hidden = false;
+}
+
+checkoutEl.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const data = { name: nameEl.value, phone: phoneEl.value, area: areaEl.value };
+  const msg = validate(data);
+  errEl.textContent = msg;
+  confirmEl.hidden = true;
+  if (msg) return;
+  placeOrder(data);
+  checkoutEl.reset();
 });
 
 // Initialize the app: restore cart from storage, then load menu data

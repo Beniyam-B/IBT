@@ -244,3 +244,56 @@ footer {
     color: #64748B;
     font-size: 0.9rem;
 }
+#checkout-section {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin: 0 1rem 1rem;
+}
+
+#checkout-section h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+#checkout label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+#checkout input,
+#checkout select {
+  width: 100%;
+  margin-top: 0.3rem;
+  padding: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+#checkout button {
+  border: none;
+  border-radius: var(--radius);
+  background: var(--green);
+  color: white;
+  font-weight: 600;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+}
+
+.error {
+  color: #B91C1C;
+  font-size: 0.9rem;
+  min-height: 1.2em;
+}
+
+.confirmation {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #E8F5E9;
+  color: var(--green);
+  border-radius: 6px;
+  font-weight: 600;
+}

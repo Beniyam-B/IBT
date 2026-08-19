@@ -16,6 +16,27 @@
 <main>
     <section id="menu" aria-label="Menu"></section>
     <aside id="cart" aria-label="Your order"></aside>
+    <section id="checkout-section" aria-label="Checkout">
+  <h2>Checkout</h2>
+  <form id="checkout" novalidate>
+    <label>Name
+      <input id="name" required>
+    </label>
+    <label>Phone (TeleBirr)
+      <input id="phone" placeholder="09xxxxxxxx">
+    </label>
+    <label>Delivery area
+      <select id="area">
+        <option>Bole</option>
+        <option>Kazanchis</option>
+        <option>Megenagna</option>
+      </select>
+    </label>
+    <p id="form-error" class="error" aria-live="polite"></p>
+    <button type="submit">Place order</button>
+  </form>
+  <p id="confirmation" class="confirmation" hidden></p>
+</section>
 </main>
 
 <footer>
