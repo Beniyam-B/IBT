@@ -1,0 +1,14 @@
+[
+  { "id": 1, "name": "Doro Wot", "category": "Main", "price": 320, "spicy": true, "image": "images/Doro.jpg", "desc": "Slow-simmered chicken in berbere sauce, hard-boiled egg, served with injera." },
+  { "id": 2, "name": "Tibs", "category": "Main", "price": 1200, "spicy": false, "image": "images/Tibs.jpg", "desc": "Pan-seared beef with onion, rosemary and jalapeno." },
+  { "id": 3, "name": "Kitfo", "category": "Main", "price": 1360, "spicy": true, "image": "images/Kitfo.jpg", "desc": "Minced beef warmed in spiced butter, served leb leb with ayib and gomen." },
+  { "id": 4, "name": "FirFir", "category": "Main", "price": 180, "spicy": true, "image": "images/firfir.jpg", "desc": "Torn injera pan-fried in a spiced berbere and onion sauce." },
+  { "id": 5, "name": "Shiro Wot", "category": "Vegetarian", "price": 220, "spicy": true, "image": "images/shiro.jpg", "desc": "Ground chickpea stew simmered with garlic, ginger and berbere." },
+  { "id": 6, "name": "Gomen", "category": "Vegetarian", "price": 250, "spicy": false, "image": "images/gomen.jpg", "desc": "Collard greens sauteed with garlic and green chili." },
+  { "id": 7, "name": "Misir Wot", "category": "Vegetarian", "price": 210, "spicy": true, "image": "images/misir.jpg", "desc": "Spiced red lentils simmered slowly in berbere and garlic." },
+  { "id": 8, "name": "Beyaynetu", "category": "Vegetarian", "price": 500, "spicy": false, "image": "images/beyaynetu.jpg", "desc": "A vegetarian sampler platter - five stews on fresh injera." },
+  { "id": 9, "name": "Sambusa", "category": "Appetizer", "price": 90, "spicy": false, "image": "images/sambusa.jpg", "desc": "Crisp pastry triangles filled with spiced lentils or beef." },
+  { "id": 10, "name": "Chechebsa", "category": "Breakfast", "price": 130, "spicy": false, "image": "images/chechebsa.jpg", "desc": "Torn flatbread tossed in spiced butter and berbere." },
+  { "id": 11, "name": "Buna", "category": "Drink", "price": 60, "spicy": false, "image": "images/buna.jpg", "desc": "Traditional Ethiopian coffee, roasted and brewed fresh." },
+  { "id": 12, "name": "Tej", "category": "Drink", "price": 150, "spicy": false, "image": "images/tej.jpg", "desc": "Ethiopian honey wine, fermented with gesho leaves." }
+]

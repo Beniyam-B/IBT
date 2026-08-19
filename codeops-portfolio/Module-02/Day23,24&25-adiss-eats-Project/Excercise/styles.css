@@ -1,0 +1,246 @@
+:root {
+  /* Design tokens: centralized colors, spacing and radii used throughout */
+    --navy-900: #1b375f;
+    --gold: #fdd577;
+    --gold-light: #E4B438;
+    --terracotta: #A6472A;
+    --cream: #FAF6EC;
+    --ink: #2A2116;
+    --muted: #3a352d;
+    --green: #2F6B4F;
+    --line: #E7DFCB;
+    --radius: 10px;
+    --bg: #FAF6EC;
+}
+
+* {
+  /* Make width/height include padding and border for predictable layouts */
+    box-sizing: border-box;
+}
+
+body {
+  /* Page defaults: remove default margin, set font, background and text color */
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+}
+
+header {
+  /* Top navigation bar: uses flexbox to arrange title, input and controls */
+    background: var(--navy-900);
+    color: white;
+    padding: 1rem;
+    display: flex;
+  flex-wrap: wrap; /* allow items to wrap on smaller screens */
+    align-items: center;
+  justify-content: space-between; /* push title and controls to edges */
+    gap: 1rem;
+}
+
+header h1 {
+  /* Page title: remove default margin and set size */
+    font-family: "fantasy", Papyrus;
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+header h1 span {
+  /* Highlight part of the title in the accent gold color */
+    color: var(--gold);
+}
+
+header input {
+  /* Search/input control: flexible size with sensible min/max and styling */
+    flex: 1;
+    min-width: 200px;
+    max-width: 320px;
+    padding: 0.6rem 0.8rem;
+    border-radius: var(--radius);
+    border: none;
+    font-size: 1rem;
+}
+
+main {
+    /* Main content area: single-column grid by default */
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+@media (min-width: 800px) {
+    /* Desktop layout: two columns, wider menu and a sidebar (cart) */
+    main {
+    grid-template-columns: 2fr 1fr;
+}
+}
+
+#menu {
+    /* Responsive menu grid: auto-fill cards with a minimum width */
+    display: grid;
+    /* repeat(auto-fill, minmax(180px, 1fr)) creates as many 180px-wide columns
+       as will fit; columns expand to fill remaining space */
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    align-content: start;
+}
+
+.dish {
+    /* Individual dish card: stack content vertically and allow an absolute
+       positioned badge inside (hence position: relative) */
+    position: relative;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    /* Smooth hover transitions for lift and shadow */
+    transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.dish:hover {
+    /* Lift the card slightly and add a soft shadow on hover */
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(27, 55, 95, 0.12);
+}
+
+.dish img {
+    /* Dish image: fill card width, crop to 140px height while preserving
+       aspect using object-fit: cover to avoid distortion */
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.dish .badge {
+    /* Small pill/badge (e.g., "HOT" or "NEW") positioned over the image */
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--terracotta);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 999px;
+}
+
+.dish h3 {
+    /* Dish title: compact spacing and emphasis */
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--ink);
+}
+
+.dish .category {
+    /* Small metadata like category or cuisine */
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.dish .desc {
+    /* Short description text */
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.dish .price {
+    /* Price styling: stands out in green and bold */
+    margin: 0;
+    color: var(--green);
+    font-weight: 700;
+}
+
+.dish .add {
+    /* Add-to-cart button: sticks to the bottom via margin-top: auto */
+    margin-top: auto;
+    padding: 0.5rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--terracotta);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 200ms ease;
+}
+
+.dish .add:hover {
+    /* Slightly darker background on hover for affordance */
+    background: #8a3a22;
+}
+
+#cart {
+    /* Sidebar cart box: uses fit-content so it only grows as needed */
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1rem;
+    height: fit-content;
+}
+
+#cart h2 {
+    /* Cart heading */
+    margin-top: 0;
+    font-size: 1.1rem;
+}
+
+#cart ul {
+    /* Cart items list: vertical stack with gaps and no default list styling */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+#cart li {
+    /* Individual cart row: align name and controls on opposite sides */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.6rem;
+}
+
+#cart li .rm {
+    /* Remove button styling: visible affordance with red tone */
+    border: none;
+    background: #FEE2E2;
+    color: #B91C1C;
+    border-radius: 6px;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+}
+
+#cart .total {
+    /* Cart total: visually separated by a thicker top border */
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--line);
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-align: right;
+    color: var(--terracotta);
+}
+
+.empty {
+    /* Empty state text for cart or lists */
+    color: #64748B;
+    font-style: italic;
+}
+
+footer {
+    /* Page footer: small muted text centered */
+    text-align: center;
+    padding: 1rem;
+    color: #64748B;
+    font-size: 0.9rem;
+}
