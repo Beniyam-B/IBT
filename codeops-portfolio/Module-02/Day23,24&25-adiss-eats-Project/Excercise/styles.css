@@ -1,9 +1,16 @@
+/*
+  Adiss Eats styling:
+  - colors and spacing are centralized in :root
+  - the page layout is built with flexbox and CSS grid
+  - the menu, cart, and checkout sections are styled as separate blocks
+*/
+
 :root {
-  /* Design tokens: centralized colors, spacing and radii used throughout */
+  /* Color tokens and reusable values for the whole app. */
     --navy-900: #1b375f;
     --gold: #fdd577;
     --gold-light: #E4B438;
-    --terracotta: #A6472A;
+    --terracotta: #e49217;
     --cream: #FAF6EC;
     --ink: #2A2116;
     --muted: #3a352d;
@@ -14,12 +21,12 @@
 }
 
 * {
-  /* Make width/height include padding and border for predictable layouts */
+  /* Padding and border count inside the declared width; keeps layouts predictable. */
     box-sizing: border-box;
 }
 
 body {
-  /* Page defaults: remove default margin, set font, background and text color */
+  /* Base page styling: white space, fonts, background, and text color. */
     margin: 0;
     font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     background: var(--bg);
@@ -27,31 +34,31 @@ body {
 }
 
 header {
-  /* Top navigation bar: uses flexbox to arrange title, input and controls */
+  /* Top bar: brand, search, and layout controls. */
     background: var(--navy-900);
     color: white;
     padding: 1rem;
     display: flex;
-  flex-wrap: wrap; /* allow items to wrap on smaller screens */
+    flex-wrap: wrap;
     align-items: center;
-  justify-content: space-between; /* push title and controls to edges */
+    justify-content: space-between;
     gap: 1rem;
 }
 
 header h1 {
-  /* Page title: remove default margin and set size */
+  /* Main page title styling. */
     font-family: "fantasy", Papyrus;
     margin: 0;
     font-size: 1.4rem;
 }
 
 header h1 span {
-  /* Highlight part of the title in the accent gold color */
+  /* Highlight the accent text in gold. */
     color: var(--gold);
 }
 
 header input {
-  /* Search/input control: flexible size with sensible min/max and styling */
+  /* Search box sizing and styling. */
     flex: 1;
     min-width: 200px;
     max-width: 320px;
@@ -62,7 +69,7 @@ header input {
 }
 
 main {
-    /* Main content area: single-column grid by default */
+    /* Main page layout: menu + cart on larger screens, stacked on mobile. */
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -70,25 +77,22 @@ main {
 }
 
 @media (min-width: 800px) {
-    /* Desktop layout: two columns, wider menu and a sidebar (cart) */
+    /* Desktop layout: two-column content with a wider menu and a cart sidebar. */
     main {
     grid-template-columns: 2fr 1fr;
 }
 }
 
 #menu {
-    /* Responsive menu grid: auto-fill cards with a minimum width */
+    /* Grid for dish cards. Each card is auto-sized to fit the available width. */
     display: grid;
-    /* repeat(auto-fill, minmax(180px, 1fr)) creates as many 180px-wide columns
-       as will fit; columns expand to fill remaining space */
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
     align-content: start;
 }
 
 .dish {
-    /* Individual dish card: stack content vertically and allow an absolute
-       positioned badge inside (hence position: relative) */
+    /* Each dish card is a vertical column with image, title, price, and button. */
     position: relative;
     background: white;
     border: 1px solid var(--line);
@@ -97,19 +101,17 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    /* Smooth hover transitions for lift and shadow */
     transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
 .dish:hover {
-    /* Lift the card slightly and add a soft shadow on hover */
+    /* Slight lift and shadow make cards feel interactive. */
     transform: translateY(-4px);
     box-shadow: 0 12px 24px rgba(27, 55, 95, 0.12);
 }
 
 .dish img {
-    /* Dish image: fill card width, crop to 140px height while preserving
-       aspect using object-fit: cover to avoid distortion */
+    /* Images fill card width and keep a consistent height. */
     width: 100%;
     height: 140px;
     object-fit: cover;
@@ -117,7 +119,7 @@ main {
 }
 
 .dish .badge {
-    /* Small pill/badge (e.g., "HOT" or "NEW") positioned over the image */
+    /* Small spicy badge placed on top of the dish image. */
     position: absolute;
     top: 10px;
     right: 10px;
@@ -130,35 +132,35 @@ main {
 }
 
 .dish h3 {
-    /* Dish title: compact spacing and emphasis */
+    /* Dish title styling. */
     margin: 0;
     font-size: 1.05rem;
     color: var(--ink);
 }
 
 .dish .category {
-    /* Small metadata like category or cuisine */
+    /* Category/subtitle text is smaller and muted. */
     margin: 0;
     font-size: 0.8rem;
     color: var(--muted);
 }
 
 .dish .desc {
-    /* Short description text */
+    /* Dish description uses a smaller muted font. */
     margin: 0;
     font-size: 0.85rem;
     color: var(--muted);
 }
 
 .dish .price {
-    /* Price styling: stands out in green and bold */
+    /* Price is emphasized in green for easy scanning. */
     margin: 0;
     color: var(--green);
     font-weight: 700;
 }
 
 .dish .add {
-    /* Add-to-cart button: sticks to the bottom via margin-top: auto */
+    /* Add button sits at the bottom of each card. */
     margin-top: auto;
     padding: 0.5rem;
     border: none;
@@ -171,12 +173,12 @@ main {
 }
 
 .dish .add:hover {
-    /* Slightly darker background on hover for affordance */
+    /* Darker button state when hovered. */
     background: #8a3a22;
 }
 
 #cart {
-    /* Sidebar cart box: uses fit-content so it only grows as needed */
+    /* Cart sidebar is a white panel that holds all order items. */
     background: white;
     border: 1px solid var(--line);
     border-radius: var(--radius);
@@ -185,13 +187,13 @@ main {
 }
 
 #cart h2 {
-    /* Cart heading */
+    /* Cart title styling. */
     margin-top: 0;
     font-size: 1.1rem;
 }
 
 #cart ul {
-    /* Cart items list: vertical stack with gaps and no default list styling */
+    /* List of cart rows without default bullets. */
     list-style: none;
     margin: 0;
     padding: 0;
@@ -201,7 +203,7 @@ main {
 }
 
 #cart li {
-    /* Individual cart row: align name and controls on opposite sides */
+    /* Each order row aligns the name and price on opposite ends. */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -211,7 +213,7 @@ main {
 }
 
 #cart li .rm {
-    /* Remove button styling: visible affordance with red tone */
+    /* Remove button is a small red pill. */
     border: none;
     background: #FEE2E2;
     color: #B91C1C;
@@ -221,7 +223,7 @@ main {
 }
 
 #cart .total {
-    /* Cart total: visually separated by a thicker top border */
+    /* Final order total is bold and separated from item rows. */
     margin-top: 1rem;
     padding-top: 1rem;
     border-top: 2px solid var(--line);
@@ -232,68 +234,76 @@ main {
 }
 
 .empty {
-    /* Empty state text for cart or lists */
+    /* Empty-state text for empty cart or no-result menu. */
     color: #64748B;
     font-style: italic;
 }
 
 footer {
-    /* Page footer: small muted text centered */
+    /* Footer text is subtle and centered. */
     text-align: center;
     padding: 1rem;
     color: #64748B;
     font-size: 0.9rem;
 }
+
 #checkout-section {
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 1rem;
-  margin: 0 1rem 1rem;
+  /* Checkout panel is a separate card below the main menu/cart layout. */
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin: 0 1rem 1rem;
 }
 
 #checkout-section h2 {
-  margin-top: 0;
-  font-size: 1.1rem;
+  /* Section title for delivery details. */
+    margin-top: 0;
+    font-size: 1.1rem;
 }
 
 #checkout label {
-  display: block;
-  margin-bottom: 0.75rem;
-  font-size: 0.9rem;
+  /* Labels stack above each input field. */
+    display: block;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
 }
 
 #checkout input,
 #checkout select {
-  width: 100%;
-  margin-top: 0.3rem;
-  padding: 0.5rem;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  font-size: 1rem;
+  /* Form fields fill available width and keep a consistent look. */
+    width: 100%;
+    margin-top: 0.3rem;
+    padding: 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 1rem;
 }
 
 #checkout button {
-  border: none;
-  border-radius: var(--radius);
-  background: var(--green);
-  color: white;
-  font-weight: 600;
-  padding: 0.6rem 1rem;
-  cursor: pointer;
+  /* Submit button is green to signal order confirmation. */
+    border: none;
+    border-radius: var(--radius);
+    background: var(--green);
+    color: white;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
 }
 
 .error {
-  color: #B91C1C;
-  font-size: 0.9rem;
-  min-height: 1.2em;
+  /* Validation errors are red and compact for form feedback. */
+    color: #B91C1C;
+    font-size: 0.9rem;
+    min-height: 1.2em;
 }
 
 .confirmation {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background: #E8F5E9;
-  color: var(--green);
-  border-radius: 6px;
-  font-weight: 600;
+  /* Success message is green and clearly visible after checkout. */
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: #E8F5E9;
+    color: var(--green);
+    border-radius: 6px;
+    font-weight: 600;
 }
