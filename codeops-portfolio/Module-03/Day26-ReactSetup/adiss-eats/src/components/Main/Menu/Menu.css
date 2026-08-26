@@ -1,0 +1,15 @@
+
+.menu-section {
+width: 100%;
+}
+.menu-heading {
+text-align: center;
+margin: 0 0 1rem 0;
+font-size: 1.5rem;
+color: #0c1411;
+}
+.menu-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+gap: 1rem;
+}

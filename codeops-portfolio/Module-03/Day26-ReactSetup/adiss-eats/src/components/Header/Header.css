@@ -1,0 +1,10 @@
+
+.head{
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 1rem;
+background: #098bb3;
+box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+}
+.head h1{ margin:0; font-size:1.25rem; color:#effdf8; }

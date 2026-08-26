@@ -1,0 +1,14 @@
+.ma {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1.5rem;
+    padding: 1rem;
+    box-sizing: border-box;
+    background-color: #038bfa;
+}
+
+@media (max-width: 880px) {
+.ma {
+    grid-template-columns: 1fr;
+}
+}

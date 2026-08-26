@@ -1,0 +1,16 @@
+.side {
+    background-color: #c8e6d4;
+    border-radius: 8px;
+    box-sizing: border-box;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.side h1 {
+    margin: 0;
+    font-size: 1rem;
+    text-align: center;
+    color: #184c37;
+}
