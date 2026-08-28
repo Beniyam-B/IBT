@@ -1,0 +1,28 @@
+
+.menu-section {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 1rem;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.04);
+}
+
+.menu-header {
+    margin-bottom: 1rem;
+}
+
+.menu-header h2 {
+    color: #1d2c2c;
+    font-size: 1.6rem;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.menu-empty {
+    color: #555;
+    padding: 1rem 0;
+}

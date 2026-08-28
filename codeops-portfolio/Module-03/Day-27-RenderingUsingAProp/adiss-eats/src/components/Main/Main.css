@@ -1,0 +1,15 @@
+.main-layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 1.25rem;
+    padding: 1.25rem;
+    background: transparent;
+    flex: 1;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+.main-layout {
+    grid-template-columns: 1fr;
+}
+}
