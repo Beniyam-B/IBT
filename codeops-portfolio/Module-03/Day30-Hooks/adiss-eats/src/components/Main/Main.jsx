@@ -5,14 +5,17 @@ import Menu from "./Menu/Menu.jsx";
 import Sidebar from "./Sidebar/Sidebar.jsx";
 
 function Main({ onAddToCart, onRemoveFromCart }) {
-const [category, setCategory] = useState("All");
+const [selectedCategories, setSelectedCategories] = useState([]);
+const [spiceFilter, setSpiceFilter] = useState("All");
 
 return (
     <main className="main">
     <Sidebar />
     <Menu
-        category={category}
-        onCategoryChange={setCategory}
+        selectedCategories={selectedCategories}
+        onCategoryChange={setSelectedCategories}
+        spiceFilter={spiceFilter}
+        onSpiceFilterChange={setSpiceFilter}
         onAddToCart={onAddToCart}
         onRemoveFromCart={onRemoveFromCart}
     />

@@ -6,7 +6,7 @@ export const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, { items: [] });
-  const total = state.items.reduce((sum, d) => sum + d.price, 0);
+  const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   function addItem(dish) {
     dispatch({ type: "add", dish });

@@ -50,12 +50,12 @@
     border-radius: 6px;
     padding: 0.45rem 0.75rem;
     cursor: pointer;
-    background: #27df55;
+    background: #ff0000;
     color: #ffffffc9;
 }
 
 .dish-actions button:last-child {
-    background: #ff0101;
+    background: #01ff23;
     color: #eceef1;
 }
 
