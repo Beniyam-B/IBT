@@ -6,21 +6,40 @@ import Main from "./components/Main/Main.jsx";
 import DishDetail from "./DishDetail.jsx";
 import Checkout from "./Checkout.jsx";
 import Login from "./auth/Login.jsx";
+import Register from "./auth/Register.jsx";
 import { CartProvider, CartContext } from "./cart/cartProvider.jsx";
 import { AuthProvider } from "./auth/RequireAuth.jsx";
 import RequireAuth from "./auth/RequireAuth.jsx";
 import { useFetch } from "./hooks/useFetch.js";
 
-function Home() {
-  const { data: dishes, loading, error } = useFetch("/dishes.json");
-  const { addItem } = useContext(CartContext);
+function buildDishImage(dish) {
+  const slug = dish?.slug || dish?.nameEn || dish?.name || "ethiopian-food";
+  return `https://images.unsplash.com/featured/?${encodeURIComponent(slug)}&auto=format&fit=crop&w=900&q=80`;
+}
 
-  const featured = dishes?.[0];
+function normalizeDish(dish) {
+  const numericId = Number(String(dish.id).replace(/\D/g, "")) || String(dish.id);
+
+  return {
+    ...dish,
+    id: numericId,
+    name: dish.nameEn || dish.name || "Dish",
+    price: dish.priceETB ?? dish.price ?? 0,
+    category: dish.category || "Main",
+    spicy: String(dish.spiceLevel || "").toLowerCase().includes("hot") || String(dish.spiceLevel || "").toLowerCase().includes("fiery") || Boolean(dish.isSpicy),
+    image: dish.image || buildDishImage(dish),
+  };
+}
+
+function Home() {
+  const { data: dishes, loading, error } = useFetch("https://addis-eats-backend.onrender.com/menu/specials");
+  const { addItem } = useContext(CartContext);
+  const featured = Array.isArray(dishes) ? normalizeDish(dishes[0]) : null;
 
   return (
     <div className="home">
-      <h1>Addis Eats</h1>
-      <p>Today's specials, delivered fast.</p>
+      <h1 className="home__title">Addis Eats</h1>
+      <p className="home__subtitle">Today's specials, delivered fast.</p>
 
       {loading ? (
         <p>Loading today's special…</p>
@@ -28,18 +47,18 @@ function Home() {
         <p>{error}</p>
       ) : featured ? (
         <div className="featured-dish">
-          <h2>Today's Special</h2>
-          <img src={featured.image} alt={featured.name} />
-          <h3>{featured.name}</h3>
-          <p>{featured.price} ETB</p>
-          <div className="home-actions">
-            <button type="button" className="primary-btn" onClick={() => addItem(featured)}>Add to cart</button>
-            <Link to={`/menu/${featured.id}`} className="secondary-link">View details</Link>
+          <p className="featured-dish__label">Today's Special</p>
+          <img className="featured-dish__image" src={featured.image} alt={featured.name} />
+          <h3 className="featured-dish__name">{featured.name}</h3>
+          <p className="featured-dish__price">{featured.price} ETB</p>
+          <div className="featured-dish__actions">
+            <button type="button" className="btn" onClick={() => addItem(featured)}>Add to cart</button>
+            <Link className="btn btn--outline" to={`/menu/${featured.id}`}>View</Link>
           </div>
         </div>
       ) : null}
 
-      <Link to="/menu"><button type="button" className="primary-btn">See the menu</button></Link>
+      <Link className="btn home__cta" to="/menu">See the menu</Link>
     </div>
   );
 }
@@ -47,8 +66,8 @@ function Home() {
 function NotFound() {
   return (
     <div className="not-found">
-      <h2>Page not found</h2>
-      <Link to="/">Go back home</Link>
+      <h2 className="not-found__title">Page not found</h2>
+      <Link className="not-found__link" to="/">Go back home</Link>
     </div>
   );
 }
@@ -59,26 +78,29 @@ function Cart() {
   if (items.length === 0) {
     return (
       <div className="cart-page">
-        <h2>Your cart is empty</h2>
-        <Link to="/menu" className="primary-link">Browse the menu</Link>
+        <h2 className="cart-page__title">Your cart is empty</h2>
+        <Link className="btn" to="/menu">Browse the menu</Link>
       </div>
     );
   }
 
   return (
     <div className="cart-page">
-      <h2>Your order</h2>
-      <ul>
+      <h2 className="cart-page__title">Your order</h2>
+      <ul className="cart-page__items">
         {items.map((item) => (
-          <li key={item.id}>
-            {item.name} × {item.quantity} — {item.price * item.quantity} ETB
-            <button type="button" className="secondary-btn" onClick={() => removeItem(item.id)}>Remove one</button>
+          <li className="cart-page__item" key={item.id}>
+            <span>{item.name} × {item.quantity}</span>
+            <span>{item.price * item.quantity} ETB</span>
+            <button type="button" className="cart-page__remove" onClick={() => removeItem(item.id)}>Remove one</button>
           </li>
         ))}
       </ul>
-      <p>Total: {total} ETB</p>
-      <button type="button" className="secondary-btn" onClick={clearCart}>Clear cart</button>
-      <Link to="/checkout"><button type="button" className="primary-btn">Go to checkout</button></Link>
+      <p className="cart-page__total">Total: {total} ETB</p>
+      <div className="cart-page__actions">
+        <button type="button" className="btn btn--outline" onClick={clearCart}>Clear cart</button>
+        <Link className="btn" to="/checkout">Go to checkout</Link>
+      </div>
     </div>
   );
 }
@@ -96,6 +118,7 @@ function App() {
               <Route path="cart" element={<Cart />} />
               <Route path="checkout" element={<RequireAuth><Checkout /></RequireAuth>} />
               <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

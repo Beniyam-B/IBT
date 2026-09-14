@@ -3,26 +3,28 @@ import PropTypes from "prop-types";
 import "./Sidebar.css";
 
 const Sidebar = ({ searchText, onSearchChange }) => {
-    const searchRef = useRef(null);
+  const searchRef = useRef(null);
 
-    useEffect(() => {
-        if (searchRef.current) searchRef.current.focus();
-    }, []);
+  useEffect(() => {
+    if (searchRef.current) searchRef.current.focus();
+  }, []);
 
-    return (
-        <div className="side">
-            <div className="side-content">
-                <h1>Sidebar</h1>
-                <input
-                    ref={searchRef}
-                    type="text"
-                    value={searchText}
-                    onChange={(e) => onSearchChange(e.target.value)}
-                    placeholder="Search Dishes..."
-                />
-            </div>
-        </div>
-    );
+  return (
+    <aside className="sidebar">
+      <div className="sidebar__content">
+        <p className="sidebar__label">Browse menu</p>
+        <h2 className="sidebar__title">Find your dish</h2>
+        <input
+          ref={searchRef}
+          type="text"
+          value={searchText}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Search dishes..."
+          className="sidebar__search"
+        />
+      </div>
+    </aside>
+  );
 };
 
 Sidebar.propTypes = {

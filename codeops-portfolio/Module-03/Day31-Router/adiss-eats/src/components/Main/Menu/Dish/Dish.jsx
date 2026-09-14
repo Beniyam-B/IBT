@@ -5,7 +5,7 @@ import { CartContext } from "../../../../cart/cartProvider.jsx";
 
 function Dish({ id, name, price, currency, spicy, image, onAdd, onRemove }) {
   const { items } = useContext(CartContext);
-  const count = items.find((item) => item.id === id)?.quantity ?? 0;
+  const count = items.find((item) => String(item.id) === String(id))?.quantity ?? 0;
 
   function handleAdd() {
     if (onAdd) {
@@ -21,26 +21,40 @@ function Dish({ id, name, price, currency, spicy, image, onAdd, onRemove }) {
   }
 
   return (
-    <div className="dish-item">
-      <img className="dish-image" src={image} alt={name} />
-      <div className="dish-info">
-        <h3 className="dish-name">
+    <article className="dish-card">
+      <img className="dish-card__image" src={image} alt={name} />
+
+      <div className="dish-card__info">
+        <h3 className="dish-card__name">
           {name}
-          {spicy === true && <span className="spicy">🌶 Spicy</span>}
+          {spicy === true && <span className="dish-card__spicy">🌶 Spicy</span>}
         </h3>
-        <p className="dish-price">
+        <p className="dish-card__price">
           {price} {currency}
         </p>
       </div>
 
-      <div className="dish-actions">
-        <button type="button" onClick={handleRemove} disabled={count === 0}>
+      <div className="dish-card__actions">
+        <button
+          type="button"
+          className="dish-card__button dish-card__button--remove"
+          onClick={handleRemove}
+          disabled={count === 0}
+          aria-label={`Remove one ${name}`}
+        >
           -
         </button>
-        <span>{count}</span>
-        <button type="button" onClick={handleAdd}>+</button>
+        <span className="dish-card__count">{count}</span>
+        <button
+          type="button"
+          className="dish-card__button dish-card__button--add"
+          onClick={handleAdd}
+          aria-label={`Add one ${name}`}
+        >
+          +
+        </button>
       </div>
-    </div>
+    </article>
   );
 }
 

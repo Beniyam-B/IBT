@@ -1,20 +1,19 @@
 .main {
-    display: grid;
-    grid-template-columns: 220px minmax(0, 1fr);
-    gap: 2rem;
-    padding: 1rem;
-    box-sizing: border-box;
-    background: transparent;
-    align-items: start;
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  gap: 1.25rem;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  align-items: start;
 }
 
-.main > .side,
-.main > .menu-section {
-    min-height: 240px;
+.main__sidebar,
+.main__content {
+  min-height: 200px;
 }
 
 @media (max-width: 880px) {
-.main {
+  .main {
     grid-template-columns: 1fr;
-}
+  }
 }

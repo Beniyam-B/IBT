@@ -5,24 +5,29 @@ import Menu from "./Menu/Menu.jsx";
 import Sidebar from "./Sidebar/Sidebar.jsx";
 
 function Main({ onAddToCart, onRemoveFromCart }) {
-const [selectedCategories, setSelectedCategories] = useState([]);
-const [spiceFilter, setSpiceFilter] = useState("All");
-const [searchText, setSearchText] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [spiceFilter, setSpiceFilter] = useState("All");
+  const [searchText, setSearchText] = useState("");
 
-return (
+  return (
     <main className="main">
-    <Sidebar searchText={searchText} onSearchChange={setSearchText} />
-    <Menu
-        selectedCategories={selectedCategories}
-        onCategoryChange={setSelectedCategories}
-        spiceFilter={spiceFilter}
-        onSpiceFilterChange={setSpiceFilter}
-        searchText={searchText}
-        onAddToCart={onAddToCart}
-        onRemoveFromCart={onRemoveFromCart}
-    />
+      <aside className="main__sidebar">
+        <Sidebar searchText={searchText} onSearchChange={setSearchText} />
+      </aside>
+
+      <div className="main__content">
+        <Menu
+          selectedCategories={selectedCategories}
+          onCategoryChange={setSelectedCategories}
+          spiceFilter={spiceFilter}
+          onSpiceFilterChange={setSpiceFilter}
+          searchText={searchText}
+          onAddToCart={onAddToCart}
+          onRemoveFromCart={onRemoveFromCart}
+        />
+      </div>
     </main>
-);
+  );
 }
 
 Main.propTypes = {

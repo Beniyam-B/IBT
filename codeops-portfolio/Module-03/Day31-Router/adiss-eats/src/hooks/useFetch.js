@@ -5,7 +5,7 @@ async function load(url, signal, setData, setError, setLoading) {
     const res = await fetch(url, { signal });
     if (!res.ok) throw new Error("Could not load the menu");
     const json = await res.json();
-    setData(json);
+    setData(json?.data ?? json);
   } catch (e) {
     if (e.name !== "AbortError") setError(e.message);
   } finally {

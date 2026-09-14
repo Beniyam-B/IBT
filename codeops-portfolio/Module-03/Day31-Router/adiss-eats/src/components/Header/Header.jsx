@@ -1,38 +1,45 @@
 import { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import "./Header.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CartContext } from "../../cart/cartProvider.jsx";
 import { AuthContext } from "../../auth/RequireAuth.jsx";
 
-const navStyle = ({ isActive }) => (isActive ? "nav-link active" : "nav-link");
+const navClass = ({ isActive }) => "site-header__link" + (isActive ? " site-header__link--active" : "");
 
 const Header = () => {
-    const { totalQuantity } = useContext(CartContext);
-    const { user, logout } = useContext(AuthContext);
+  const { totalQuantity } = useContext(CartContext);
+  const { user, logout } = useContext(AuthContext);
 
-return (
-    <div className="head">
-    <h1>Addis Eats</h1>
+  return (
+    <div className="site-header">
+      <span className="site-header__brand">Addis Eats</span>
 
-    <div className="nav-group">
-        <nav className="main-nav">
-            <NavLink to="/" className={navStyle} end>Home</NavLink>
-            <NavLink to="/menu" className={navStyle}>Menu</NavLink>
-            {user ? (
-            <>
-                <NavLink to="/checkout" className={navStyle}>Checkout</NavLink>
-                <span className="user-greeting">Hi, {user.name}</span>
-                <button type="button" onClick={logout}>Log out</button>
-            </>
-            ) : (
-                <NavLink to="/login" className={navStyle}>Login / Register</NavLink>
-            )}
-        </nav>
+      <nav className="site-header__nav">
+        <NavLink to="/" className={navClass} end>
+          <FontAwesomeIcon icon="fa-solid fa-house" /> Home
+        </NavLink>
+        <NavLink to="/menu" className={navClass}>
+          <FontAwesomeIcon icon="fa-solid fa-utensils" /> Menu
+        </NavLink>
+        {user && <NavLink to="/checkout" className={navClass}>Checkout</NavLink>}
+      </nav>
 
-        <NavLink to="/cart" className="nav-link cart-link">Cart ({totalQuantity})</NavLink>
+      <NavLink to="/cart" className="site-header__cart" aria-label={`Cart with ${totalQuantity} items`}>
+        <FontAwesomeIcon icon="fa-solid fa-cart-shopping" />
+        <span className="site-header__cart-count" aria-live="polite">{totalQuantity}</span>
+      </NavLink>
+
+      {user ? (
+        <div className="site-header__user">
+          <span className="site-header__greeting">Hi, {user.name}</span>
+          <button type="button" className="site-header__logout" onClick={logout}>Log out</button>
+        </div>
+      ) : (
+        <NavLink to="/login" className="site-header__link">Login</NavLink>
+      )}
     </div>
-    </div>
-);
+  );
 };
 
 export default Header;

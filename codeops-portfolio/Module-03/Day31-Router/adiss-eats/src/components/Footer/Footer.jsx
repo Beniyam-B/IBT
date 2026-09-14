@@ -1,10 +1,11 @@
-import './Footer.css'
-const Footer = ()=>{
-    return(
-        <div className="foot">
-            <h1>Footer</h1>
-        </div>
-        
-    )
-}
-export default Footer 
+import './Footer.css';
+
+const Footer = () => {
+  return (
+    <footer className="footer">
+      <p className="footer__text">Addis Eats • Fresh Ethiopian flavors daily</p>
+    </footer>
+  );
+};
+
+export default Footer;

@@ -3,26 +3,43 @@ import { useParams, Link } from "react-router-dom";
 import { useFetch } from "./hooks/useFetch.js";
 import { CartContext } from "./cart/cartProvider.jsx";
 
+function normalizeDishForDetail(item) {
+  const numericId = Number(String(item.id).replace(/\D/g, "")) || String(item.id);
+
+  return {
+    ...item,
+    id: numericId,
+    name: item.nameEn || item.name || "Dish",
+    price: item.priceETB ?? item.price ?? 0,
+    category: item.category || "Main",
+    spicy: String(item.spiceLevel || "").toLowerCase().includes("hot") || String(item.spiceLevel || "").toLowerCase().includes("fiery") || Boolean(item.isSpicy),
+    image: item.image || `https://images.unsplash.com/featured/?${encodeURIComponent(item.slug || item.nameEn || item.name || "ethiopian-food")}&auto=format&fit=crop&w=900&q=80`,
+  };
+}
+
 function DishDetail() {
-const { id } = useParams();
-const { data: dishes, loading, error } = useFetch("/dishes.json");
-const { addItem } = useContext(CartContext);
+  const { id } = useParams();
+  const { data: dishes, loading, error } = useFetch("https://addis-eats-backend.onrender.com/menu/");
+  const { addItem } = useContext(CartContext);
 
-if (loading) return <p>Loading…</p>;
-if (error) return <p>{error}</p>;
+  if (loading) return <p>Loading…</p>;
+  if (error) return <p>{error}</p>;
 
-const dish = dishes?.find((d) => String(d.id) === id);
-if (!dish) return <p>No dish called {id}. <Link to="/menu">Back to menu</Link></p>;
+  const normalizedDishes = (dishes ?? []).map(normalizeDishForDetail);
+  const dish = normalizedDishes.find((d) => String(d.id) === String(id));
+  if (!dish) return <p>No dish called {id}. <Link to="/menu">Back to menu</Link></p>;
 
-return (
+  return (
     <div className="dish-detail">
-    <img src={dish.image} alt={dish.name} />
-    <h2>{dish.name} {dish.spicy && <span>🌶 Spicy</span>}</h2>
-    <p>{dish.price} ETB</p>
-    <button type="button" onClick={() => addItem(dish)}>Add to cart</button>
-    <Link to="/menu">Back to menu</Link>
+      <img className="dish-detail__image" src={dish.image} alt={dish.name} />
+      <h2 className="dish-detail__name">{dish.name} {dish.spicy && <span>🌶</span>}</h2>
+      <p className="dish-detail__price">{dish.price} ETB</p>
+      <div className="dish-detail__actions">
+        <button type="button" className="btn" onClick={() => addItem(dish)}>Add to cart</button>
+        <Link className="btn btn--outline" to="/menu">Back to menu</Link>
+      </div>
     </div>
-);
+  );
 }
 
 export default DishDetail;

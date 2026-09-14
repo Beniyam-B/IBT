@@ -1,24 +1,26 @@
 export function cartReducer(state, action) {
   switch (action.type) {
     case "add": {
-      const existingItem = state.items.find((item) => item.id === action.dish.id);
+      const dishId = String(action.dish.id);
+      const existingItem = state.items.find((item) => String(item.id) === dishId);
 
       if (!existingItem) {
         return {
           ...state,
-          items: [...state.items, { ...action.dish, quantity: 1 }],
+          items: [...state.items, { ...action.dish, id: dishId, quantity: 1 }],
         };
       }
 
       return {
         ...state,
         items: state.items.map((item) =>
-          item.id === action.dish.id ? { ...item, quantity: item.quantity + 1 } : item
+          String(item.id) === dishId ? { ...item, quantity: item.quantity + 1 } : item
         ),
       };
     }
     case "remove": {
-      const itemIndex = state.items.findIndex((item) => item.id === action.id);
+      const itemId = String(action.id);
+      const itemIndex = state.items.findIndex((item) => String(item.id) === itemId);
 
       if (itemIndex === -1) {
         return state;
