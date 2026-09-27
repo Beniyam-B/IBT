@@ -1,0 +1,17 @@
+[
+  { "id": 1, "name": "Doro Wat", "price": 240, "category": "Main", "spicy": true, "image": "https://images.unsplash.com/featured/?doro-wat&auto=format&fit=crop&w=900&q=80" },
+  { "id": 2, "name": "Kitfo", "price": 260, "category": "Main", "spicy": true, "image": "https://images.unsplash.com/featured/?kitfo&auto=format&fit=crop&w=900&q=80" },
+  { "id": 3, "name": "Shiro", "price": 120, "category": "Main", "spicy": false, "image": "https://images.unsplash.com/featured/?shiro-wat&auto=format&fit=crop&w=900&q=80" },
+  { "id": 4, "name": "Tibs", "price": 220, "category": "Main", "spicy": true, "image": "https://images.unsplash.com/featured/?tibs&auto=format&fit=crop&w=900&q=80" },
+  { "id": 5, "name": "Misir Wat", "price": 110, "category": "Side", "spicy": true, "image": "https://images.unsplash.com/featured/?misir-wat&auto=format&fit=crop&w=900&q=80" },
+  { "id": 6, "name": "Gomen", "price": 100, "category": "Side", "spicy": false, "image": "https://images.unsplash.com/featured/?gomen&auto=format&fit=crop&w=900&q=80" },
+  { "id": 7, "name": "Ayib", "price": 90, "category": "Side", "spicy": false, "image": "https://images.unsplash.com/featured/?ayib&auto=format&fit=crop&w=900&q=80" },
+  { "id": 8, "name": "Sambusa", "price": 60, "category": "Snack", "spicy": false, "image": "https://images.unsplash.com/featured/?sambusa&auto=format&fit=crop&w=900&q=80" },
+  { "id": 9, "name": "Dabo Kolo", "price": 45, "category": "Snack", "spicy": false, "image": "https://images.unsplash.com/featured/?dabo-kolo&auto=format&fit=crop&w=900&q=80" },
+  { "id": 10, "name": "Fatira", "price": 85, "category": "Breakfast", "spicy": false, "image": "https://images.unsplash.com/featured/?fatira&auto=format&fit=crop&w=900&q=80" },
+  { "id": 11, "name": "Ful", "price": 95, "category": "Breakfast", "spicy": false, "image": "https://images.unsplash.com/featured/?ful&auto=format&fit=crop&w=900&q=80" },
+  { "id": 12, "name": "Genfo", "price": 100, "category": "Breakfast", "spicy": false, "image": "https://images.unsplash.com/featured/?genfo&auto=format&fit=crop&w=900&q=80" },
+  { "id": 13, "name": "Buna", "price": 40, "category": "Drink", "spicy": false, "image": "https://images.unsplash.com/featured/?ethiopian-coffee&auto=format&fit=crop&w=900&q=80" },
+  { "id": 14, "name": "Tej", "price": 130, "category": "Drink", "spicy": false, "image": "https://images.unsplash.com/featured/?tej&auto=format&fit=crop&w=900&q=80" },
+  { "id": 15, "name": "Ambo Water", "price": 30, "category": "Drink", "spicy": false, "image": "https://images.unsplash.com/featured/?water-bottle&auto=format&fit=crop&w=900&q=80" }
+]
