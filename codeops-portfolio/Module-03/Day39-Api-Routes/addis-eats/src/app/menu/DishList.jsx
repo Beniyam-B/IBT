@@ -1,13 +1,24 @@
 import Link from "next/link";
-import { getDishes } from "./dishes";
+import { db } from "@/lib/db";
 
-export default async function DishList() {
-  const dishes = await getDishes();
+export default async function DishList({ query, category }) {
+  const dishes = await db.dish.findMany();
+
+  const filtered = dishes.filter((dish) => {
+    const matchesQuery = !query || dish.name.toLowerCase().includes(query.toLowerCase());
+    const matchesCategory = !category || category === "all" || dish.category.toLowerCase() === category.toLowerCase();
+    return matchesQuery && matchesCategory;
+  });
+
+  if (filtered.length === 0) {
+    return <p>No dishes found.</p>;
+  }
+
   return (
     <ul>
-      {dishes.map((dish) => (
+      {filtered.map((dish) => (
         <li key={dish.id}>
-          <Link href={`/menu/${dish.id}`}>{dish.name}</Link> — {dish.price} ETB
+          <Link href={`/menu/${dish.id}`}>{dish.name}</Link> - {dish.price} {dish.currency}
         </li>
       ))}
     </ul>

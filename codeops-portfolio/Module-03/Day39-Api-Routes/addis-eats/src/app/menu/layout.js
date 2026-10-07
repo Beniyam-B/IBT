@@ -1,12 +1,15 @@
+import { Suspense } from "react";
 import CategoryBar from "./CategoryBar";
 
 export default function MenuLayout({ children }) {
   return (
-    <div style={{ display: "flex" }}>
+    <div className="menu-layout">
       <aside>
-        <CategoryBar />
+        <Suspense fallback={null}>
+          <CategoryBar />
+        </Suspense>
       </aside>
-      <div>{children}</div>
+      <div className="content">{children}</div>
     </div>
   );
 }

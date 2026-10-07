@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import DishCard from "./DishCard";
-import { getDish, getDishes } from "../dishes";
+import { getDish, db } from "@/lib/db";
 
 export async function generateStaticParams() {
-  const dishes = await getDishes();
+  const dishes = await db.dish.findMany();
   return dishes.map((d) => ({ id: d.id }));
 }
 

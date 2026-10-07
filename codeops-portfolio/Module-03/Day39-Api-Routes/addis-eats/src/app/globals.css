@@ -1,26 +1,97 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #fffaf3;
+  --text: #2b1d14;
+  --muted: #7a6a5d;
+  --brand: #b4441c;
+  --card: #ffffff;
+  --border: #eadfd3;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+* { box-sizing: border-box; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.6;
+}
+
+a { color: var(--brand); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+h1 { margin: 0 0 1rem; font-size: 2rem; }
+
+
+.site-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #ffffff;
+  border-bottom: 1px solid #eadfd3;
+}
+
+.site-header .logo {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.site-header nav {
+  margin-left: auto;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.site-footer {
+  padding: 1.25rem;
+  text-align: center;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+
+.hero { text-align: center; padding-top: 4rem; }
+.hero p { color: var(--muted); font-size: 1.1rem; margin-bottom: 1.5rem; }
+
+.btn {
+  display: inline-block;
+  padding: 0.7rem 1.5rem;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.btn:hover { text-decoration: none; opacity: 0.9; }
+
+.menu-layout { display: flex; gap: 2rem; }
+.menu-layout aside { min-width: 160px; }
+.menu-layout .content { flex: 1; }
+
+input {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.dish-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+.dish-list li {
+  padding: 0.9rem 1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
 }

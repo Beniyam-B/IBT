@@ -2,9 +2,10 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main>
+    <main className="hero">
       <h1>Addis Eats</h1>
-      <Link href="/menu">View Menu</Link>
+      <p>Ethiopian classics, made fresh in the heart of Addis Ababa.</p>
+      <Link href="/menu" className="btn">View Menu</Link>
     </main>
   );
 }

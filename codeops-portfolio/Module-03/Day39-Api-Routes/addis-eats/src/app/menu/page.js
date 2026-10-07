@@ -2,15 +2,15 @@ import { Suspense } from "react";
 import FilterShell from "./FilterShell";
 import DishList from "./DishList";
 
-export const revalidate = 3600;
+export default async function MenuPage({ searchParams }) {
+  const { q = "", category = "all" } = await searchParams;
 
-export default function MenuPage() {
   return (
     <main>
       <h1>Our menu</h1>
       <FilterShell>
-        <Suspense fallback={<p>Loading dishes...</p>}>
-          <DishList />
+        <Suspense key={`${q}-${category}`} fallback={<p>Loading dishes...</p>}>
+          <DishList query={q} category={category} />
         </Suspense>
       </FilterShell>
     </main>
