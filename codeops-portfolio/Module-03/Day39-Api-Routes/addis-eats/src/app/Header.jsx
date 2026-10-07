@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="site-header">
-      <Link href="/" className="logo">Addis Eats</Link>
+    <header>
+      <Link href="/">Addis Eats</Link>
       <nav>
         <Link href="/menu">Menu</Link>
         <Link href="/cart">Cart</Link>

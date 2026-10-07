@@ -1,9 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 export default function FilterShell({ children }) {
-  const [query, setQuery] = useState("");
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useSearchParams();
+  const [query, setQuery] = useState(params.get("q") ?? "");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (query === (params.get("q") ?? "")) return;
+      const next = new URLSearchParams(params.toString());
+      if (query) next.set("q", query);
+      else next.delete("q");
+      router.replace(`${pathname}?${next.toString()}`);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query, params, pathname, router]);
 
   return (
     <div>
