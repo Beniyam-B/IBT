@@ -1,7 +1,8 @@
 import { getDish } from "@/lib/db";
 
 export async function GET(request, { params }) {
-  const dish = await getDish(params.id);
+  const { id } = await params;
+  const dish = await getDish(id);
 
   if (!dish) {
     return Response.json(

@@ -8,11 +8,13 @@ export default async function MenuPage({ searchParams }) {
   return (
     <main>
       <h1>Our menu</h1>
-      <FilterShell>
-        <Suspense key={`${q}-${category}`} fallback={<p>Loading dishes...</p>}>
-          <DishList query={q} category={category} />
-        </Suspense>
-      </FilterShell>
+      <Suspense fallback={null}>
+        <FilterShell>
+          <Suspense key={`${q}|${category}`} fallback={<p>Loading dishes...</p>}>
+            <DishList query={q} category={category} />
+          </Suspense>
+        </FilterShell>
+      </Suspense>
     </main>
   );
 }

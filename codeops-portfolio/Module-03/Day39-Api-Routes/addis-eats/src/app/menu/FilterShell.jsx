@@ -1,33 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function FilterShell({ children }) {
   const router = useRouter();
-  const pathname = usePathname();
-  const params = useSearchParams();
-  const [query, setQuery] = useState(params.get("q") ?? "");
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") ?? "");
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (query === (params.get("q") ?? "")) return;
-      const next = new URLSearchParams(params.toString());
-      if (query) next.set("q", query);
-      else next.delete("q");
-      router.replace(`${pathname}?${next.toString()}`);
+    if ((searchParams.get("q") ?? "") === query) return;
+    const t = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (query) params.set("q", query);
+      else params.delete("q");
+      const qs = params.toString();
+      router.replace(qs ? `/menu?${qs}` : "/menu");
     }, 300);
-    return () => clearTimeout(timer);
-  }, [query, params, pathname, router]);
+    return () => clearTimeout(t);
+  }, [query, router, searchParams]);
 
   return (
     <div>
-      <input
-        placeholder="Search dishes..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
-      <div>{children}</div>
+      <input placeholder="Search dishes..." value={query} onChange={(e) => setQuery(e.target.value)} />
+      {children}
     </div>
   );
 }

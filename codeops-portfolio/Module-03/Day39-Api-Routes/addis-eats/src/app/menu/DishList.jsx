@@ -1,5 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { db } from "@/lib/db";
+import styles from "./menu.module.css";
 
 export default async function DishList({ query, category }) {
   const dishes = await db.dish.findMany();
@@ -10,15 +12,17 @@ export default async function DishList({ query, category }) {
     return matchesQuery && matchesCategory;
   });
 
-  if (filtered.length === 0) {
-    return <p>No dishes found.</p>;
-  }
+  if (filtered.length === 0) return <p>No dishes found.</p>;
 
   return (
-    <ul>
+    <ul className={styles.dishList}>
       {filtered.map((dish) => (
-        <li key={dish.id}>
-          <Link href={`/menu/${dish.id}`}>{dish.name}</Link> - {dish.price} {dish.currency}
+        <li key={dish.id} className={styles.dishItem}>
+          <Image src={dish.image} alt={dish.name} width={80} height={80} className={styles.thumb} />
+          <div>
+            <Link href={`/menu/${dish.id}`}>{dish.name}</Link>
+            <p className={styles.meta}>{dish.price} {dish.currency}</p>
+          </div>
         </li>
       ))}
     </ul>

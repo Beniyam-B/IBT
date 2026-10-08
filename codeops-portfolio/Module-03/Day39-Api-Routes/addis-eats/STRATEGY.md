@@ -1,22 +1,21 @@
 # Rendering Strategy — Addis Eats
 
-| Route         | Strategy          | Why                                                        |
-|---------------|--------------------|--------------------------------------------------------------|
-| /             | Static             | The story and address never change between builds            |
-| /menu         | ISR, 1 hour        | Dishes change occasionally; speed matters most                |
-| /menu/[id]    | Static via params  | Every dish id is known at build time (generateStaticParams)   |
-| /cart         | Client             | It's the person's own state, and private                      |
-| /checkout     | Dynamic            | Reads the session cookie and live pricing, can't be prebuilt   |
+| Route              | Strategy                         | Why                                                                 |
+|--------------------|----------------------------------|----------------------------------------------------------------------|
+| /                  | Static                           | Story and tagline never change between builds                        |
+| /menu              | Dynamic                          | Reads searchParams (q, category) on every request                    |
+| /menu/[id]         | Static via generateStaticParams  | Every dish id is known at build time                                 |
+| /cart              | Client                           | The cart is the person's own state, kept in the browser              |
+| /checkout          | Static shell + server action     | Page is just a form; the session and validation checks run in placeOrder |
+| /login, /register  | Static shell, client form        | UI only for now; submit wiring comes with the real auth step         |
+| /api/dishes        | Route handler (GET)              | Reads dishes from db.js                                              |
+| /api/dishes/[id]   | Route handler (GET)              | Returns one dish, or 404 with { error }                              |
+| /api/orders        | Route handler (POST)             | Validates with orderSchema, 422 on failure, 201 on success; never cached |
 
 ## Build output
 
-Paste the route table from `npm run build` here once the fixes above are rebuilt — confirm `/menu` and `/menu/[id]` show the static marker (○) and `/checkout` shows the dynamic marker (ƒ).
+Paste the route table from `npm run build` here and confirm each marker matches the table above.
 
 ```
-Route (app)          Size     First Load JS
-┌ ○ /
-├ ○ /menu
-├ ○ /menu/[id]
-├ ○ /cart
-└ ƒ /checkout
+<paste route table>
 ```

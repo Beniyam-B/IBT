@@ -1,21 +1,26 @@
 # Component Boundaries — Addis Eats
 
-| Component                          | Runs on | Why                                                      |
-|--------------------------------------|---------|-------------------------------------------------------------|
-| app/layout.js                        | Server  | Passes children into Providers, imports nothing client      |
-| app/providers.jsx                    | Client  | Holds cart state via context                                 |
-| app/menu/page.js                     | Server  | No interactivity of its own, wraps content                   |
-| app/menu/layout.js                   | Server  | Just composes CategoryBar + children, no state itself        |
-| app/menu/CategoryBar.jsx             | Client  | Holds selected category and handles clicks                   |
-| app/menu/FilterShell.jsx             | Client  | Holds search input state                                     |
-| app/menu/DishList.jsx                | Server  | Fetches dishes directly, pure markup, ships no JavaScript     |
-| app/menu/[id]/page.js                | Server  | Fetches a single dish, no interactivity of its own            |
-| app/menu/[id]/DishCard.jsx           | Server  | Pure markup from data                                         |
-| app/menu/[id]/AddToCartButton.jsx    | Client  | onClick, writes to the cart context                           |
+| Component                             | Runs on | Why                                                        |
+|---------------------------------------|---------|--------------------------------------------------------------|
+| src/app/layout.js                     | Server  | Passes children into Providers, imports nothing client        |
+| src/app/providers.jsx                 | Client  | Holds cart state via context                                  |
+| src/app/Header.jsx, Footer.jsx        | Server  | Plain markup and links, no state                              |
+| src/app/menu/layout.js                | Server  | Composes CategoryBar and children                             |
+| src/app/menu/CategoryBar.jsx          | Client  | useSearchParams to bold the active category                   |
+| src/app/menu/FilterShell.jsx          | Client  | Holds the search input and updates ?q= in the URL             |
+| src/app/menu/page.js                  | Server  | Reads searchParams and passes them to DishList                |
+| src/app/menu/DishList.jsx             | Server  | Reads db.js and filters; ships no JavaScript                  |
+| src/app/menu/[id]/page.js             | Server  | Fetches one dish                                              |
+| src/app/menu/[id]/DishCard.jsx        | Server  | Markup from data                                              |
+| src/app/menu/[id]/AddToCartButton.jsx | Client  | onClick writes to the cart context                            |
+| src/app/checkout/page.js              | Client  | useActionState needs the browser                              |
+| src/app/login/page.js, register/page.js | Client | Controlled form inputs                                       |
+| src/app/actions.js                    | Server  | "use server": placeOrder and cancelOrder, checks run inside   |
+| src/lib/db.js, schema.js              | Server  | Mock data layer and zod schemas                               |
 
 ## Bundle size for /menu
 
-Before (Day 37 baseline): <paste First Load JS from the build before today's changes>
-After (Day 38): <paste First Load JS from the build after today's changes>
+Day 37 baseline: <paste First Load JS>
+Now: <paste First Load JS>
 
-Note: Providers and AddToCartButton add a small amount of client JS, but DishList and DishCard still ship zero JavaScript — the increase should stay in the low kilobytes, not scale with the number of dishes.
+Note: DishList and DishCard ship no JavaScript. The client islands are small and do not grow with the number of dishes.

@@ -8,7 +8,7 @@ export async function generateStaticParams() {
 }
 
 export default async function DishPage({ params }) {
-  const { id } = params;
+  const { id } = await params;
   const dish = await getDish(id);
   if (!dish) notFound();
   return <DishCard {...dish} />;

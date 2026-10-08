@@ -2,31 +2,32 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import styles from "./menu.module.css";
 
-const categories = ["all", "mains", "sides", "drinks"]; // must match dish.category in dishes.js
+const categories = ["all", "main", "vegetarian"];
 
 export default function CategoryBar() {
-  const params = useSearchParams();
-  const current = params.get("category") ?? "all";
-
-  function hrefFor(cat) {
-    const next = new URLSearchParams(params.toString());
-    if (cat === "all") next.delete("category");
-    else next.set("category", cat);
-    return `/menu?${next.toString()}`;
-  }
+  const searchParams = useSearchParams();
+  const active = searchParams.get("category") ?? "all";
+  const q = searchParams.get("q");
 
   return (
-    <nav style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-      {categories.map((cat) => (
-        <Link
-          key={cat}
-          href={hrefFor(cat)}
-          style={{ fontWeight: cat === current ? "700" : "400" }}
-        >
-          {cat}
-        </Link>
-      ))}
+    <nav>
+      <ul className={styles.categoryList}>
+        {categories.map((c) => {
+          const params = new URLSearchParams();
+          if (q) params.set("q", q);
+          if (c !== "all") params.set("category", c);
+          const qs = params.toString();
+          return (
+            <li key={c}>
+              <Link href={qs ? `/menu?${qs}` : "/menu"} className={c === active ? styles.active : undefined}>
+                {c[0].toUpperCase() + c.slice(1)}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </nav>
   );
 }

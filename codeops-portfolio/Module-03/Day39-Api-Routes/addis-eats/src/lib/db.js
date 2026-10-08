@@ -13,7 +13,7 @@ const mockDishes = [
     currency: "ETB",
     category: "Main",
     available: true,
-    image: "/images/dishes/dish_1.jpg",
+    image: "/images/Doro%20Wat.jpg",         // dish_1
   },
   {
     id: "dish_2",
@@ -23,7 +23,7 @@ const mockDishes = [
     currency: "ETB",
     category: "Vegetarian",
     available: true,
-    image: "/images/dishes/dish_2.jpg",
+    image: "/images/Beyaynetu.jpg",          // dish_2
   },
   {
     id: "dish_3",
@@ -33,7 +33,7 @@ const mockDishes = [
     currency: "ETB",
     category: "Main",
     available: true,
-    image: "/images/dishes/dish_3.jpg",
+    image: "/images/Kitfo.jpg",              // dish_3
   },
   {
     id: "dish_4",
@@ -43,7 +43,7 @@ const mockDishes = [
     currency: "ETB",
     category: "Vegetarian",
     available: true,
-    image: "/images/dishes/dish_4.jpg",
+    image: "/images/Shiro%20Tegabeno.jpg",   // dish_4
   },
 ];
 
