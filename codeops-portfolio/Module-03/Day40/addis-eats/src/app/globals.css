@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #fffaf3;
+  --bg-soft: #fbeedd;
+  --text: #2b1d14;
+  --muted: #7a6a5d;
+  --brand: #b4441c;
+  --brand-dark: #8f3314;
+  --card: #ffffff;
+  --border: #eadfd3;
+  --success: #2f7d4f;
+  --danger: #b3261e;
+  --radius: 14px;
+  --shadow: 0 6px 24px rgba(43, 29, 20, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.6;
+}
+
+a { color: var(--brand); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+h1 { margin: 0 0 1rem; font-size: 2rem; line-height: 1.2; }
+h2 { margin: 0 0 0.75rem; font-size: 1.4rem; line-height: 1.3; }
+
+input,
+textarea {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  margin-bottom: 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  color: var(--text);
+}
+input:focus,
+textarea:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+  border-color: transparent;
+}
