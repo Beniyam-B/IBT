@@ -58,7 +58,8 @@ export function Providers({ children }) {
       decrease,
       removeItem,
       clear,
-      count: items.reduce((n, i) => n + i.quantity, 0),
+      count: items.length, // distinct dishes, not total quantity
+      quantity: items.reduce((n, i) => n + i.quantity, 0),
       total: items.reduce((sum, i) => sum + i.price * i.quantity, 0),
     };
   }, [items]);

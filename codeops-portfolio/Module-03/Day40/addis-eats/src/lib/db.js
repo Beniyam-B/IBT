@@ -53,8 +53,7 @@ g.__addisEats ??= { users: [], orders: [], nextUser: 101, nextOrder: 101 };
 const store = g.__addisEats;
 
 // Attach the photo whose file name matches the dish name (null when there is none).
-const withImage = (dish) => ({ ...dish, image: findDishImage(dish.name) });
-
+const withImage = (dish) => ({ ...dish, image: findDishImage(dish.name, dish.id) });
 export const db = {
   dish: {
     findMany: async () => mockDishes.map(withImage),

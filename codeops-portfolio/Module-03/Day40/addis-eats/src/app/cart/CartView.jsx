@@ -22,7 +22,7 @@ export default function CartView() {
 
   return (
     <>
-      <p className={styles.count}>{count} {count === 1 ? "item" : "items"}</p>
+      <p className={styles.count}>{count} {count === 1 ? "dish" : "dishes"}</p>
       <div className={styles.layout}>
         <ul className={styles.list}>
           {items.map((item) => (
