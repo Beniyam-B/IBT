@@ -1,0 +1,78 @@
+# Rendering Strategy — Addis Eats
+
+Question asked of every route: *does it depend on who is asking, and how stale may it be?*
+
+| Route              | Strategy                          | One line of reasoning                                                              |
+|--------------------|-----------------------------------|--------------------------------------------------------------------------------------|
+| /                  | ISR, 1 h                          | Shows popular dishes from the dishes API, which is cached for an hour, so the page inherits that window |
+| /menu              | ISR, revalidate = 3600            | Page 1 and its pager are prerendered; search, category and later pages are fetched by the client (SWR) from /api/dishes |
+| /menu/[id]         | Static via generateStaticParams (20 pages, 1 h) | Every dish id comes from the API at build time; `dynamicParams = false` gives a real 404 for the rest |
+| /cart              | Client                            | The cart is private to this browser tab and never leaves it until checkout          |
+| /checkout          | Dynamic                           | Verifies the session cookie to guard the page (redirects to /login?next=…); also reads `?dish=` |
+| /login, /register  | Dynamic                           | They read `?next=` (where the person was going), and bounce anyone already signed in |
+| /kitchen           | Dynamic                           | Staff only: verifies the session and the role while rendering                        |
+| /orders            | Dynamic                           | One person's orders, read from the session cookie: never cacheable                   |
+| /orders/[id]       | Dynamic + client poll             | Reads the session and the order on the server, then SWR polls every 5 s until it is delivered or cancelled |
+| /api/dishes        | Route handler (GET)               | Search, category and paging for the client; reads `request.url`, so always dynamic   |
+| /api/dishes/[id]   | Route handler (GET)               | One dish, or 404 with `{ error }`                                                    |
+| /api/orders        | Route handler (POST)              | Writes are never cached; validated server-side                                       |
+| /api/orders/[id]   | Route handler (GET)               | Polled by the tracking screen: 401 signed out, 403 not yours, 404 missing            |
+| /api/session       | Route handler (GET)               | Reads the cookie; lets the static header know who is signed in                       |
+| /sitemap.xml       | Generated file route              | Built from the dishes at build time; private routes left out. Confirm the marker in your build output |
+| /robots.txt        | Generated file route              | Static rules plus a pointer to the sitemap. Confirm the marker in your build output |
+| /opengraph-image, /menu/[id]/opengraph-image | Generated image routes | One site-wide card and one per dish (name and price), drawn with `ImageResponse`. Confirm the markers in your build output |
+
+## Build output (production build)
+
+```
+Route (app)             Revalidate  Expire
+┌ ○ /                           1h      1y
+├ ○ /_not-found
+├ ƒ /api/dishes
+├ ƒ /api/dishes/[id]
+├ ƒ /api/orders
+├ ƒ /api/orders/[id]
+├ ƒ /api/session
+├ ○ /cart
+├ ƒ /checkout
+├ ƒ /kitchen
+├ ƒ /login
+├ ○ /menu                       1h      1y
+├   /menu/[id]
+│ ├ ● /menu/dish_1              1h      1y
+│ ├ ● /menu/dish_2              1h      1y
+│ ├ ● /menu/dish_3              1h      1y
+│ └ ● [+17 more paths]
+├ ƒ /orders
+├ ƒ /orders/[id]
+└ ƒ /register
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+```
+
+## What changed on Day 42
+
+- **`/login` and `/register` became dynamic.** They read `?next=` on the server, so the sign-in form is rendered with a safe destination and works without JavaScript.
+- **`/kitchen` is new** and dynamic (session + role).
+- **A proxy runs before the private routes** (`/cart`, `/checkout`, `/orders`, `/kitchen`). It reads one cookie and redirects: no page is built for a signed-out visitor. `/menu` and everything public stays static and indexable. See `AUTH.md`.
+- **The header is still static.** Signed-in state comes from `GET /api/session`, fetched by the client, so the root layout never reads cookies and the public pages stay static.
+
+## What changed on Day 41
+
+- **`/` and `/menu/[id]` now show a 1 h revalidate.** They read the dishes API with `fetch(..., { next: { revalidate: 3600 } })`, and a cached fetch gives the route the same window. That is correct: the menu is the same for everyone.
+- **/menu stays ISR.** Reading `searchParams` on the server would have made it dynamic again, so the filters live in the URL but are read by a client component (`useSearchParams`). The server-rendered first page is also the Suspense fallback, so the static HTML is complete and crawlable.
+- **/orders/[id] is new** and follows the Day 41 shape: the server renders the order, the client polls it. The route itself is dynamic because it reads the session cookie.
+
+## Why the header does not read the session itself
+
+`cookies()` anywhere in a route opts the whole route out of static. If the root layout read the session, every route would turn ƒ. Instead the header is static and one small client island asks `GET /api/session` who is signed in.
+
+## What changed on Days 43-45
+
+- **No route changed its rendering strategy.** The font, metadata, JSON-LD and preview images are server-side only.
+- **New generated routes:** `/sitemap.xml`, `/robots.txt`, `/icon`, `/opengraph-image` and `/menu/[id]/opengraph-image`. Re-run `npm run build` and paste the new route table above; do not trust this note over the build output.
+- Every page now has a distinct title and description (title template in the root layout).

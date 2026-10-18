@@ -1,0 +1,66 @@
+/* Shared building blocks used by several pages */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.4rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.btn:hover { text-decoration: none; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.primary { background: var(--brand); color: #fff; }
+.primary:hover:not(:disabled) { background: var(--brand-dark); }
+
+.outline { background: #fff; color: var(--brand); border-color: var(--brand); }
+.outline:hover:not(:disabled) { background: var(--bg-soft); }
+
+.small { padding: 0.4rem 0.9rem; font-size: 0.9rem; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.pageHeader { margin-bottom: 1.5rem; }
+.pageHeader p { margin: 0; color: var(--muted); }
+
+.empty {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--muted);
+}
+.empty h2 { color: var(--text); }
+
+/* forms */
+.field { margin-bottom: 1rem; }
+.field label { display: block; margin-bottom: 0.3rem; font-weight: 600; font-size: 0.95rem; }
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"] { border-color: var(--danger); }
+.fieldError { margin: 0.25rem 0 0; color: var(--danger); font-size: 0.875rem; }
+
+.alert {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: #fdecea;
+  border: 1px solid #f5c2be;
+  color: var(--danger);
+}
+.success {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: #e8f5ec;
+  border: 1px solid #bfe0c9;
+  color: var(--success);
+}
