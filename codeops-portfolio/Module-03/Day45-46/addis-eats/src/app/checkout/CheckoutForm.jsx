@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useActionState, useEffect } from "react";
 import { placeOrder } from "../actions";
 import { useCart } from "../providers";
+import { AREAS } from "@/lib/areas";
 import ui from "@/components/ui.module.css";
 import styles from "./checkout.module.css";
+import areaStyles from "./area.module.css";
 
 // Client leaf: useActionState is a hook. The checks themselves (session, schema, prices)
 // all run inside the placeOrder server action.
@@ -82,6 +84,24 @@ export default function CheckoutForm({ quick, defaultName, defaultPhone }) {
             aria-describedby={errors.phone ? "phone-error" : undefined}
           />
           {errors.phone && <p id="phone-error" className={ui.fieldError} role="alert">{errors.phone[0]}</p>}
+        </div>
+
+        <div className={ui.field}>
+          <label htmlFor="area">Delivery area</label>
+          <select
+            id="area"
+            name="area"
+            className={areaStyles.select}
+            defaultValue={state?.values?.area ?? ""}
+            aria-invalid={Boolean(errors.area)}
+            aria-describedby={errors.area ? "area-error" : undefined}
+          >
+            <option value="" disabled>Choose your area…</option>
+            {AREAS.map((area) => (
+              <option key={area} value={area}>{area}</option>
+            ))}
+          </select>
+          {errors.area && <p id="area-error" className={ui.fieldError} role="alert">{errors.area[0]}</p>}
         </div>
 
         <div className={ui.field}>

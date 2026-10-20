@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { orderSchema, registerSchema, loginSchema } from "@/lib/schema";
+import { checkoutSchema, registerSchema, loginSchema } from "@/lib/schema";
 import {
   advanceStatus,
   createOrder,
@@ -25,12 +25,13 @@ export async function placeOrder(prevState, formData) {
     name: String(formData.get("name") ?? ""),
     phone: String(formData.get("phone") ?? ""),
     notes: String(formData.get("notes") ?? ""),
+    area: String(formData.get("area") ?? ""),
   };
 
   const user = await getSession();
   if (!user) return { values, error: "Please log in to place an order." };
 
-  const parsed = orderSchema.safeParse({
+  const parsed = checkoutSchema.safeParse({
     ...values,
     notes: values.notes || undefined,
     items: String(formData.get("items") ?? "[]"),
@@ -64,6 +65,7 @@ export async function placeOrder(prevState, formData) {
       name: parsed.data.name,
       phone: parsed.data.phone,
       notes: parsed.data.notes,
+      area: parsed.data.area,
       items: lines,
       total,
       currency: "ETB",

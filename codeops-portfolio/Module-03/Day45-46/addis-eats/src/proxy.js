@@ -15,5 +15,5 @@ export function proxy(request) {
 
 // Narrow on purpose: only the private routes pay for it. /menu stays public and indexable.
 export const config = {
-  matcher: ["/cart/:path*", "/checkout/:path*", "/orders/:path*", "/kitchen/:path*"],
+  matcher: ["/cart/:path*", "/checkout/:path*", "/orders/:path*", "/kitchen/:path*", "/dashboard/:path*"],
 };

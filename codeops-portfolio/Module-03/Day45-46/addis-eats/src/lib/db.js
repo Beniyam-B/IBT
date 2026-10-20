@@ -7,6 +7,8 @@ import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import { findDishImage } from "./images";
 import fallbackDishes from "./dishes.fallback.json";
+import { paginate, sortOrders } from "./orderTable";
+import { makeDemoOrders } from "./seedOrders";
 
 // ---- Menu: the public dishes API -----------------------------------------------------
 const DISHES_API =
@@ -109,6 +111,27 @@ if (!store.users.some((u) => u.role === "staff")) {
   });
 }
 
+// Optional demo data, off by default. With SEED_DEMO_DATA=true, a "Demo Customer" (phone
+// 0911000000, password demo123) gets 45 orders over the last two weeks, so the dashboard and the
+// paged table have something to show. Never switch this on for real users.
+if (process.env.SEED_DEMO_DATA === "true" && !store.seeded) {
+  store.seeded = true;
+  const demoUser = {
+    id: `user_${store.nextUser++}`,
+    name: "Demo Customer",
+    phone: "0911000000",
+    email: null,
+    role: "customer",
+    passwordHash: bcrypt.hashSync("demo123", 10),
+    createdAt: new Date().toISOString(),
+  };
+  store.users.push(demoUser);
+  for (const order of makeDemoOrders({ dishes: fallbackDishes, userId: demoUser.id })) {
+    store.orders.push({ id: `ord_${store.nextOrder++}`, ...order });
+  }
+  console.warn("[db] SEED_DEMO_DATA is on: 45 demo orders loaded for Demo Customer (0911000000 / demo123)");
+}
+
 // Never hand the hash to the rest of the app.
 const publicUser = ({ passwordHash, ...user }) => user;
 
@@ -153,9 +176,12 @@ export async function getOrder(id) {
   return order ? withStatus(order) : null;
 }
 
-// The orders of ONE person. The id comes from the session, never from the request.
-export async function getOrdersFor(userId) {
-  return store.orders.filter((o) => o.userId === userId).map(withStatus).reverse();
+// The orders of ONE person, sorted and paged. The id comes from the session, never from the
+// request; sort, dir and page come from the URL and are validated in orderTable.js.
+// Returns { rows, total, page, pageSize, totalPages }: one page, not every order.
+export async function getOrdersFor(userId, { sort = "date", dir = "desc", page = 1, pageSize = 10 } = {}) {
+  const mine = store.orders.filter((o) => o.userId === userId).map(withStatus);
+  return paginate(sortOrders(mine, sort, dir), page, pageSize);
 }
 
 // Staff: move an order to the next step by hand.

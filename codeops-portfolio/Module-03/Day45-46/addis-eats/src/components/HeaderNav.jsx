@@ -38,6 +38,7 @@ export default function HeaderNav() {
           {link("/checkout", "Checkout")}
           {link("/orders", "My orders")}
           {user.role === "staff" && link("/kitchen", "Kitchen")}
+          {user.role === "staff" && link("/dashboard", "Dashboard")}
         </>
       )}
 

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AREAS } from "./areas";
 
 // Spaces and dashes are ignored: "0912 345 678" is the same number as "0912345678".
 const phone = z
@@ -15,6 +16,13 @@ export const orderSchema = z.object({
   notes: z.string().max(200, "Notes cannot exceed 200 characters").optional(),
   // the cart, sent by the checkout form as a JSON string
   items: z.string().optional(),
+  // optional here so POST /api/orders keeps working; the checkout form requires it (below)
+  area: z.enum(AREAS, { message: "Choose a delivery area" }).optional(),
+});
+
+// What the checkout FORM sends: the same fields, with the delivery area required.
+export const checkoutSchema = orderSchema.extend({
+  area: z.enum(AREAS, { message: "Choose your delivery area" }),
 });
 
 export const registerSchema = z.object({
