@@ -17,7 +17,8 @@ export const metadata = {
   alternates: { canonical: "/menu" },
 };
 
-const PAGE_SIZE = 8;
+// The whole menu (20 dishes today) fits on one page; the pager only appears if the menu grows past this.
+const PAGE_SIZE = 24;
 
 export default async function MenuPage() {
   // Page one is rendered on the server: fast, indexable, and no client request.
