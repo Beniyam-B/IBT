@@ -12,17 +12,17 @@ export default function RevenueChart({ data }) {
     <div
       className={styles.chartBox}
       role="img"
-      aria-label="Bar chart of revenue by delivery area, largest first. The same numbers are in the table below."
+      aria-label="Bar chart of revenue by neighbourhood, largest first. The same numbers are in the table below."
     >
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 24, right: 16, left: 8, bottom: 8 }}>
-          <CartesianGrid vertical={false} strokeDasharray="3 3" />
-          <XAxis dataKey="area" />
-          <YAxis tickFormatter={etb} width={90} domain={[0, "auto"]} />
-          <Tooltip formatter={(value) => [etb(value), "Revenue"]} />
-          <Bar dataKey="revenue" name="Revenue" fill="#b4441c">
-            <LabelList dataKey="revenue" position="top" formatter={etb} />
-          </Bar>
+        <BarChart data={data} layout="vertical" margin={{ top: 8, right: 80, left: 8, bottom: 8 }}>
+        <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+        <XAxis type="number" tickFormatter={etb} domain={[0, "auto"]} />
+        <YAxis type="category" dataKey="area" width={100} />
+        <Tooltip formatter={(value) => [etb(value), "Revenue"]} />
+        <Bar dataKey="revenue" name="Revenue" fill="#b4441c">
+        <LabelList dataKey="revenue" position="right" formatter={etb} />
+        </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>

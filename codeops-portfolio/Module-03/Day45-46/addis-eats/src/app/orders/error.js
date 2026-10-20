@@ -6,6 +6,7 @@ import ui from "@/components/ui.module.css";
 // button with a handler). The real message is not shown, because it can reveal internals.
 export default function OrdersError({ reset }) {
   return (
+    <main>
     <div className={`${ui.card} ${ui.empty}`} role="alert">
       <h2>We could not load this page</h2>
       <p>Nothing was lost. Check your connection and try again.</p>
@@ -13,5 +14,6 @@ export default function OrdersError({ reset }) {
         Try again
       </button>
     </div>
+    </main>
   );
 }

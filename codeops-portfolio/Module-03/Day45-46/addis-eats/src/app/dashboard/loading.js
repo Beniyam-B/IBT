@@ -9,9 +9,13 @@ export default function Loading() {
           <SkeletonBox height={34} width="12rem" />
           <SkeletonBox height={18} width="16rem" />
         </div>
+        <div style={{ display: "grid", gap: "1rem", marginBottom: "2.5rem" }}>
+        <SkeletonBox height={300} />
+        <SkeletonRows count={4} height={40} />
+        </div>
         <div style={{ display: "grid", gap: "1rem" }}>
-          <SkeletonBox height={300} />
-          <SkeletonRows count={4} height={40} />
+        <SkeletonBox height={300} />
+        <SkeletonRows count={4} height={40} />
         </div>
       </LoadingRegion>
     </main>

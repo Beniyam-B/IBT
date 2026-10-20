@@ -6,6 +6,7 @@ import ui from "@/components/ui.module.css";
 // button with a handler). The real message is not shown, because it can reveal internals.
 export default function DashboardError({ reset }) {
   return (
+    <main>
     <div className={`${ui.card} ${ui.empty}`} role="alert">
       <h2>We could not load the dashboard</h2>
       <p>The numbers could not be read. Try again in a moment.</p>
@@ -13,5 +14,6 @@ export default function DashboardError({ reset }) {
         Try again
       </button>
     </div>
+    </main>
   );
 }

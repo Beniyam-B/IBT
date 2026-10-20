@@ -53,20 +53,24 @@ export default async function DashboardPage({ searchParams }) {
       </div>
 
       <section className={styles.section} aria-labelledby="revenue-heading">
-        <h2 id="revenue-heading">Revenue by delivery area</h2>
+        <h2 id="revenue-heading">Revenue by neighbourhood</h2>
         <p className={styles.sub}>ETB, all orders except cancelled ones, largest first</p>
+        {revenue.some((r) => r.revenue > 0) ? (
         <RevenueChart data={revenue} />
+        ) : (
+  <p className={styles.sub}>No revenue yet: every order so far was cancelled.</p>
+)}
         <SummaryTable
-          caption="Revenue by delivery area (ETB)"
-          head={["Area", "Revenue"]}
+          caption="Revenue by neighbourhood (ETB)"
+          head={["Neighbourhood", "Revenue"]}
           rows={revenue.map((r) => [r.area, etb(r.revenue)])}
           numeric={[false, true]}
         />
       </section>
 
       <section className={styles.section} aria-labelledby="orders-heading">
-        <h2 id="orders-heading">Orders per day</h2>
-        <p className={styles.sub}>Orders placed per day, {range} (UTC), including cancelled ones</p>
+        <h2 id="orders-heading">Orders per day, {range}</h2>
+        <p className={styles.sub}>Number of orders placed each day (UTC), including cancelled ones</p>
         <OrdersChart data={daily} />
         <SummaryTable
           caption={`Orders placed per day, ${range}`}
