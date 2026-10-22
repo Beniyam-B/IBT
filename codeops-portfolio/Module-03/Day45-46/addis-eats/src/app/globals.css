@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --page-scale: 0.75;
   --bg: #fffaf3;
   --bg-soft: #fbeedd;
   --text: #2b1d14;
@@ -17,6 +18,8 @@
 
 * { box-sizing: border-box; }
 
+html { zoom: var(--page-scale); }
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -26,6 +29,7 @@ body {
   color: var(--text);
   font-family: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
   line-height: 1.6;
+
 }
 
 a { color: var(--brand); text-decoration: none; }
