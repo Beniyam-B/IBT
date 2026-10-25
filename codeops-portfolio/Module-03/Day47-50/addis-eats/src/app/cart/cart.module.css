@@ -1,0 +1,30 @@
+.layout { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
+.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+.row { display: grid; grid-template-columns: 96px 1fr auto auto; gap: 1rem; align-items: center; padding: 0.9rem; }
+.thumb { border-radius: 10px; }
+.info { display: flex; flex-direction: column; gap: 0.1rem; }
+.name { font-weight: 700; color: var(--text); font-size: 1.05rem; }
+.unit { color: var(--muted); font-size: 0.9rem; }
+.remove { align-self: flex-start; padding: 0; border: 0; background: none; color: var(--danger); font: inherit; font-size: 0.85rem; cursor: pointer; }
+.remove:hover { text-decoration: underline; }
+.qty { display: inline-flex; align-items: center; gap: 0.6rem; border: 1px solid var(--border); border-radius: 999px; padding: 0.15rem 0.4rem; }
+.qty button { width: 1.8rem; height: 1.8rem; border: 0; border-radius: 50%; background: var(--bg-soft); color: var(--brand-dark); font-size: 1.1rem; cursor: pointer; }
+.qty button:hover { background: var(--brand); color: #fff; }
+.qty span { min-width: 1.2rem; text-align: center; font-weight: 700; }
+.lineTotal { min-width: 5rem; text-align: right; }
+.summary { padding: 1.25rem; position: sticky; top: 5rem; display: grid; gap: 0.75rem; }
+.summary h2 { margin: 0; }
+.sumRow { display: flex; justify-content: space-between; color: var(--muted); }
+.sumTotal { color: var(--text); font-weight: 800; font-size: 1.2rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+.full { width: 100%; }
+
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+  .row { grid-template-columns: 72px 1fr; }
+  .qty, .lineTotal { grid-column: 2; justify-self: start; text-align: left; }
+  .summary { position: static; }
+}
+.count { margin: -0.5rem 0 1.25rem; color: var(--muted); }
+.thumb { position: relative; width: 96px; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 10px; background: var(--bg-soft); }
+.thumbImg { object-fit: cover; }
+.thumbFallback { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(135deg, #f6d9b8, #e9b98a); color: var(--brand-dark); font-size: 1.6rem; font-weight: 800; }

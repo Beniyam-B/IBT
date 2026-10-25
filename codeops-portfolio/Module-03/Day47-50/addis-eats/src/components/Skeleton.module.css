@@ -1,0 +1,5 @@
+.bar { background: linear-gradient(90deg, var(--bg-soft) 25%, #fff 50%, var(--bg-soft) 75%); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; border-radius: 8px; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .bar { animation: none; } }
+.stack { display: grid; gap: 0.5rem; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

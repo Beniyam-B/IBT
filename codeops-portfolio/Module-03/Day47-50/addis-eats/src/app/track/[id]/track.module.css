@@ -1,0 +1,7 @@
+.layout { display: grid; gap: 1.5rem; grid-template-columns: 1fr 1fr; align-items: start; }
+@media (max-width: 800px) { .layout { grid-template-columns: 1fr; } }
+.status { font-weight: 700; margin: 0 0 0.5rem; }
+.badge { display: inline-block; margin: 0 0 1rem; padding: 0.2rem 0.7rem; border: 1px solid var(--border); border-radius: 999px; font-size: 0.85rem; }
+.facts { display: grid; gap: 0.75rem; margin: 0; }
+.facts dt { color: var(--muted); font-size: 0.85rem; }
+.facts dd { margin: 0; font-weight: 600; }
