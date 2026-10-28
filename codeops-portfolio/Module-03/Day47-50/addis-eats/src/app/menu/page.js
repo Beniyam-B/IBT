@@ -35,7 +35,7 @@ export default async function MenuPage({ searchParams }) {
   };
 
   return (
-    <main>
+    <main className={styles.menuPage}>
       <div className={ui.pageHeader}>
         <h1>Menu</h1>
         <p>Fresh Ethiopian dishes, delivered across Addis Ababa.</p>
