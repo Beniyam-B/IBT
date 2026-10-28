@@ -4,7 +4,7 @@ The Day 35 food-ordering app rebuilt on Next.js 16 (App Router): file routing, n
 a chosen rendering strategy per route, server components fetching their own data, and my own
 endpoints and server actions behind them. Mock data layer (`src/lib/db.js`) until a real database.
 
-**Deployed URL:** _paste it here after you deploy_
+**Deployed URL:** ibt-blond.vercel.app
 
 ## Run it
 
