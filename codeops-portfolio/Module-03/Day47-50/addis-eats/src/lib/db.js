@@ -116,6 +116,28 @@ if (!store.users.some((u) => u.role === "staff")) {
   });
 }
 
+const DEMO_CUSTOMERS = [
+  { name: "Abebe", phone: "0911111111", email: "abebe@example.com", password: "user123" },
+  { name: "Kebede", phone: "0911222333", email: "kebede@example.com", password: "user123" },
+  { name: "Almaz", phone: "0911333444", email: "almaz@example.com", password: "user123" },
+];
+
+for (const demo of DEMO_CUSTOMERS) {
+  const phone = normalizePhone(demo.phone);
+  const email = demo.email.trim().toLowerCase();
+  if (!store.users.some((u) => u.phone === phone || (u.email && u.email === email))) {
+    store.users.push({
+      id: `user_${store.nextUser++}`,
+      name: demo.name,
+      phone,
+      email,
+      role: "customer",
+      passwordHash: bcrypt.hashSync(demo.password, 10),
+      createdAt: new Date().toISOString(),
+    });
+  }
+}
+
 // Optional demo data, off by default. With SEED_DEMO_DATA=true, a "Demo Customer" (phone
 // 0911000000, password demo123) gets 45 orders over the last two weeks, so the dashboard and the
 // paged table have something to show. Never switch this on for real users.
