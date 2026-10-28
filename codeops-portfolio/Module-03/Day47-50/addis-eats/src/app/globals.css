@@ -63,3 +63,18 @@ textarea:focus {
   outline-offset: 1px;
   border-color: transparent;
 }
+/* ---- Day 48: keyboard and touch ---- */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid #1a1a1a;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #fff; /* stays visible on dark backgrounds too */
+}
+:where(button, select, textarea, input:not([type="hidden"], [type="checkbox"], [type="radio"])) {
+  min-height: 44px;
+}
+:where(nav a, footer a) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 0.25rem;
+}

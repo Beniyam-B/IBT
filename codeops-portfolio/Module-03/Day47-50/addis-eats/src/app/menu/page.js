@@ -1,56 +1,111 @@
-import { Suspense } from "react";
-import { listDishes } from "@/lib/db";
-import DishList from "./DishList";
-import MenuBrowser from "./MenuBrowser";
-import Pager from "./Pager";
+import Link from "next/link";
+import { listCategories, listDishes } from "@/lib/db";
+import PageLinks from "@/components/PageLinks";
+import ui from "@/components/ui.module.css";
+import DishCard from "./DishCard";
 import styles from "./menu.module.css";
-
-// ISR: built as static HTML, regenerated in the background at most once an hour.
-// Nothing here reads a cookie, header or searchParams, so the route stays static.
-export const revalidate = 3600;
 
 export const metadata = {
   title: "Menu",
-  description:
-    "Doro Wat, Tibs, Kitfo and Shiro: browse the full Addis Eats menu, search by dish or filter by category.",
-  // /menu?category=… and /menu?page=2 are the same page to a crawler
-  alternates: { canonical: "/menu" },
+  description: "Browse every Addis Eats dish, search by name and filter by category.",
 };
 
-// The whole menu (20 dishes today) fits on one page; the pager only appears if the menu grows past this.
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 8;
 
-export default async function MenuPage() {
-  // Page one is rendered on the server: fast, indexable, and no client request.
-  const first = await listDishes({ page: 1, pageSize: PAGE_SIZE });
-  const firstPage = (
-    <>
-      <DishList dishes={first.items} />
-      <Pager page={1} totalPages={first.totalPages} />
-    </>
-  );
+// Server component. The URL holds the whole state: /menu?q=doro&category=Mains&page=2
+// Search is a plain GET form, so Enter works, the back button works and the result is shareable.
+export default async function MenuPage({ searchParams }) {
+  const params = await searchParams;
+
+  // Anything from the URL is a claim: trim the search, whitelist the category, clamp the page.
+  const q = String(params.q ?? "").trim().slice(0, 60);
+  const categories = await listCategories();
+  const category =
+    categories.find((c) => c.toLowerCase() === String(params.category ?? "").toLowerCase()) ?? "all";
+  const requested = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
+
+  const result = await listDishes({ q, category, page: requested, pageSize: PAGE_SIZE });
+
+  const filterHref = (cat) => {
+    const p = new URLSearchParams();
+    if (q) p.set("q", q);
+    if (cat !== "all") p.set("category", cat);
+    const qs = p.toString();
+    return qs ? `/menu?${qs}` : "/menu";
+  };
 
   return (
-    <div>
-      <div className={styles.pageHead}>
-        <h1>Our menu</h1>
-        <p>Fresh, home-style Ethiopian dishes. Search, filter, or page through the menu.</p>
+    <main>
+      <div className={ui.pageHeader}>
+        <h1>Menu</h1>
+        <p>Fresh Ethiopian dishes, delivered across Addis Ababa.</p>
       </div>
-      {/* MenuBrowser reads the URL (useSearchParams). While that is not available, e.g. in the
-          static HTML, the same server-rendered first page is shown as the fallback. */}
-      <Suspense
-        fallback={
-          <>
-            {/* same size as the real search box, so nothing jumps when it hydrates */}
-            <input className={styles.search} placeholder="Search dishes…" aria-label="Search dishes" disabled />
-            {firstPage}
-          </>
-        }
-      >
-        <MenuBrowser pageSize={PAGE_SIZE}>
-          {firstPage}
-        </MenuBrowser>
-      </Suspense>
-    </div>
+
+      <form action="/menu" method="get" role="search" className={styles.search}>
+        <div className={styles.searchField}>
+          <label htmlFor="q">Search dishes</label>
+          <input
+            id="q"
+            name="q"
+            type="search"
+            defaultValue={q}
+            placeholder="Doro wat, tibs, shiro…"
+            autoComplete="off"
+            enterKeyHint="search"
+          />
+        </div>
+        {category !== "all" && <input type="hidden" name="category" value={category} />}
+        <button type="submit" className={`${ui.btn} ${ui.primary}`}>Search</button>
+        {q && <Link href={filterHref("all").split("?")[0]} className={`${ui.btn} ${ui.outline}`}>Clear</Link>}
+      </form>
+
+      <nav aria-label="Categories">
+        <ul className={styles.chips}>
+          {["all", ...categories].map((cat) => {
+            const active = cat === category;
+            return (
+              <li key={cat}>
+                <Link
+                  href={filterHref(cat)}
+                  className={`${styles.chip} ${active ? styles.chipActive : ""}`}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {active && <span aria-hidden="true">✓&nbsp;</span>}
+                  {cat === "all" ? "All" : cat}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {result.total === 0 ? (
+        // Empty is not an error: say why, and what to do next.
+        <div className={`${ui.card} ${ui.empty}`}>
+          <h2>No dishes match</h2>
+          <p>Try a different word, or clear the filters to see the whole menu.</p>
+          <Link href="/menu" className={`${ui.btn} ${ui.primary}`}>Show the whole menu</Link>
+        </div>
+      ) : (
+        <>
+          <p className={styles.count} role="status">
+            {result.total} dish{result.total === 1 ? "" : "es"}, page {result.page} of {result.totalPages}
+          </p>
+          <ul className={styles.grid}>
+            {result.items.map((dish) => (
+              <li key={dish.id}>
+                <DishCard dish={dish} />
+              </li>
+            ))}
+          </ul>
+          <PageLinks
+            basePath="/menu"
+            query={{ q, category: category !== "all" ? category : "" }}
+            page={result.page}
+            totalPages={result.totalPages}
+          />
+        </>
+      )}
+    </main>
   );
 }

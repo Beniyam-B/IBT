@@ -69,12 +69,14 @@ export async function placeOrder(prevState, formData) {
       items: lines,
       total,
       currency: "ETB",
+      // One key per checkout page: a repeated tap or a retry returns the SAME order
+      idempotencyKey: String(formData.get("key") ?? "").slice(0, 64) || undefined,
     },
     user.id // from the session, never from the form
   );
 
   revalidatePath("/orders");
-  return { id: order.id, total };
+  return { id: order.id, total: order.total };
 }
 
 export async function cancelOrder(orderId) {

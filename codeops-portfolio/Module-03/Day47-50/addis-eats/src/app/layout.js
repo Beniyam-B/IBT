@@ -9,9 +9,10 @@ import { SITE_URL, SITE_NAME } from "@/lib/seo";
 // visitor loads the page), with a metric-matched fallback so the swap does not move the layout.
 // `variable` instead of `className` because globals.css sets the body font-family itself.
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
+const siteUrl = SITE_URL;
 
 export const metadata = {
-  metadataBase: new URL(SITE_URL), // without it, relative og:image paths resolve against nothing
+  metadataBase: new URL(siteUrl), // without it, relative og:image paths resolve against nothing
   title: {
     template: `%s · ${SITE_NAME}`, // each page supplies only its own part
     default: `${SITE_NAME} — Ethiopian food delivery in Addis Ababa`,

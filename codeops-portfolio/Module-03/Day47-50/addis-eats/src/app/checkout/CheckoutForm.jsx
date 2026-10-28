@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { placeOrder } from "../actions";
 import { useCart } from "../providers";
 import { AREAS } from "@/lib/areas";
@@ -14,6 +14,13 @@ import areaStyles from "./area.module.css";
 export default function CheckoutForm({ quick, defaultName, defaultPhone }) {
   const { items, clear } = useCart();
   const [state, formAction, pending] = useActionState(placeOrder, null);
+
+  // One key per page load. Made after mount so the server and browser HTML match.
+  const [key, setKey] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => setKey(crypto.randomUUID()), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const lines = quick ? [quick] : items;
   const total = lines.reduce((sum, l) => sum + l.price * l.quantity, 0);
@@ -57,6 +64,7 @@ export default function CheckoutForm({ quick, defaultName, defaultPhone }) {
         )}
 
         <input type="hidden" name="items" value={cartPayload} />
+        <input type="hidden" name="key" value={key} />
 
         <div className={ui.field}>
           <label htmlFor="name">Full name</label>
@@ -77,6 +85,7 @@ export default function CheckoutForm({ quick, defaultName, defaultPhone }) {
             id="phone"
             name="phone"
             type="tel"
+            inputMode="tel"
             placeholder="09… or +2519…"
             autoComplete="tel"
             defaultValue={state?.values?.phone ?? defaultPhone}

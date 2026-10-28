@@ -160,6 +160,14 @@ function currentStatus(order) {
 const withStatus = (order) => ({ ...order, status: currentStatus(order) });
 
 export async function createOrder(data, userId = null) {
+  // Idempotent: the same key from the same person returns the order that already exists.
+  // There is no await between the check and the push, so two taps cannot both get past it.
+  if (data.idempotencyKey) {
+    const existing = store.orders.find(
+      (o) => o.userId === userId && o.idempotencyKey === data.idempotencyKey
+    );
+    if (existing) return withStatus(existing);
+  }
   const order = {
     id: `ord_${store.nextOrder++}`,
     ...data,
