@@ -89,6 +89,11 @@ export async function getDish(id) {
   return (await loadDishes()).find((d) => d.id === id) || null;
 }
 
+export async function findUserById(userId) {
+  const user = store.users.find((u) => u.id === userId);
+  return user ? publicUser(user) : null;
+}
+
 // ---- Users and orders (in memory) -------------------------------------------------------
 // Kept on globalThis so the data survives hot reloads and is shared by every route bundle.
 // Resets when the server restarts.
