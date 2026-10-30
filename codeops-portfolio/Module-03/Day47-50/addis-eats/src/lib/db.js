@@ -9,6 +9,7 @@ import { findDishImage } from "./images";
 import fallbackDishes from "./dishes.fallback.json";
 import { paginate, sortOrders } from "./orderTable";
 import { makeDemoOrders } from "./seedOrders";
+import { loadInto, saveFrom } from "./persist";
 
 // ---- Menu: the public dishes API -----------------------------------------------------
 const DISHES_API =
@@ -74,11 +75,18 @@ export const db = {
     findUnique: async ({ where }) => (await loadDishes()).find((d) => d.id === where.id) || null,
   },
   order: {
-    findMany: async () => store.orders.map(withStatus),
+    findMany: async () => {
+      await loadInto(store);
+      return store.orders.map(withStatus);
+    },
   },
   user: {
-    findMany: async () => store.users.map(publicUser),
+    findMany: async () => {
+      await loadInto(store);
+      return store.users.map(publicUser);
+    },
     findUnique: async ({ where }) => {
+      await loadInto(store);
       const user = store.users.find((u) => (where.phone ? u.phone === where.phone : u.email === where.email));
       return user ? publicUser(user) : null;
     },
@@ -89,7 +97,7 @@ export async function getDish(id) {
   return (await loadDishes()).find((d) => d.id === id) || null;
 }
 
-export async function findUserById(userId) {
+async function findUserByIdImpl(userId) {
   const user = store.users.find((u) => u.id === userId);
   return user ? publicUser(user) : null;
 }
@@ -186,7 +194,7 @@ function currentStatus(order) {
 
 const withStatus = (order) => ({ ...order, status: currentStatus(order) });
 
-export async function createOrder(data, userId = null) {
+async function createOrderImpl(data, userId = null) {
   // Idempotent: the same key from the same person returns the order that already exists.
   // There is no await between the check and the push, so two taps cannot both get past it.
   if (data.idempotencyKey) {
@@ -206,7 +214,7 @@ export async function createOrder(data, userId = null) {
   return withStatus(order);
 }
 
-export async function getOrder(id) {
+async function getOrderImpl(id) {
   const order = store.orders.find((o) => o.id === id);
   return order ? withStatus(order) : null;
 }
@@ -214,13 +222,13 @@ export async function getOrder(id) {
 // The orders of ONE person, sorted and paged. The id comes from the session, never from the
 // request; sort, dir and page come from the URL and are validated in orderTable.js.
 // Returns { rows, total, page, pageSize, totalPages }: one page, not every order.
-export async function getOrdersFor(userId, { sort = "date", dir = "desc", page = 1, pageSize = 10 } = {}) {
+async function getOrdersForImpl(userId, { sort = "date", dir = "desc", page = 1, pageSize = 10 } = {}) {
   const mine = store.orders.filter((o) => o.userId === userId).map(withStatus);
   return paginate(sortOrders(mine, sort, dir), page, pageSize);
 }
 
 // Staff: move an order to the next step by hand.
-export async function advanceStatus(id) {
+async function advanceStatusImpl(id) {
   const order = store.orders.find((o) => o.id === id);
   if (!order) throw new Error("Order not found");
   const index = STAGE_NAMES.indexOf(currentStatus(order));
@@ -228,7 +236,7 @@ export async function advanceStatus(id) {
   return withStatus(order);
 }
 
-export async function markCancelled(id) {
+async function markCancelledImpl(id) {
   const order = store.orders.find((o) => o.id === id);
   if (!order) throw new Error("Order not found");
   order.status = "CANCELLED";
@@ -244,7 +252,7 @@ export function normalizePhone(input) {
   return digits.startsWith("+251") ? `0${digits.slice(4)}` : digits;
 }
 
-export async function registerUser({ name, phone, email, password }) {
+async function registerUserImpl({ name, phone, email, password }) {
   const cleanPhone = normalizePhone(phone);
   const cleanEmail = (email ?? "").trim().toLowerCase();
 
@@ -273,7 +281,7 @@ export async function registerUser({ name, phone, email, password }) {
 const DUMMY_HASH = bcrypt.hashSync("not-a-real-password", 10);
 
 // identifier is a phone number (09… or +2519…) or an email address
-export async function verifyUser({ identifier, password }) {
+async function verifyUserImpl({ identifier, password }) {
   const id = identifier.trim();
   const user = id.includes("@")
     ? store.users.find((u) => u.email === id.toLowerCase())
@@ -282,6 +290,25 @@ export async function verifyUser({ identifier, password }) {
   if (!user || !ok) throw new Error("Invalid phone number, email or password");
   return publicUser(user);
 }
+
+// ---- Shared storage ----------------------------------------------------------------------
+// Every function that reads or changes users or orders first loads the shared copy, and the ones
+// that change something save it afterwards. (No-ops when Redis is not configured.)
+const synced = (fn, { write = false } = {}) => async (...args) => {
+  await loadInto(store);
+  const result = await fn(...args);
+  if (write) await saveFrom(store);
+  return result;
+};
+
+export const findUserById = synced(findUserByIdImpl);
+export const getOrder = synced(getOrderImpl);
+export const getOrdersFor = synced(getOrdersForImpl);
+export const verifyUser = synced(verifyUserImpl);
+export const createOrder = synced(createOrderImpl, { write: true });
+export const advanceStatus = synced(advanceStatusImpl, { write: true });
+export const markCancelled = synced(markCancelledImpl, { write: true });
+export const registerUser = synced(registerUserImpl, { write: true });
 
 // ---- Sessions (database session: the cookie holds a random token, the server holds the truth) ----
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
