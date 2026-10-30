@@ -62,6 +62,6 @@ Expected result for 3: the person lands on `/menu` (the app's fallback), never o
 
 ## Known gaps (stated, not hidden)
 
-- Users, sessions and orders are in memory (`db.js`): they reset when the server process restarts, and they are **not shared between serverless instances**. See README, "Deploying".
+- The app uses a mock in-memory store by default (`db.js`) with optional Redis-backed persistence via `src/lib/persist.js`. If Redis is not configured, accounts, sessions and orders still reset when the server process restarts. See README, "Deploying".
 - `POST /api/orders` is for outside callers and does not rebuild line items or prices from the dish list; the UI uses `placeOrder`, which does.
 - No rate limiting, password reset or social sign-in.

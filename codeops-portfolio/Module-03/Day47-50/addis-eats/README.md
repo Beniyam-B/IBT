@@ -2,7 +2,8 @@
 
 The Day 35 food-ordering app rebuilt on Next.js 16 (App Router): file routing, nested layouts,
 a chosen rendering strategy per route, server components fetching their own data, and my own
-endpoints and server actions behind them. Mock data layer (`src/lib/db.js`) until a real database.
+endpoints and server actions behind them. The app uses a mock in-memory data layer in `src/lib/db.js`,
+with optional shared persistence through `src/lib/persist.js` when Upstash Redis environment variables are configured.
 
 **Deployed URL:** ibt-blond.vercel.app
 
@@ -18,9 +19,9 @@ npm run build
 npm run start                  # http://localhost:3000  (present from this, not from npm run dev)
 ```
 
-Variables (see `.env.example`): `NEXT_PUBLIC_SITE_URL` is the public address of the site and is **inlined at build time**, so change it and rebuild. `DISHES_API_URL` is optional. `next/font` downloads Inter during `npm run build`, so the first build needs internet.
+Variables (see `.env.example`): `NEXT_PUBLIC_SITE_URL` is the public address of the site and is **inlined at build time**, so change it and rebuild. `DISHES_API_URL` is optional. `SESSION_SECRET` signs the session cookie in production. Optional Redis persistence is enabled by `KV_REST_API_URL` + `KV_REST_API_TOKEN` or `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`. `next/font` downloads Inter during `npm run build`, so the first build needs internet.
 
-`DISHES_API_URL` is optional (it defaults to the public dishes API). Nothing sensitive is read by client code.
+`DISHES_API_URL` is optional (it defaults to the public dishes API). Nothing sensitive is read by client code. The user and order store is still a mock layer until a real database is introduced.
 
 ## Documents
 
@@ -50,7 +51,7 @@ and `GET /api/dishes/[id]` are not called by my pages: they are for outside call
 ### Data
 
 - **Dishes** come from a public JSON API (20 dishes). `src/lib/db.js` fetches it with `next: { revalidate: 3600 }` and falls back to a bundled copy (`src/lib/dishes.fallback.json`) if it cannot be reached. Override the source with `DISHES_API_URL`.
-- **Users and orders** are in memory (mock) until a real database exists.
+- **Users and orders** are kept in a mock in-memory store by default, but the app can persist them through Upstash Redis via `src/lib/persist.js` when the env vars are configured. This keeps registrations and orders shared across server instances without changing the app logic.
 - **Order status** moves on by itself so the polling screen has something to show: PENDING, then PREPARING after 20 s, ON THE WAY after 50 s, DELIVERED after 90 s (`STAGES` in `db.js`). An order can only be cancelled while PENDING.
 
 ### Server actions (`src/app/actions.js`, `"use server"`)
@@ -148,9 +149,9 @@ boundary), then revert both lines.
 
 ## Known limits (mock data layer)
 
-- Users and orders live in server memory and reset when the server restarts. The order status is a demo timer, not a real kitchen.
+- The app stores users, sessions and orders in a mock server-side store by default. If Redis persistence is not configured, the data resets when the server restarts. The order status remains a demo timer, not a real kitchen.
 - The dishes come from a public CDN file that has no search or paging of its own, so `/api/dishes` filters and pages it in my own code.
-- Users and sessions are in memory and reset on restart. No rate limiting, password reset or social sign-in; a real product would use Auth.js or a hosted provider.
+- The app still uses a mock auth layer and does not include rate limiting, password reset or social sign-in; a real product would use Auth.js or a hosted provider.
 - Dish ids are fixed at build time (`dynamicParams = false`), so a dish added later needs a rebuild.
 
 ## 8-minute walkthrough
@@ -165,7 +166,7 @@ boundary), then revert both lines.
 
 ## Deploying
 
-The users, sessions and orders are in memory. On a serverless host each request may reach a different instance, so a login can vanish between requests. Use a host that runs one long-lived Node process (`npm run start`), or replace `src/lib/db.js` with a real database before deploying. After the first deploy, set `NEXT_PUBLIC_SITE_URL` to the real address and **redeploy**: it is baked in at build.
+The app keeps a mock user/session/order store in memory by default. To keep registration, login and orders working across server instances on Vercel or a serverless host, set the Upstash Redis variables in `.env.local` / Vercel and the app will read and write a shared copy through `src/lib/persist.js`. Without those variables, a server restart still resets the mock data, and a multi-instance host may still split it across machines. For production use, replace the mock store with a real database before launch. After the first deploy, set `NEXT_PUBLIC_SITE_URL` to the real address and **redeploy**: it is baked in at build.
 
 ## Live site
 https://ibt-blond.vercel.app
@@ -184,9 +185,10 @@ https://ibt-blond.vercel.app
 |---|---|
 | `NEXT_PUBLIC_SITE_URL` | Public address, used for previews and the sitemap |
 | `SESSION_SECRET` | Signs the login cookie. Set a long random value in production |
-| `SEED_DEMO_DATA` | `true` loads demo orders into the in-memory store |
+| `KV_REST_API_URL` / `KV_REST_API_TOKEN` | Optional Upstash Redis credentials for shared mock persistence across server instances |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Alternate Upstash names accepted by the app |
+| `SEED_DEMO_DATA` | `true` loads demo orders into the mock store |
 | `DEMO_STATES` | `true` enables `?demo=slow|empty|error` |
 
 ## Known limitation
-Users and orders live in server memory (see FUTURE.md). On serverless hosting, accounts created
-through Register can disappear between requests. Use the seeded demo accounts above.
+The app still uses a mock user/session/order store by default. Without the Redis persistence env vars, a server restart or a multi-instance deploy can still reset or split the auth data. Use the seeded demo accounts above, or configure Upstash Redis before relying on live registrations and orders in production.
