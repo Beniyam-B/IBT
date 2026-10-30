@@ -4,11 +4,13 @@
 // memory. An account created on instance A did not exist on instance B, so register and login
 // looked broken. With Upstash Redis configured, every instance reads and writes ONE shared copy.
 //
-// Locally, Redis is often absent, but the app still needs its mock data to survive a route
-// reload or a server restart. The file-backed fallback keeps the same in-memory model working
-// without requiring external services.
+// For a temporary Vercel deployment, the browser can also hold the shared store in a cookie so a
+// user account and their orders survive route reloads and server restarts without needing Redis.
+// The local file fallback remains for development when neither Redis nor a browser cookie is
+// available.
 import fs from "node:fs/promises";
 import path from "node:path";
+import { cookies } from "next/headers";
 import { Redis } from "@upstash/redis";
 
 // Vercel's Upstash integration names them KV_REST_API_*; upstash.com names them UPSTASH_REDIS_REST_*.
@@ -18,6 +20,7 @@ const redis = url && token ? new Redis({ url, token }) : null;
 
 // Change the version (v1 -> v2) to start again from a fresh seed.
 const KEY = "addis-eats:store:v1";
+const COOKIE_KEY = "addis-eats-demo-store";
 const FILE_STORE_PATH = process.env.ADDIS_EATS_STORE_PATH || path.join(process.cwd(), ".data", "addis-eats-store.json");
 
 export const persistenceEnabled = true;
@@ -28,6 +31,33 @@ const snapshot = (store) => ({
   nextUser: store.nextUser,
   nextOrder: store.nextOrder,
 });
+
+async function writeCookieStore(store) {
+  try {
+    const jar = await cookies();
+    jar.set(COOKIE_KEY, encodeURIComponent(JSON.stringify(snapshot(store))), {
+      httpOnly: false,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function readCookieStore() {
+  try {
+    const jar = await cookies();
+    const raw = jar.get(COOKIE_KEY)?.value;
+    if (!raw) return null;
+    return JSON.parse(decodeURIComponent(raw));
+  } catch {
+    return null;
+  }
+}
 
 async function writeFileStore(store) {
   await fs.mkdir(path.dirname(FILE_STORE_PATH), { recursive: true });
@@ -59,14 +89,22 @@ export async function loadInto(store) {
       store.nextOrder = saved.nextOrder;
       return;
     } catch (error) {
-      console.error(`[persist] could not read shared storage (${error.message}); falling back to local file`);
+      console.error(`[persist] could not read shared storage (${error.message}); falling back to browser cookie`);
     }
   }
 
   try {
-    const saved = await readFileStore();
+    const saved = await readCookieStore();
     if (!saved) {
-      await writeFileStore(store);
+      const fileStore = await readFileStore();
+      if (!fileStore) {
+        await writeCookieStore(store);
+        return;
+      }
+      store.users = fileStore.users ?? [];
+      store.orders = fileStore.orders ?? [];
+      store.nextUser = fileStore.nextUser ?? store.nextUser ?? 101;
+      store.nextOrder = fileStore.nextOrder ?? store.nextOrder ?? 101;
       return;
     }
     store.users = saved.users ?? [];
@@ -74,7 +112,7 @@ export async function loadInto(store) {
     store.nextUser = saved.nextUser ?? store.nextUser ?? 101;
     store.nextOrder = saved.nextOrder ?? store.nextOrder ?? 101;
   } catch (error) {
-    console.error(`[persist] could not read local storage (${error.message}); using this instance's memory`);
+    console.error(`[persist] could not read browser cookie storage (${error.message}); using this instance's memory`);
   }
 }
 
@@ -89,8 +127,10 @@ export async function saveFrom(store) {
   }
 
   try {
+    const savedToCookie = await writeCookieStore(store);
+    if (savedToCookie) return;
     await writeFileStore(store);
   } catch (error) {
-    console.error(`[persist] could not write local storage (${error.message})`);
+    console.error(`[persist] could not write browser cookie storage (${error.message})`);
   }
 }
