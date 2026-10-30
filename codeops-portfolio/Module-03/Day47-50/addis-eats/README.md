@@ -166,3 +166,27 @@ boundary), then revert both lines.
 ## Deploying
 
 The users, sessions and orders are in memory. On a serverless host each request may reach a different instance, so a login can vanish between requests. Use a host that runs one long-lived Node process (`npm run start`), or replace `src/lib/db.js` with a real database before deploying. After the first deploy, set `NEXT_PUBLIC_SITE_URL` to the real address and **redeploy**: it is baked in at build.
+
+## Live site
+https://ibt-blond.vercel.app
+
+## Demo accounts
+| Role | Phone | Password |
+|---|---|---|
+| Staff | 0900000000 | staff123 |
+| Customer | 0911111111 | user123 |
+| Customer | 0911222333 | user123 |
+| Customer | 0911333444 | user123 |
+| Demo Customer (45 orders, needs `SEED_DEMO_DATA=true`) | 0911000000 | demo123 |
+
+## Environment variables
+| Name | Purpose |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | Public address, used for previews and the sitemap |
+| `SESSION_SECRET` | Signs the login cookie. Set a long random value in production |
+| `SEED_DEMO_DATA` | `true` loads demo orders into the in-memory store |
+| `DEMO_STATES` | `true` enables `?demo=slow|empty|error` |
+
+## Known limitation
+Users and orders live in server memory (see FUTURE.md). On serverless hosting, accounts created
+through Register can disappear between requests. Use the seeded demo accounts above.
