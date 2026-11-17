@@ -1,0 +1,3 @@
+# Exercise 1: What is a server?
+
+A server is a program that waits for requests and answers them. Imagine a restaurant kitchen with a window: a customer slips an order through, the kitchen prepares it, and a plate comes back. A server works the same way, but the requests arrive over the internet and the answers are data such as a menu, a photo, or a confirmation. It never gets tired, handles many requests at once, and stays switched on in some building so people anywhere can reach it at any hour. When you open an app and see a list of restaurants, a server somewhere received your request, looked up the information, and sent it back to you.
