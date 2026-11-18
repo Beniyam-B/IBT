@@ -1,9 +1,13 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using AddisEats.Api.Services;
+
+var builder = WebApplication.CreateBuilder(args);
 
 // ---- 1. Register services: what the app CAN do
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IClock, RealClock>();
 
 var app = builder.Build();
 
