@@ -1,4 +1,6 @@
-﻿public class CustomerClass
+﻿namespace AddisEats.Catalog;
+
+public class CustomerClass
 {
     public string Name { get; }
     public string Phone { get; }
@@ -9,3 +11,4 @@
         Phone = phone;
     }
 }
+
