@@ -1,0 +1,24 @@
+PART B: replace the in-memory data with a database (SQL Server LocalDB)
+
+1) NuGet package:  Microsoft.EntityFrameworkCore.SqlServer   (latest stable 10.x)
+
+2) appsettings.json: add next to "Menu":
+  "ConnectionStrings": {
+    "AddisEats": "Server=(localdb)\\MSSQLLocalDB;Database=AddisEatsDay54;Trusted_Connection=True;TrustServerCertificate=True"
+  }
+
+3) Program.cs
+   a) add at the top:
+        using AddisEats.Api.Data;
+        using Microsoft.EntityFrameworkCore;
+   b) replace this line:
+        builder.Services.AddScoped<IMenuService, MenuService>();
+      with:
+        builder.Services.AddDbContext<AddisEatsContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("AddisEats")));
+        builder.Services.AddScoped<IMenuService, DbMenuService>();
+   c) right after   var app = builder.Build();   add:
+        using (var scope = app.Services.CreateScope())
+        {
+            scope.ServiceProvider.GetRequiredService<AddisEatsContext>().Database.EnsureCreated();
+        }
