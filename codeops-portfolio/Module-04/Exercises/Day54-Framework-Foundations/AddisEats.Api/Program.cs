@@ -1,6 +1,8 @@
-﻿using AddisEats.Api.Options;
+﻿using AddisEats.Api.Auth;
+using AddisEats.Api.Options;
 using AddisEats.Api.Payments;
 using AddisEats.Api.Services;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,9 @@ builder.Services.AddTransient<LifetimeProbe>();
 builder.Services.AddScoped<IPaymentProvider, CbeBirrProvider>();
 builder.Services.Configure<DeliveryOptions>(builder.Configuration.GetSection(DeliveryOptions.SectionName));
 
+builder.Services.AddAuthentication(DemoHeaderAuthHandler.SchemeName)
+    .AddScheme<AuthenticationSchemeOptions, DemoHeaderAuthHandler>(DemoHeaderAuthHandler.SchemeName, _ => { });
+
 var app = builder.Build();
 
 // ---- 2. Build the pipeline: what happens to each request
@@ -24,7 +29,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
+app.UseAuthentication();   // who are you?
+app.UseAuthorization();    // are you allowed?
 app.MapControllers();
 
 app.Run();

@@ -48,3 +48,9 @@ Sec-Fetch-Site: same-origin
 Sec-Fetch-Mode: cors
 Sec-Fetch-Dest: empty
 What it told me: it names the exact service type that was never registered and the controller that needed it, so the fix is to register that interface in Program.cs.
+
+## Exercise 8: UseAuthentication before UseAuthorization
+
+With the correct order, GET /api/v1/secure returned 401 without the X-Demo-User header and 200 with it. With UseAuthorization placed before UseAuthentication, the request that had the header was still rejected with 401.
+
+Why the order matters: authentication works out who the caller is, and authorization then checks what that caller may do, so if authorization runs first it sees an anonymous user and rejects everyone.
