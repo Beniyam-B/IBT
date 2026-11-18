@@ -1,4 +1,5 @@
-﻿using AddisEats.Api.Payments;
+﻿using AddisEats.Api.Options;
+using AddisEats.Api.Payments;
 using AddisEats.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,8 +11,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IClock, CapturedClock>();
 builder.Services.AddTransient<LifetimeProbe>();
-builder.Services.AddScoped<IPaymentProvider, TeleBirrProvider>();
 builder.Services.AddScoped<IPaymentProvider, CbeBirrProvider>();
+builder.Services.Configure<DeliveryOptions>(builder.Configuration.GetSection(DeliveryOptions.SectionName));
 
 var app = builder.Build();
 
