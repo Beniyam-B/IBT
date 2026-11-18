@@ -7,7 +7,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IClock, RealClock>();
+builder.Services.AddTransient<IClock, CapturedClock>();   // experiment: transient, scoped, singleton
+builder.Services.AddTransient<LifetimeProbe>();
 
 var app = builder.Build();
 
