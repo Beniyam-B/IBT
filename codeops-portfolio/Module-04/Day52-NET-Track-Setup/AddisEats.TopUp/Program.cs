@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 // Pin the culture so "1,000.50" is read and printed the same way on every machine.
 CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
