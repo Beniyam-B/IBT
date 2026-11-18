@@ -1,4 +1,5 @@
-﻿using AddisEats.Api.Services;
+﻿using AddisEats.Api.Payments;
+using AddisEats.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,8 +8,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddTransient<IClock, CapturedClock>();   // experiment: transient, scoped, singleton
+builder.Services.AddScoped<IClock, CapturedClock>();
 builder.Services.AddTransient<LifetimeProbe>();
+builder.Services.AddScoped<IPaymentProvider, TeleBirrProvider>();
+builder.Services.AddScoped<IPaymentProvider, CbeBirrProvider>();
 
 var app = builder.Build();
 
