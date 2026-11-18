@@ -1,0 +1,14 @@
+﻿Console.WriteLine("--- Exercise 1 ---");
+Ex01Methods.Run();
+Console.WriteLine("\n--- Exercise 2 ---");
+Ex02Overloads.Run();
+Console.WriteLine("\n--- Exercise 3 ---");
+Ex03Properties.Run();
+Console.WriteLine("\n--- Exercise 4 ---");
+Ex04Equality.Run();
+Console.WriteLine("\n--- Exercise 5 ---");
+Ex05Linq.Run();
+Console.WriteLine("\n--- Exercise 6 ---");
+Ex06Interfaces.Run();
+Console.WriteLine("\n--- Exercise 7 ---");
+Ex07Exceptions.Run();
