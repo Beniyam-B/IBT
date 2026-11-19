@@ -1,5 +1,6 @@
 ﻿using AddisEats.Api.Options;
 using AddisEats.Api.Services.MenuServices;
+using AddisEats.Api.Services.OrderServices;
 using AddisEats.Api.Services.RestaurantServices;
 
 const string FrontendPolicy = "frontend";
@@ -15,6 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<MenuOptions>(builder.Configuration.GetSection(MenuOptions.SectionName));
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 // CORS: only the origins we trust (5173 = Vite, 3000 = Next.js / Create React App).
 builder.Services.AddCors(options =>
@@ -38,3 +40,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
