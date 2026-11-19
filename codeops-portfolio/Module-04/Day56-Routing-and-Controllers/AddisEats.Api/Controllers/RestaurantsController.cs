@@ -24,9 +24,8 @@ public class RestaurantsController : ControllerBase
 
     // GET api/v1/restaurants?area=Bole&maxFeeEtb=55&page=1&limit=5
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult GetAll([FromQuery] RestaurantQuery q)
+    public ActionResult<PagedResponse<RestaurantDto>> GetAll([FromQuery] RestaurantQuery q)
     {
         if (q.Page < 1 || q.Limit < 1 || q.Limit > MaxLimit)
         {
@@ -37,7 +36,7 @@ public class RestaurantsController : ControllerBase
                                   .Select(r => r.ToDto())
                                   .ToList();
 
-        return Ok(new { data = results, page = q.Page, pageSize = q.Limit, total = _restaurants.CountAll(q) });
+        return Ok(new PagedResponse<RestaurantDto>(results, q.Page, q.Limit, _restaurants.CountAll(q)));
     }
 
     // GET api/v1/restaurants/7
@@ -57,9 +56,8 @@ public class RestaurantsController : ControllerBase
 
     // GET api/v1/restaurants/7/menu?category=Drinks
     [HttpGet("{id:int}/menu")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetMenu(int id, [FromQuery] string? category)
+    public ActionResult<PagedResponse<MenuItemDto>> GetMenu(int id, [FromQuery] string? category)
     {
         // The parent must exist before the child can.
         if (_restaurants.GetById(id) is null)
@@ -71,7 +69,8 @@ public class RestaurantsController : ControllerBase
                          .Select(m => m.ToDto())
                          .ToList();
 
-        return Ok(items);   // 200, even when the list is empty
+        return Ok(new PagedResponse<MenuItemDto>(items, 1, Math.Max(items.Count, 1), items.Count));   // 200, even when the list is empty
     }
 }
+
 

@@ -27,6 +27,16 @@ public class MenuService : IMenuService
         }
     }
 
+    public int CountAll(string? category, decimal maxPrice)
+    {
+        lock (Gate)
+        {
+            return _items.Count(m => (string.IsNullOrWhiteSpace(category)
+                                      || m.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
+                                     && m.PriceEtb <= maxPrice);
+        }
+    }
+
     public MenuItem? GetById(int id)
     {
         lock (Gate)
@@ -58,3 +68,4 @@ public class MenuService : IMenuService
         }
     }
 }
+

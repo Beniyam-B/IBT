@@ -26,9 +26,8 @@ public class MenuController : ControllerBase
 
     // GET api/v1/menu?category=Breakfast&maxPrice=200&page=1&limit=5
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult GetAll(
+    public ActionResult<PagedResponse<MenuItemDto>> GetAll(
         [FromQuery] string? category,
         [FromQuery] decimal? maxPrice,
         [FromQuery] int page = 1,
@@ -44,14 +43,13 @@ public class MenuController : ControllerBase
         decimal ceiling = maxPrice ?? _options.MaxPriceEtb;
         var results = _menu.GetAll(category, ceiling, page, pageSize);
 
-        return Ok(new { data = results.Select(m => m.ToDto()).ToList(), page, pageSize });
+        return Ok(new PagedResponse<MenuItemDto>(results.Select(m => m.ToDto()).ToList(), page, pageSize, _menu.CountAll(category, ceiling)));
     }
 
     // GET api/v1/menu/7
     [HttpGet("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetById(int id)
+    public ActionResult<MenuItemDto> GetById(int id)
     {
         var item = _menu.GetById(id);
 
@@ -65,9 +63,9 @@ public class MenuController : ControllerBase
 
     // POST api/v1/menu
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType<MenuItemDto>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult Create([FromBody] CreateMenuItemDto request)
+    public ActionResult<MenuItemDto> Create([FromBody] CreateMenuItemDto request)
     {
         if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Category))
         {
@@ -90,4 +88,5 @@ public class MenuController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created.ToDto());
     }
 }
+
 
