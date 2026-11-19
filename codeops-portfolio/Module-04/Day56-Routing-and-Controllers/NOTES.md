@@ -13,3 +13,6 @@ I gave two actions the identical route `lookup/{key}` / `lookup/{name}`. The exc
 
 Fix 1, a constraint: `lookup/{key:int}` versus `lookup/{name}`. A request for lookup/5 matches only the int route and lookup/yod only the other, so nothing is ambiguous.
 Fix 2, distinct literal paths: `lookup/by-key/{key}` versus `lookup/by-name/{name}`. The literal segments make the two URLs different.
+
+## Exercise 6: ActionResult<RestaurantDto>
+Before, GetOne returned IActionResult and Swagger showed no schema for the 200 response (screenshots/getone-before.png). After changing it to ActionResult<RestaurantDto>, Swagger documents the exact RestaurantDto shape (screenshots/getone-after.png). NotFound and the other status codes can still be returned.

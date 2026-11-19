@@ -42,9 +42,8 @@ public class RestaurantsController : ControllerBase
 
     // GET api/v1/restaurants/7
     [HttpGet("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetOne(int id)
+    public ActionResult<RestaurantDto> GetOne(int id)
     {
         var found = _restaurants.GetById(id);
 
@@ -53,7 +52,7 @@ public class RestaurantsController : ControllerBase
             return NotFound(new { message = $"Restaurant {id} does not exist." });
         }
 
-        return Ok(found.ToDto());
+        return found.ToDto();
     }
 
     // GET api/v1/restaurants/7/menu?category=Drinks
@@ -75,3 +74,4 @@ public class RestaurantsController : ControllerBase
         return Ok(items);   // 200, even when the list is empty
     }
 }
+
