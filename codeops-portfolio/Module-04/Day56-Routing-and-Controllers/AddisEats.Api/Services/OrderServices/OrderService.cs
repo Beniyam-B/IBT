@@ -10,12 +10,21 @@ public class OrderService : IOrderService
 {
     private static readonly object Gate = new();
 
+    // Which statuses an order may move to from each status.
+    private static readonly Dictionary<OrderStatus, OrderStatus[]> Allowed = new()
+    {
+        [OrderStatus.Placed] = new[] { OrderStatus.Preparing, OrderStatus.Cancelled },
+        [OrderStatus.Preparing] = new[] { OrderStatus.OnTheWay, OrderStatus.Cancelled },
+        [OrderStatus.OnTheWay] = new[] { OrderStatus.Delivered },
+        [OrderStatus.Delivered] = Array.Empty<OrderStatus>(),
+        [OrderStatus.Cancelled] = Array.Empty<OrderStatus>()
+    };
+
     // The shared seed list, so orders survive from one request to the next.
     private readonly List<Order> _orders = SeedData.Orders;
     private readonly IRestaurantService _restaurants;
     private readonly IMenuService _menu;
 
-    // A service can depend on other services: the container supplies them too.
     public OrderService(IRestaurantService restaurants, IMenuService menu)
     {
         _restaurants = restaurants;
@@ -57,6 +66,20 @@ public class OrderService : IOrderService
 
             _orders.Add(order);
             return order;
+        }
+    }
+
+    public bool TryChangeStatus(Order order, OrderStatus next)
+    {
+        lock (Gate)
+        {
+            if (!Allowed[order.Status].Contains(next))
+            {
+                return false;
+            }
+
+            order.Status = next;
+            return true;
         }
     }
 }

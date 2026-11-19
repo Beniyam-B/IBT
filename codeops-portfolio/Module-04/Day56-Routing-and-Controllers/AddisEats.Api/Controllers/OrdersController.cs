@@ -52,4 +52,32 @@ public class OrdersController : ControllerBase
         // 201 Created, with a Location header that points at GET api/v1/orders/{id}
         return CreatedAtAction(nameof(GetOne), new { id = order.Id }, order.ToDto());
     }
+
+    // PATCH api/v1/orders/2/status   body: { "status": "OnTheWay" }
+    [HttpPatch("{id:int}/status")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public ActionResult<OrderDto> UpdateStatus(int id, [FromBody] UpdateOrderStatusDto request)
+    {
+        if (!Enum.IsDefined(request.Status))
+        {
+            return BadRequest(new { message = "Unknown status." });
+        }
+
+        var order = _orders.GetById(id);
+
+        if (order is null)
+        {
+            return NotFound(new { message = $"Order {id} does not exist." });
+        }
+
+        // 409: the request is well formed but conflicts with the order's current state.
+        if (!_orders.TryChangeStatus(order, request.Status))
+        {
+            return Conflict(new { message = $"An order that is {order.Status} cannot move to {request.Status}." });
+        }
+
+        return order.ToDto();
+    }
 }
