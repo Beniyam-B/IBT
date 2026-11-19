@@ -1,0 +1,25 @@
+﻿@host = http://localhost:5217
+
+### all restaurants (first 20)
+GET {{host}}/api/v1/restaurants
+
+### Bole only, five per page
+GET {{host}}/api/v1/restaurants?area=Bole&page=1&limit=5
+
+### page 2 of the same: must differ from page 1
+GET {{host}}/api/v1/restaurants?area=Bole&page=2&limit=5
+
+### one restaurant
+GET {{host}}/api/v1/restaurants/1
+
+### the 404 case
+GET {{host}}/api/v1/restaurants/9999
+
+### the menu of restaurant 1
+GET {{host}}/api/v1/restaurants/1/menu
+
+### an existing restaurant with nothing in that category: 200 and []
+GET {{host}}/api/v1/restaurants/1/menu?category=Dessert
+
+### a menu for a restaurant that does not exist: 404
+GET {{host}}/api/v1/restaurants/9999/menu
