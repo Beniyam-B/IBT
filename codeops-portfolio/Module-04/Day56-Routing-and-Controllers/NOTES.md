@@ -16,3 +16,9 @@ Fix 2, distinct literal paths: `lookup/by-key/{key}` versus `lookup/by-name/{nam
 
 ## Exercise 6: ActionResult<RestaurantDto>
 Before, GetOne returned IActionResult and Swagger showed no schema for the 200 response (screenshots/getone-before.png). After changing it to ActionResult<RestaurantDto>, Swagger documents the exact RestaurantDto shape (screenshots/getone-after.png). NotFound and the other status codes can still be returned.
+
+## Exercise 8: JSON options
+camelCase, omitted nulls and string enums are set once in Program.cs with AddJsonOptions.
+Before: {"id":4,"restaurantId":1,"menuItemId":1,"quantity":2,"totalEtb":370,"status":0,"placedOn":"2026-11-19T04:46:56.1806651Z"}
+After:  {"id":3,"restaurantId":1,"menuItemId":1,"quantity":2,"totalEtb":370,"status":"Placed","placedOn":"2026-11-19T04:49:14.9801786Z"}
+The status changed from a number to a name, so a frontend developer can read it.

@@ -1,4 +1,6 @@
-﻿using AddisEats.Api.Options;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using AddisEats.Api.Options;
 using AddisEats.Api.Services.MenuServices;
 using AddisEats.Api.Services.OrderServices;
 using AddisEats.Api.Services.RestaurantServices;
@@ -8,7 +10,13 @@ const string FrontendPolicy = "frontend";
 var builder = WebApplication.CreateBuilder(args);
 
 // ---- 1. Register services: what the app CAN do
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;                    // deliveryFeeEtb
+        o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;         // null fields are left out
+        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());                        // "Placed", not 0
+    });
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -40,4 +48,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
 
