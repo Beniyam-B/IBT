@@ -85,6 +85,16 @@ public static class SeedData
             })
             .ToList();
 
+    // Delivery fee by area, in ETB.
+    private static decimal FeeFor(string area) => area switch
+    {
+        "Bole" => 50m,
+        "Mexico" => 55m,
+        "Megenagna" => 65m,
+        "Ayat" => 80m,
+        _ => 80m
+    };
+
     private static Restaurant R(int id, string name, string address, string phone, bool isActive, string ownerAddress) =>
         new()
         {
@@ -93,6 +103,8 @@ public static class SeedData
             Address = address,
             Phone = phone,
             IsActive = isActive,
+            DeliveryFeeEtb = FeeFor(address),
             OwnerAddress = ownerAddress
         };
 }
+
