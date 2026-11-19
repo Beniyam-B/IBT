@@ -1,4 +1,5 @@
 ﻿using AddisEats.Api.Dtos;
+using AddisEats.Api.Mappers;
 using AddisEats.Api.Models;
 using AddisEats.Api.Options;
 using AddisEats.Api.Services.MenuServices;
@@ -43,7 +44,7 @@ public class MenuController : ControllerBase
         decimal ceiling = maxPrice ?? _options.MaxPriceEtb;
         var results = _menu.GetAll(category, ceiling, page, pageSize);
 
-        return Ok(new { data = results, page, pageSize });
+        return Ok(new { data = results.Select(m => m.ToDto()).ToList(), page, pageSize });
     }
 
     // GET api/v1/menu/7
@@ -59,7 +60,7 @@ public class MenuController : ControllerBase
             return NotFound(new { message = $"Menu item {id} does not exist." });
         }
 
-        return Ok(item);
+        return Ok(item.ToDto());
     }
 
     // POST api/v1/menu
@@ -86,6 +87,7 @@ public class MenuController : ControllerBase
         });
 
         // 201 Created, with a Location header that points at GET api/v1/menu/{id}
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created.ToDto());
     }
 }
+

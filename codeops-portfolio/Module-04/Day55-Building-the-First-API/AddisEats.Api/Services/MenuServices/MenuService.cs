@@ -44,4 +44,17 @@ public class MenuService : IMenuService
             return item;
         }
     }
+
+    public List<MenuItem> ForRestaurant(int restaurantId, string? category)
+    {
+        lock (Gate)
+        {
+            return _items
+                .Where(m => m.RestaurantId == restaurantId)
+                .Where(m => string.IsNullOrWhiteSpace(category)
+                            || m.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(m => m.Id)
+                .ToList();
+        }
+    }
 }
