@@ -1,6 +1,5 @@
-namespace AddisEats.Api.Entities;
+﻿namespace AddisEats.Api.Models;
 
-// The menu item as the application (and later the database) stores it.
 public class MenuItem
 {
     public int Id { get; set; }
