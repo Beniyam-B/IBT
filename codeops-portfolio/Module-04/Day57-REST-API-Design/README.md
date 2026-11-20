@@ -74,3 +74,41 @@ Chosen: way 1. DELETE exists for this, it is idempotent (cancelling twice is not
 Chosen: way 1. Finding is filtering a collection, and a filter in the query string keeps the path a noun.
 
 No named-verb route remains. Login, which resists this, arrives on Day 63 and will be written as `POST /api/v1/auth/login` with that reason documented.
+
+## Error catalogue
+
+Every failure the API can produce is listed here once. The code is for machines (a frontend switches on `code`); the message is for people.
+
+| Code | Status | When | Message to the client |
+|---|---|---|---|
+| `VALIDATION_FAILED` | 400 | A field is missing or malformed, or the body cannot be parsed | Names the field and the rule |
+| `INVALID_PAGING` | 400 | `page` is below 1, or `limit` is outside 1 to 50 | page must be 1 or more, and limit must be between 1 and 50 |
+| `UNKNOWN_PARAMETER` | 400 | The query string has a parameter the endpoint does not accept | Names the unknown parameter and lists the accepted ones |
+| `RESTAURANT_NOT_FOUND` | 404 | The restaurant id does not exist | The restaurant was not found |
+| `MENU_ITEM_NOT_FOUND` | 404 | The menu item id does not exist | The menu item was not found |
+| `ORDER_NOT_FOUND` | 404 | The order id does not exist | The order was not found |
+| `RESTAURANT_CLOSED` | 409 | Ordering from a closed restaurant | This restaurant is closed |
+| `ORDER_STATUS_CONFLICT` | 409 | The move is not allowed from the order's current status | An order that is X cannot move to Y |
+| `ORDER_ALREADY_DELIVERED` | 409 | Cancelling a delivered order | This order cannot be cancelled |
+| `AMOUNT_INVALID` | 422 | A quantity or a price of zero or less | Must be greater than zero |
+| `ITEM_NOT_ON_MENU` | 422 | The menu item does not belong to that restaurant | That item is not on this restaurant's menu |
+| `INTERNAL_ERROR` | 500 | An unhandled exception (made global on Day 58) | Something went wrong on our side |
+
+### One error shape
+Every error body is a ProblemDetails (RFC 7807) with an extra `code` field:
+
+```json
+{
+  "type": "https://addiseats.et/errors/restaurant-not-found",
+  "title": "The restaurant was not found.",
+  "status": 404,
+  "detail": "Restaurant 9999 does not exist.",
+  "instance": "/api/v1/restaurants/9999",
+  "code": "RESTAURANT_NOT_FOUND"
+}
+```
+
+Validation errors add an `errors` object, so a frontend can attach each message to a form field. No error body ever contains a stack trace.
+
+### 400 or 422
+400 means the request could not be parsed or is malformed. 422 means it parsed cleanly but breaks a business rule. This rule holds on every endpoint.
