@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using AddisEats.Api.Errors;
+using AddisEats.Api.Filters;
 using AddisEats.Api.Options;
 using AddisEats.Api.Services.MenuServices;
 using AddisEats.Api.Services.OrderServices;
@@ -11,7 +12,7 @@ const string FrontendPolicy = "frontend";
 var builder = WebApplication.CreateBuilder(args);
 
 // ---- 1. Register services: what the app CAN do
-builder.Services.AddControllers()
+builder.Services.AddControllers(options => options.Filters.Add<RejectUnknownQueryParametersFilter>())
     .ConfigureApiBehaviorOptions(options =>
     {
         // Binding and parsing failures use the same error shape as every other failure.
@@ -70,3 +71,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

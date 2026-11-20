@@ -129,3 +129,9 @@ Validation errors add an `errors` object, so a frontend can attach each message 
 | A public mobile API | REST | Every client, from our own app to a partner's website, can call plain HTTP and JSON, and responses can be cached and documented in Swagger. Paging and a `fields` parameter already save mobile data without adding a new query language. |
 | An internal service-to-service call | gRPC | Both ends are ours, so the compact binary format and the strongly typed contract generated from a `.proto` file are an advantage and browser support does not matter. It is faster than JSON and supports streaming. |
 | A dashboard that needs six resources on one screen | GraphQL | One query can ask for exactly the six resources and fields the screen shows, instead of six round trips that each return more than is needed. The extra complexity is acceptable for one read-heavy internal screen. |
+
+## Unknown query parameters: rejected
+
+Decision: **reject**. A query parameter an endpoint does not declare returns `400 UNKNOWN_PARAMETER`, and the message names the unknown parameter and lists the accepted ones. Ignoring it would be friendlier, but a typo such as `?aera=Bole` would then silently return all 32 restaurants and the client developer would never learn why the filter did nothing.
+
+It is one global filter (`RejectUnknownQueryParametersFilter`), so the same convention holds on `/restaurants`, `/menu-items` and `/orders`: each action accepts exactly the query parameters it declares. A path value such as `id` is not a query parameter, so `?id=1` on `/restaurants/1` is rejected too.
