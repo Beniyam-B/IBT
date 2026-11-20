@@ -29,3 +29,22 @@ All paths are versioned under `/api/v1`. The failure column lists every status a
 - **409** the request is fine but clashes with the current state (closed restaurant, a move the order cannot make).
 - **422** the request is well formed but breaks a business rule (a quantity of 0, an item that is not on that restaurant's menu).
 - **500** our code threw and nobody caught it. Never returned for input the caller got wrong.
+
+## Identifiers and filters
+
+An identifier selects one thing, so it belongs in the path. A filter changes which subset comes back, so it belongs in the query string.
+
+| Segment | Kind | Where it lives |
+|---|---|---|
+| `/api/v1` | version prefix | path |
+| `restaurants`, `menu-items`, `orders` | collection (plural noun) | path |
+| `{id}` | identifier | path, constrained with `:int` |
+| `menu` in `restaurants/{id}/menu` | sub-resource of a restaurant | path |
+| `status` in `orders/{id}/status` | sub-resource of an order | path |
+| `area`, `areas`, `maxFeeEtb`, `category`, `maxPrice` | filters | query string |
+| `page`, `limit` | paging controls | query string |
+
+What I changed:
+1. `/api/v1/menu` became `/api/v1/menu-items`, so the collection is a plural, hyphenated noun like the others.
+2. Nothing else needed moving: no identifier is passed in the query string, and no filter is in the path (`/restaurants?area=Bole`, not `/restaurants/bole`).
+3. The deepest path is two levels (`restaurants/{id}/menu`). Reaching one restaurant's items another way would use a filter on `/menu-items`, not a longer path.
