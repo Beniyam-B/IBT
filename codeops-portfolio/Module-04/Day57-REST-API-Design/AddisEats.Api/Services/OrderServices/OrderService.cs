@@ -10,11 +10,11 @@ public class OrderService : IOrderService
 {
     private static readonly object Gate = new();
 
-    // Which statuses an order may move to from each status.
+    // PATCH moves an order forward only. Cancelling is DELETE, so there is exactly one way to cancel.
     private static readonly Dictionary<OrderStatus, OrderStatus[]> Allowed = new()
     {
-        [OrderStatus.Placed] = new[] { OrderStatus.Preparing, OrderStatus.Cancelled },
-        [OrderStatus.Preparing] = new[] { OrderStatus.OnTheWay, OrderStatus.Cancelled },
+        [OrderStatus.Placed] = new[] { OrderStatus.Preparing },
+        [OrderStatus.Preparing] = new[] { OrderStatus.OnTheWay },
         [OrderStatus.OnTheWay] = new[] { OrderStatus.Delivered },
         [OrderStatus.Delivered] = Array.Empty<OrderStatus>(),
         [OrderStatus.Cancelled] = Array.Empty<OrderStatus>()
@@ -39,16 +39,35 @@ public class OrderService : IOrderService
         }
     }
 
-    public Order? Place(CreateOrderDto request)
+    public PlaceOrderResult Place(CreateOrderDto request)
     {
+        if (request.Quantity <= 0)
+        {
+            return new PlaceOrderResult(PlaceOrderOutcome.AmountInvalid);
+        }
+
         var restaurant = _restaurants.GetById(request.RestaurantId);
+
+        if (restaurant is null)
+        {
+            return new PlaceOrderResult(PlaceOrderOutcome.RestaurantNotFound);
+        }
+
+        if (!restaurant.IsActive)
+        {
+            return new PlaceOrderResult(PlaceOrderOutcome.RestaurantClosed);
+        }
+
         var item = _menu.GetById(request.MenuItemId);
 
-        if (restaurant is null || !restaurant.IsActive
-            || item is null || item.RestaurantId != restaurant.Id
-            || request.Quantity <= 0)
+        if (item is null)
         {
-            return null;
+            return new PlaceOrderResult(PlaceOrderOutcome.MenuItemNotFound);
+        }
+
+        if (item.RestaurantId != restaurant.Id)
+        {
+            return new PlaceOrderResult(PlaceOrderOutcome.ItemNotOnMenu);
         }
 
         lock (Gate)
@@ -65,7 +84,7 @@ public class OrderService : IOrderService
             };
 
             _orders.Add(order);
-            return order;
+            return new PlaceOrderResult(PlaceOrderOutcome.Placed, order);
         }
     }
 
@@ -80,6 +99,37 @@ public class OrderService : IOrderService
 
             order.Status = next;
             return true;
+        }
+    }
+
+    public CancelOutcome Cancel(int id)
+    {
+        lock (Gate)
+        {
+            var order = _orders.FirstOrDefault(o => o.Id == id);
+
+            if (order is null)
+            {
+                return CancelOutcome.NotFound;
+            }
+
+            if (order.Status == OrderStatus.Cancelled)
+            {
+                return CancelOutcome.Cancelled;   // idempotent: cancelling twice is not an error
+            }
+
+            if (order.Status == OrderStatus.Delivered)
+            {
+                return CancelOutcome.AlreadyDelivered;
+            }
+
+            if (order.Status == OrderStatus.OnTheWay)
+            {
+                return CancelOutcome.NotCancellable;
+            }
+
+            order.Status = OrderStatus.Cancelled;
+            return CancelOutcome.Cancelled;
         }
     }
 }
