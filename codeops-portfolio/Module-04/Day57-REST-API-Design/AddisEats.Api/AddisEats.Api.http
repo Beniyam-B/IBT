@@ -1,48 +1,72 @@
 ﻿@host = http://localhost:5217
 
-### all restaurants (first 20)
+### 1 all restaurants: 200
 GET {{host}}/api/v1/restaurants
 
-### Bole only, five per page
-GET {{host}}/api/v1/restaurants?area=Bole&page=1&limit=5
-
-### page 2 of the same: must differ from page 1
+### 2 Bole, page 2: 200
 GET {{host}}/api/v1/restaurants?area=Bole&page=2&limit=5
 
-### one restaurant
-GET {{host}}/api/v1/restaurants/1
+### 3 a typo in a parameter name: 400 UNKNOWN_PARAMETER
+GET {{host}}/api/v1/restaurants?aera=Bole
 
-### the 404 case
+### 4 limit out of range: 400 INVALID_PAGING
+GET {{host}}/api/v1/restaurants?limit=0
+
+### 5 not a number: 400 VALIDATION_FAILED with an errors object
+GET {{host}}/api/v1/restaurants?page=abc
+
+### 6 no such restaurant: 404 RESTAURANT_NOT_FOUND
 GET {{host}}/api/v1/restaurants/9999
 
-### the menu of restaurant 1
-GET {{host}}/api/v1/restaurants/1/menu
-
-### an existing restaurant with nothing in that category: 200 and []
-GET {{host}}/api/v1/restaurants/1/menu?category=Dessert
-
-### a menu for a restaurant that does not exist: 404
-GET {{host}}/api/v1/restaurants/9999/menu
-
-### fails the :int route constraint: 404, because no route matches
+### 7 fails the :int constraint: 404, no route matches (empty body)
 GET {{host}}/api/v1/restaurants/abc
 
-### several areas at once (repeated key): 15 restaurants
-GET {{host}}/api/v1/restaurants?areas=Bole&areas=Ayat
+### 8 a restaurant's menu, paged: 200
+GET {{host}}/api/v1/restaurants/1/menu
 
-### delivery fee ceiling
-GET {{host}}/api/v1/restaurants?maxFeeEtb=55
+### 9 nothing in that category: 200 with an empty data array
+GET {{host}}/api/v1/restaurants/1/menu?category=Dessert
 
-### read an order
-GET {{host}}/api/v1/orders/1
+### 10 menu of a restaurant that does not exist: 404 RESTAURANT_NOT_FOUND
+GET {{host}}/api/v1/restaurants/9999/menu
 
-### fails the :int route constraint: 404
-GET {{host}}/api/v1/orders/abc
+### 11 menu items, filtered: 200
+GET {{host}}/api/v1/menu-items?category=Drinks&limit=5
 
-### an order that does not exist: 404
-GET {{host}}/api/v1/orders/999
+### 12 no such menu item: 404 MENU_ITEM_NOT_FOUND
+GET {{host}}/api/v1/menu-items/9999
 
-### place an order: 201 and a Location header
+### 13 create a menu item: 201 and a Location header
+POST {{host}}/api/v1/menu-items
+Content-Type: application/json
+
+{
+  "name": "Genfo",
+  "category": "Breakfast",
+  "priceEtb": 95
+}
+
+### 14 a price of zero parses fine but breaks a rule: 422 AMOUNT_INVALID
+POST {{host}}/api/v1/menu-items
+Content-Type: application/json
+
+{
+  "name": "Genfo",
+  "category": "Breakfast",
+  "priceEtb": 0
+}
+
+### 15 a blank name: 400 VALIDATION_FAILED with errors.name
+POST {{host}}/api/v1/menu-items
+Content-Type: application/json
+
+{
+  "name": "",
+  "category": "Drinks",
+  "priceEtb": 50
+}
+
+### 16 place an order: 201 and a Location header (run this before request 25)
 POST {{host}}/api/v1/orders
 Content-Type: application/json
 
@@ -52,7 +76,7 @@ Content-Type: application/json
   "quantity": 2
 }
 
-### an order that cannot be placed (quantity 0): 400
+### 17 quantity zero: 422 AMOUNT_INVALID
 POST {{host}}/api/v1/orders
 Content-Type: application/json
 
@@ -62,7 +86,51 @@ Content-Type: application/json
   "quantity": 0
 }
 
-### move an order forward: 200
+### 18 unknown restaurant: 404 RESTAURANT_NOT_FOUND
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 9999,
+  "menuItemId": 1,
+  "quantity": 1
+}
+
+### 19 closed restaurant (Blue Nile): 409 RESTAURANT_CLOSED
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 2,
+  "menuItemId": 7,
+  "quantity": 1
+}
+
+### 20 item 13 belongs to restaurant 3: 422 ITEM_NOT_ON_MENU
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "menuItemId": 13,
+  "quantity": 1
+}
+
+### 21 a body that cannot be parsed: 400 VALIDATION_FAILED
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": "one"
+}
+
+### 22 read an order: 200
+GET {{host}}/api/v1/orders/1
+
+### 23 no such order: 404 ORDER_NOT_FOUND
+GET {{host}}/api/v1/orders/999
+
+### 24 move forward (order 2 is Preparing): 200, then run it again for a 409
 PATCH {{host}}/api/v1/orders/2/status
 Content-Type: application/json
 
@@ -70,10 +138,30 @@ Content-Type: application/json
   "status": "OnTheWay"
 }
 
-### a move that is not allowed (Delivered to Preparing): 409
+### 25 order 1 is Delivered, so this move is refused: 409 ORDER_STATUS_CONFLICT
 PATCH {{host}}/api/v1/orders/1/status
 Content-Type: application/json
 
 {
   "status": "Preparing"
 }
+
+### 26 PATCH does not cancel: 409 ORDER_STATUS_CONFLICT (use DELETE)
+PATCH {{host}}/api/v1/orders/3/status
+Content-Type: application/json
+
+{
+  "status": "Cancelled"
+}
+
+### 27 cancel order 3 (created by request 16): 204 with no body
+DELETE {{host}}/api/v1/orders/3
+
+### 28 cancel it again: 204 again (DELETE is idempotent)
+DELETE {{host}}/api/v1/orders/3
+
+### 29 cancel a delivered order: 409 ORDER_ALREADY_DELIVERED
+DELETE {{host}}/api/v1/orders/1
+
+### 30 cancel an order that does not exist: 404 ORDER_NOT_FOUND
+DELETE {{host}}/api/v1/orders/999
