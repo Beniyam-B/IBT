@@ -48,3 +48,29 @@ What I changed:
 1. `/api/v1/menu` became `/api/v1/menu-items`, so the collection is a plural, hyphenated noun like the others.
 2. Nothing else needed moving: no identifier is passed in the query string, and no filter is in the path (`/restaurants?area=Bole`, not `/restaurants/bole`).
 3. The deepest path is two levels (`restaurants/{id}/menu`). Reaching one restaurant's items another way would use a filter on `/menu-items`, not a longer path.
+
+## Verbs in paths
+
+I scanned every route for create, get, update, list, fetch, do, cancel and lookup. The final route table has **no verb in any path**. Two operations tempted one, so here is each written three ways.
+
+**Cancelling an order**
+
+| Way | Route | Verdict |
+|---|---|---|
+| 1. Use the method that already exists | `DELETE /api/v1/orders/91` | chosen |
+| 2. Model the state as a sub-resource | `PATCH /api/v1/orders/91/status` with `{ "status": "Cancelled" }` | works, but gives two ways to cancel |
+| 3. Model the event as a resource | `POST /api/v1/orders/91/cancellations` | useful only if cancellations need a stored reason |
+
+Chosen: way 1. DELETE exists for this, it is idempotent (cancelling twice is not an error), and it gives the API its 204. `PATCH` moves an order forward only, so there is exactly one way to cancel.
+
+**Finding a restaurant by name** (the `lookup` routes from the Day 56 experiment, now removed)
+
+| Way | Route | Verdict |
+|---|---|---|
+| 1. A filter | `GET /api/v1/restaurants?name=yod` | chosen |
+| 2. An identifier | `GET /api/v1/restaurants/yod-abyssinia` | needs a unique slug |
+| 3. A named verb | `GET /api/v1/restaurants/search?q=yod` | last resort |
+
+Chosen: way 1. Finding is filtering a collection, and a filter in the query string keeps the path a noun.
+
+No named-verb route remains. Login, which resists this, arrives on Day 63 and will be written as `POST /api/v1/auth/login` with that reason documented.
