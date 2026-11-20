@@ -112,3 +112,12 @@ Validation errors add an `errors` object, so a frontend can attach each message 
 
 ### 400 or 422
 400 means the request could not be parsed or is malformed. 422 means it parsed cleanly but breaks a business rule. This rule holds on every endpoint.
+
+## Status codes for four scenarios
+
+| Scenario | Status | Justification |
+|---|---|---|
+| A search that returns no rows | 200 with `"data": []` | The request succeeded and found nothing. A 404 would claim the endpoint does not exist, and 204 means no body at all. |
+| Cancelling an order that was already delivered | 409 `ORDER_ALREADY_DELIVERED` | The request is valid but conflicts with the order's current state. |
+| A request with a negative ETB total | 422 `AMOUNT_INVALID` | The body parsed cleanly but breaks a business rule (a total must be above zero). |
+| A valid token belonging to a courier who tries to edit a menu | 403 | The caller is known (so not 401), but is not allowed to do this. |
