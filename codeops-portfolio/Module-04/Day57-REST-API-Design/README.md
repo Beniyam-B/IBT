@@ -121,3 +121,11 @@ Validation errors add an `errors` object, so a frontend can attach each message 
 | Cancelling an order that was already delivered | 409 `ORDER_ALREADY_DELIVERED` | The request is valid but conflicts with the order's current state. |
 | A request with a negative ETB total | 422 `AMOUNT_INVALID` | The body parsed cleanly but breaks a business rule (a total must be above zero). |
 | A valid token belonging to a courier who tries to edit a menu | 403 | The caller is known (so not 401), but is not allowed to do this. |
+
+## REST, GraphQL or gRPC
+
+| Scenario | Choice | Why |
+|---|---|---|
+| A public mobile API | REST | Every client, from our own app to a partner's website, can call plain HTTP and JSON, and responses can be cached and documented in Swagger. Paging and a `fields` parameter already save mobile data without adding a new query language. |
+| An internal service-to-service call | gRPC | Both ends are ours, so the compact binary format and the strongly typed contract generated from a `.proto` file are an advantage and browser support does not matter. It is faster than JSON and supports streaming. |
+| A dashboard that needs six resources on one screen | GraphQL | One query can ask for exactly the six resources and fields the screen shows, instead of six round trips that each return more than is needed. The extra complexity is acceptable for one read-heavy internal screen. |
