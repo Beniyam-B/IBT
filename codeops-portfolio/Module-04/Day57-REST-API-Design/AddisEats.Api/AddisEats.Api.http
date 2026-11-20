@@ -1,0 +1,79 @@
+﻿@host = http://localhost:5217
+
+### all restaurants (first 20)
+GET {{host}}/api/v1/restaurants
+
+### Bole only, five per page
+GET {{host}}/api/v1/restaurants?area=Bole&page=1&limit=5
+
+### page 2 of the same: must differ from page 1
+GET {{host}}/api/v1/restaurants?area=Bole&page=2&limit=5
+
+### one restaurant
+GET {{host}}/api/v1/restaurants/1
+
+### the 404 case
+GET {{host}}/api/v1/restaurants/9999
+
+### the menu of restaurant 1
+GET {{host}}/api/v1/restaurants/1/menu
+
+### an existing restaurant with nothing in that category: 200 and []
+GET {{host}}/api/v1/restaurants/1/menu?category=Dessert
+
+### a menu for a restaurant that does not exist: 404
+GET {{host}}/api/v1/restaurants/9999/menu
+
+### fails the :int route constraint: 404, because no route matches
+GET {{host}}/api/v1/restaurants/abc
+
+### several areas at once (repeated key): 15 restaurants
+GET {{host}}/api/v1/restaurants?areas=Bole&areas=Ayat
+
+### delivery fee ceiling
+GET {{host}}/api/v1/restaurants?maxFeeEtb=55
+
+### read an order
+GET {{host}}/api/v1/orders/1
+
+### fails the :int route constraint: 404
+GET {{host}}/api/v1/orders/abc
+
+### an order that does not exist: 404
+GET {{host}}/api/v1/orders/999
+
+### place an order: 201 and a Location header
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "menuItemId": 1,
+  "quantity": 2
+}
+
+### an order that cannot be placed (quantity 0): 400
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "menuItemId": 1,
+  "quantity": 0
+}
+
+### move an order forward: 200
+PATCH {{host}}/api/v1/orders/2/status
+Content-Type: application/json
+
+{
+  "status": "OnTheWay"
+}
+
+### a move that is not allowed (Delivered to Preparing): 409
+PATCH {{host}}/api/v1/orders/1/status
+Content-Type: application/json
+
+{
+  "status": "Preparing"
+}
