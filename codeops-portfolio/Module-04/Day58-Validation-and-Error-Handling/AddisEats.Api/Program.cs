@@ -23,7 +23,7 @@ builder.Services.AddControllers(options => options.Filters.Add<RejectUnknownQuer
                 .ToDictionary(
                     entry => entry.Key,
                     entry => entry.Value!.Errors
-                        .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage) ? "The value is invalid." : e.ErrorMessage)
+                        .Select(e => !string.IsNullOrWhiteSpace(e.ErrorMessage) ? e.ErrorMessage : e.Exception is JsonException ? "The request body is malformed, has a value of the wrong type, or has a field this endpoint does not accept." : "The value is invalid.")
                         .ToArray());
 
             return ProblemFactory.Create(
@@ -38,6 +38,7 @@ builder.Services.AddControllers(options => options.Filters.Add<RejectUnknownQuer
         o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        o.JsonSerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow;   // a field we do not know is a 400
     });
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
@@ -72,5 +73,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
 
 

@@ -223,3 +223,25 @@ Why it cannot be a property attribute: a property attribute only sees the value 
 | a valid order | 201 | - |
 PS L:\IBT\codeops-portfolio\Module-04\Day58-Validation-and-Error-Handling>
 
+
+## Exercise 6: no client total
+
+The order request type has no total at all: `CreateOrderDto` holds a restaurant, an item, a quantity and a phone. The server computes `totalEtb` as `price x quantity + delivery fee` from the menu. Unknown JSON fields are rejected (`JsonUnmappedMemberHandling.Disallow`), so a client cannot slip one in.
+
+Attempt to order for 1 ETB by sending `"totalEtb": 1`:
+
+Status 400
+
+```json
+{"type":"https://addiseats.et/errors/validation-failed","title":"One or more validation errors occurred.","status":400,"detail":"One or more fields are missing or malformed.","instance":"/api/v1/orders","errors":{"request":["The request field is required."],"$.totalEtb":["The JSON property 'totalEtb' could not be mapped to any .NET member contained in type 'AddisEats.Api.Dtos.CreateOrderDto'."]},"code":"VALIDATION_FAILED"}
+```
+
+The same order without the extra field is accepted and the server works out the real total:
+
+Status 201
+
+```json
+{"id":3,"restaurantId":1,"menuItemId":1,"quantity":2,"totalEtb":370,"status":"Placed","placedOn":"2026-11-21T06:00:15.2904458Z","customerPhone":"0911234567"}
+```
+
+The one amount a client does send is `priceEtb` when creating a menu item. That is the price being defined, not a total, and it goes through `EtbAmountAttribute`.
