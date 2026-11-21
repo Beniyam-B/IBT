@@ -191,3 +191,9 @@ Applied to `priceEtb` when creating a menu item. It rejects zero, negatives and 
 | `12.345` | invalid: three decimals | 400 |
 | `0` | invalid: zero | 400 |
 | `-5` | invalid: negative | 400 |
+
+## Exercise 4: a rule across two fields
+
+`CreateOrderDto` implements `IValidatableObject` for the scheduled delivery: `scheduledFor` is required (and must be in the future) when `isScheduled` is true, and is not allowed when it is false. It runs after the property attributes and only if they all passed.
+
+Why it cannot be a property attribute: a property attribute only sees the value of the one property it sits on, and this rule needs `isScheduled` and `scheduledFor` together.

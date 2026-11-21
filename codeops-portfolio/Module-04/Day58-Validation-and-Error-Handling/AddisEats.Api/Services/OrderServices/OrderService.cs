@@ -78,6 +78,8 @@ public class OrderService : IOrderService
                 RestaurantId = restaurant.Id,
                 MenuItemId = item.Id,
                 Quantity = request.Quantity,
+                CustomerPhone = request.Phone,
+                ScheduledFor = request.IsScheduled ? request.ScheduledFor : null,
                 TotalEtb = item.PriceEtb * request.Quantity + restaurant.DeliveryFeeEtb,
                 Status = OrderStatus.Placed,
                 PlacedOn = DateTime.UtcNow
@@ -133,3 +135,4 @@ public class OrderService : IOrderService
         }
     }
 }
+

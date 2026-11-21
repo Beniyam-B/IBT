@@ -4,7 +4,7 @@ using AddisEats.Api.Validation;
 namespace AddisEats.Api.Dtos;
 
 // The body a client sends to place an order. There is no total here: the server works it out.
-public class CreateOrderDto
+public class CreateOrderDto : IValidatableObject
 {
     [Range(1, int.MaxValue, ErrorMessage = "Choose a restaurant: restaurantId must be 1 or more.")]
     public int RestaurantId { get; set; }
@@ -20,5 +20,32 @@ public class CreateOrderDto
     [StringLength(13, ErrorMessage = "A phone number has at most 13 characters.")]
     [EthiopianMobile]
     public string Phone { get; set; } = "";
-}
 
+    public bool IsScheduled { get; set; }
+    public DateTime? ScheduledFor { get; set; }
+
+    // A rule across two fields. It runs after the property attributes, and only if they all passed.
+    public IEnumerable<ValidationResult> Validate(ValidationContext context)
+    {
+        if (IsScheduled && ScheduledFor is null)
+        {
+            yield return new ValidationResult(
+                "A delivery time is required when the order is scheduled.",
+                new[] { nameof(ScheduledFor) });
+        }
+
+        if (IsScheduled && ScheduledFor is { } when && when <= DateTime.UtcNow)
+        {
+            yield return new ValidationResult(
+                "The delivery time must be in the future.",
+                new[] { nameof(ScheduledFor) });
+        }
+
+        if (!IsScheduled && ScheduledFor is not null)
+        {
+            yield return new ValidationResult(
+                "scheduledFor is only allowed when isScheduled is true.",
+                new[] { nameof(ScheduledFor) });
+        }
+    }
+}

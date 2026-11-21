@@ -88,8 +88,8 @@ public static class SeedData
     // A few starting orders. Orders created through the API are added to this list.
     public static List<Order> Orders { get; } = new()
     {
-        new Order { Id = 1, RestaurantId = 1, MenuItemId = 1,  Quantity = 2, TotalEtb = 370m, Status = OrderStatus.Delivered, PlacedOn = new DateTime(2026, 11, 17, 12, 30, 0, DateTimeKind.Utc) },
-        new Order { Id = 2, RestaurantId = 3, MenuItemId = 13, Quantity = 1, TotalEtb = 265m, Status = OrderStatus.Preparing, PlacedOn = new DateTime(2026, 11, 18, 9, 15, 0, DateTimeKind.Utc) }
+        new Order { Id = 1, CustomerPhone = "0911000001", RestaurantId = 1, MenuItemId = 1,  Quantity = 2, TotalEtb = 370m, Status = OrderStatus.Delivered, PlacedOn = new DateTime(2026, 11, 17, 12, 30, 0, DateTimeKind.Utc) },
+        new Order { Id = 2, CustomerPhone = "0911000002", RestaurantId = 3, MenuItemId = 13, Quantity = 1, TotalEtb = 265m, Status = OrderStatus.Preparing, PlacedOn = new DateTime(2026, 11, 18, 9, 15, 0, DateTimeKind.Utc) }
     };
 
     // Delivery fee by area, in ETB.
@@ -114,5 +114,6 @@ public static class SeedData
             OwnerAddress = ownerAddress
         };
 }
+
 
 
