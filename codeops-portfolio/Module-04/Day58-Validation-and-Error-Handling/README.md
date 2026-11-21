@@ -257,3 +257,193 @@ Status 500
 ```
 
 The log line carries the same trace id, so support can find the failure from what the customer reads off the screen. The response contains no stack trace, no exception message, no table names and no connection strings.
+
+## Exercise 8: every catalogue code from a real request
+
+Each body below was recorded from the running API (Development, starting data). Every one has the same shape: `type`, `title`, `status`, `detail`, `instance`, a machine `code` and a `traceId`. Validation errors add an `errors` object that lists every bad field.
+
+### VALIDATION_FAILED (400)
+
+Request: `POST /api/v1/orders with {"restaurantId":0,"menuItemId":0,"quantity":99,"phone":"12345"}`
+
+```json
+```
+
+### INVALID_PAGING (400)
+
+Request: `GET /api/v1/restaurants?limit=0`
+
+```json
+```
+
+### UNKNOWN_PARAMETER (400)
+
+Request: `GET /api/v1/restaurants?aera=Bole`
+
+```json
+```
+
+### RESTAURANT_NOT_FOUND (404)
+
+Request: `GET /api/v1/restaurants/9999`
+
+```json
+```
+
+### MENU_ITEM_NOT_FOUND (404)
+
+Request: `GET /api/v1/menu-items/9999`
+
+```json
+```
+
+### ORDER_NOT_FOUND (404)
+
+Request: `GET /api/v1/orders/999`
+
+```json
+```
+
+### RESTAURANT_CLOSED (409)
+
+Request: `POST /api/v1/orders with {"restaurantId":2,"menuItemId":7,"quantity":1,"phone":"0911234567"}`
+
+```json
+```
+
+### ORDER_STATUS_CONFLICT (409)
+
+Request: `PATCH /api/v1/orders/1/status with {"status":"Preparing"}`
+
+```json
+```
+
+### ORDER_ALREADY_DELIVERED (409)
+
+Request: `DELETE /api/v1/orders/1`
+
+```json
+```
+
+### AMOUNT_INVALID (422)
+
+Request: `POST /api/v1/orders with {"restaurantId":4,"menuItemId":19,"quantity":1,"phone":"0911234567"}`
+
+```json
+```
+
+### ITEM_NOT_ON_MENU (422)
+
+Request: `POST /api/v1/orders with {"restaurantId":1,"menuItemId":13,"quantity":1,"phone":"0911234567"}`
+
+```json
+```
+
+### INTERNAL_ERROR (500)
+
+Request: `GET /api/v1/debug/throw`
+
+```json
+```
+
+
+## Exercise 8: every catalogue code from a real request
+
+Each body below was recorded from the running API (Development, starting data). Every one has the same shape: `type`, `title`, `status`, `detail`, `instance`, a machine `code` and a `traceId`. Validation errors add an `errors` object that lists every bad field.
+
+### VALIDATION_FAILED (400)
+
+Request: `POST /api/v1/orders with {"restaurantId":0,"menuItemId":0,"quantity":99,"phone":"12345"}`
+
+```json
+{"type":"https://addiseats.et/errors/validation-failed","title":"One or more validation errors occurred.","status":400,"detail":"One or more fields are missing or malformed.","instance":"/api/v1/orders","errors":{"phone":["A phone number has at least 10 characters.","Enter a valid Ethiopian mobile number, such as 0911234567 or +251911234567."],"quantity":["Quantity must be between 1 and 50."],"menuItemId":["Choose a menu item: menuItemId must be 1 or more."],"restaurantId":["Choose a restaurant: restaurantId must be 1 or more."]},"code":"VALIDATION_FAILED","traceId":"0HNQ7ILF4R8S8:00000001"}
+```
+
+### INVALID_PAGING (400)
+
+Request: `GET /api/v1/restaurants?limit=0`
+
+```json
+{"type":"https://addiseats.et/errors/invalid-paging","title":"The page or limit is out of range.","status":400,"detail":"page must be 1 or more, and limit must be between 1 and 50.","instance":"/api/v1/restaurants","code":"INVALID_PAGING","traceId":"0HNQ7ILF4R8S9:00000001"}
+```
+
+### UNKNOWN_PARAMETER (400)
+
+Request: `GET /api/v1/restaurants?aera=Bole`
+
+```json
+{"type":"https://addiseats.et/errors/unknown-parameter","title":"The request has a query parameter this endpoint does not accept.","status":400,"detail":"Unknown query parameter(s): aera. This endpoint accepts: Area, Areas, Limit, MaxFeeEtb, Page.","instance":"/api/v1/restaurants","code":"UNKNOWN_PARAMETER","traceId":"0HNQ7ILF4R8SA:00000001"}
+```
+
+### RESTAURANT_NOT_FOUND (404)
+
+Request: `GET /api/v1/restaurants/9999`
+
+```json
+{"type":"https://addiseats.et/errors/restaurant-not-found","title":"The restaurant was not found.","status":404,"detail":"Restaurant 9999 does not exist.","instance":"/api/v1/restaurants/9999","code":"RESTAURANT_NOT_FOUND","traceId":"0HNQ7ILF4R8SB:00000001"}
+```
+
+### MENU_ITEM_NOT_FOUND (404)
+
+Request: `GET /api/v1/menu-items/9999`
+
+```json
+{"type":"https://addiseats.et/errors/menu-item-not-found","title":"The menu item was not found.","status":404,"detail":"Menu item 9999 does not exist.","instance":"/api/v1/menu-items/9999","code":"MENU_ITEM_NOT_FOUND","traceId":"0HNQ7ILF4R8SC:00000001"}
+```
+
+### ORDER_NOT_FOUND (404)
+
+Request: `GET /api/v1/orders/999`
+
+```json
+{"type":"https://addiseats.et/errors/order-not-found","title":"The order was not found.","status":404,"detail":"Order 999 does not exist.","instance":"/api/v1/orders/999","code":"ORDER_NOT_FOUND","traceId":"0HNQ7ILF4R8SD:00000001"}
+```
+
+### RESTAURANT_CLOSED (409)
+
+Request: `POST /api/v1/orders with {"restaurantId":2,"menuItemId":7,"quantity":1,"phone":"0911234567"}`
+
+```json
+{"type":"https://addiseats.et/errors/restaurant-closed","title":"This restaurant is closed.","status":409,"detail":"Restaurant 2 is closed.","instance":"/api/v1/orders","code":"RESTAURANT_CLOSED","traceId":"0HNQ7ILF4R8SE:00000001"}
+```
+
+### ORDER_STATUS_CONFLICT (409)
+
+Request: `PATCH /api/v1/orders/1/status with {"status":"Preparing"}`
+
+```json
+{"type":"https://addiseats.et/errors/order-status-conflict","title":"The order cannot make that move.","status":409,"detail":"An order that is Delivered cannot move to Preparing.","instance":"/api/v1/orders/1/status","code":"ORDER_STATUS_CONFLICT","traceId":"0HNQ7ILF4R8SF:00000001"}
+```
+
+### ORDER_ALREADY_DELIVERED (409)
+
+Request: `DELETE /api/v1/orders/1`
+
+```json
+{"type":"https://addiseats.et/errors/order-already-delivered","title":"This order cannot be cancelled.","status":409,"detail":"A delivered order cannot be cancelled.","instance":"/api/v1/orders/1","code":"ORDER_ALREADY_DELIVERED","traceId":"0HNQ7ILF4R8SG:00000001"}
+```
+
+### AMOUNT_INVALID (422)
+
+Request: `POST /api/v1/orders with {"restaurantId":4,"menuItemId":19,"quantity":1,"phone":"0911234567"}`
+
+```json
+{"type":"https://addiseats.et/errors/amount-invalid","title":"The order total is below the minimum order.","status":422,"detail":"The order total must be at least 150.00 ETB (this one is 105.00 ETB).","instance":"/api/v1/orders","code":"AMOUNT_INVALID","traceId":"0HNQ7ILF4R8SH:00000001"}
+```
+
+### ITEM_NOT_ON_MENU (422)
+
+Request: `POST /api/v1/orders with {"restaurantId":1,"menuItemId":13,"quantity":1,"phone":"0911234567"}`
+
+```json
+{"type":"https://addiseats.et/errors/item-not-on-menu","title":"That item is not on this restaurant's menu.","status":422,"detail":"Menu item 13 is not on restaurant 1's menu.","instance":"/api/v1/orders","code":"ITEM_NOT_ON_MENU","traceId":"0HNQ7ILF4R8SI:00000001"}
+```
+
+### INTERNAL_ERROR (500)
+
+Request: `GET /api/v1/debug/throw`
+
+```json
+{"type":"https://addiseats.et/errors/internal-error","title":"Something went wrong on our side.","status":500,"detail":"An unexpected error occurred. Quote the trace id if you contact support.","instance":"/api/v1/debug/throw","code":"INTERNAL_ERROR","traceId":"0HNQ7ILF4R8SJ:00000001"}
+```
+
