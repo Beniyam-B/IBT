@@ -45,6 +45,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<MenuOptions>(builder.Configuration.GetSection(MenuOptions.SectionName));
+builder.Services.Configure<OrderOptions>(builder.Configuration.GetSection(OrderOptions.SectionName));
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
@@ -71,4 +72,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
 

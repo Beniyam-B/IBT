@@ -1,8 +1,11 @@
 ﻿using AddisEats.Api.Data;
 using AddisEats.Api.Dtos;
+using AddisEats.Api.Errors;
 using AddisEats.Api.Models;
+using AddisEats.Api.Options;
 using AddisEats.Api.Services.MenuServices;
 using AddisEats.Api.Services.RestaurantServices;
+using Microsoft.Extensions.Options;
 
 namespace AddisEats.Api.Services.OrderServices;
 
@@ -24,50 +27,61 @@ public class OrderService : IOrderService
     private readonly List<Order> _orders = SeedData.Orders;
     private readonly IRestaurantService _restaurants;
     private readonly IMenuService _menu;
+    private readonly OrderOptions _options;
 
-    public OrderService(IRestaurantService restaurants, IMenuService menu)
+    public OrderService(IRestaurantService restaurants, IMenuService menu, IOptions<OrderOptions> options)
     {
         _restaurants = restaurants;
         _menu = menu;
+        _options = options.Value;
     }
 
-    public Order? GetById(int id)
+    public Result<Order> GetById(int id)
     {
         lock (Gate)
         {
-            return _orders.FirstOrDefault(o => o.Id == id);
+            var order = _orders.FirstOrDefault(o => o.Id == id);
+
+            return order is null
+                ? Fail(ErrorCatalogue.OrderNotFound, $"Order {id} does not exist.")
+                : Result<Order>.Ok(order);
         }
     }
 
-    public PlaceOrderResult Place(CreateOrderDto request)
+    // Layers 1 to 3 have already run, so the fields are present and in range. This is layer 4: business rules.
+    public Result<Order> Place(CreateOrderDto request)
     {
-        if (request.Quantity <= 0)
-        {
-            return new PlaceOrderResult(PlaceOrderOutcome.AmountInvalid);
-        }
-
         var restaurant = _restaurants.GetById(request.RestaurantId);
 
         if (restaurant is null)
         {
-            return new PlaceOrderResult(PlaceOrderOutcome.RestaurantNotFound);
+            return Fail(ErrorCatalogue.RestaurantNotFound, $"Restaurant {request.RestaurantId} does not exist.");
         }
 
         if (!restaurant.IsActive)
         {
-            return new PlaceOrderResult(PlaceOrderOutcome.RestaurantClosed);
+            return Fail(ErrorCatalogue.RestaurantClosed, $"Restaurant {restaurant.Id} is closed.");
         }
 
         var item = _menu.GetById(request.MenuItemId);
 
         if (item is null)
         {
-            return new PlaceOrderResult(PlaceOrderOutcome.MenuItemNotFound);
+            return Fail(ErrorCatalogue.MenuItemNotFound, $"Menu item {request.MenuItemId} does not exist.");
         }
 
         if (item.RestaurantId != restaurant.Id)
         {
-            return new PlaceOrderResult(PlaceOrderOutcome.ItemNotOnMenu);
+            return Fail(ErrorCatalogue.ItemNotOnMenu, $"Menu item {item.Id} is not on restaurant {restaurant.Id}'s menu.");
+        }
+
+        // Money is worked out here from the menu prices. It is never taken from the client.
+        decimal total = item.PriceEtb * request.Quantity + restaurant.DeliveryFeeEtb;
+
+        if (total < _options.MinimumOrderEtb)
+        {
+            return Fail(ErrorCatalogue.AmountInvalid,
+                $"The order total must be at least {_options.MinimumOrderEtb:N2} ETB (this one is {total:N2} ETB).");
         }
 
         lock (Gate)
@@ -80,31 +94,17 @@ public class OrderService : IOrderService
                 Quantity = request.Quantity,
                 CustomerPhone = request.Phone,
                 ScheduledFor = request.IsScheduled ? request.ScheduledFor : null,
-                TotalEtb = item.PriceEtb * request.Quantity + restaurant.DeliveryFeeEtb,
+                TotalEtb = total,
                 Status = OrderStatus.Placed,
                 PlacedOn = DateTime.UtcNow
             };
 
             _orders.Add(order);
-            return new PlaceOrderResult(PlaceOrderOutcome.Placed, order);
+            return Result<Order>.Ok(order);
         }
     }
 
-    public bool TryChangeStatus(Order order, OrderStatus next)
-    {
-        lock (Gate)
-        {
-            if (!Allowed[order.Status].Contains(next))
-            {
-                return false;
-            }
-
-            order.Status = next;
-            return true;
-        }
-    }
-
-    public CancelOutcome Cancel(int id)
+    public Result<Order> ChangeStatus(int id, OrderStatus next)
     {
         lock (Gate)
         {
@@ -112,27 +112,50 @@ public class OrderService : IOrderService
 
             if (order is null)
             {
-                return CancelOutcome.NotFound;
+                return Fail(ErrorCatalogue.OrderNotFound, $"Order {id} does not exist.");
+            }
+
+            if (!Allowed[order.Status].Contains(next))
+            {
+                var hint = next == OrderStatus.Cancelled ? " Use DELETE to cancel an order." : "";
+                return Fail(ErrorCatalogue.OrderStatusConflict, $"An order that is {order.Status} cannot move to {next}.{hint}");
+            }
+
+            order.Status = next;
+            return Result<Order>.Ok(order);
+        }
+    }
+
+    public Result<Order> Cancel(int id)
+    {
+        lock (Gate)
+        {
+            var order = _orders.FirstOrDefault(o => o.Id == id);
+
+            if (order is null)
+            {
+                return Fail(ErrorCatalogue.OrderNotFound, $"Order {id} does not exist.");
             }
 
             if (order.Status == OrderStatus.Cancelled)
             {
-                return CancelOutcome.Cancelled;   // idempotent: cancelling twice is not an error
+                return Result<Order>.Ok(order);   // idempotent: cancelling twice is not an error
             }
 
             if (order.Status == OrderStatus.Delivered)
             {
-                return CancelOutcome.AlreadyDelivered;
+                return Fail(ErrorCatalogue.OrderAlreadyDelivered, "A delivered order cannot be cancelled.");
             }
 
             if (order.Status == OrderStatus.OnTheWay)
             {
-                return CancelOutcome.NotCancellable;
+                return Fail(ErrorCatalogue.OrderStatusConflict, "An order that is on its way cannot be cancelled.");
             }
 
             order.Status = OrderStatus.Cancelled;
-            return CancelOutcome.Cancelled;
+            return Result<Order>.Ok(order);
         }
     }
-}
 
+    private static Result<Order> Fail(ApiError error, string detail) => Result<Order>.Fail(error, detail);
+}

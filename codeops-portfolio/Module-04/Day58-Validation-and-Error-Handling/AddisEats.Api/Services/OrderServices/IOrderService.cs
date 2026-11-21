@@ -1,16 +1,17 @@
 ﻿using AddisEats.Api.Dtos;
+using AddisEats.Api.Errors;
 using AddisEats.Api.Models;
 
 namespace AddisEats.Api.Services.OrderServices;
 
 public interface IOrderService
 {
-    Order? GetById(int id);
+    Result<Order> GetById(int id);
 
-    PlaceOrderResult Place(CreateOrderDto request);
+    Result<Order> Place(CreateOrderDto request);
 
-    // The same pattern as TryParse: true when the move was allowed and applied.
-    bool TryChangeStatus(Order order, OrderStatus next);
+    // Moves an order forward only. Cancelling is Cancel.
+    Result<Order> ChangeStatus(int id, OrderStatus next);
 
-    CancelOutcome Cancel(int id);
+    Result<Order> Cancel(int id);
 }

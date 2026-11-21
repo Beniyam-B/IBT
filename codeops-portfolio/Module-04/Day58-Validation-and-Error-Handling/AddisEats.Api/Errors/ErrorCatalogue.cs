@@ -12,7 +12,8 @@ public static class ErrorCatalogue
     public static readonly ApiError RestaurantClosed     = new("RESTAURANT_CLOSED", 409, "This restaurant is closed.");
     public static readonly ApiError OrderStatusConflict  = new("ORDER_STATUS_CONFLICT", 409, "The order cannot make that move.");
     public static readonly ApiError OrderAlreadyDelivered = new("ORDER_ALREADY_DELIVERED", 409, "This order cannot be cancelled.");
-    public static readonly ApiError AmountInvalid        = new("AMOUNT_INVALID", 422, "The amount must be above zero.");
+    public static readonly ApiError AmountInvalid        = new("AMOUNT_INVALID", 422, "The order total is below the minimum order.");
     public static readonly ApiError ItemNotOnMenu        = new("ITEM_NOT_ON_MENU", 422, "That item is not on this restaurant's menu.");
     public static readonly ApiError InternalError        = new("INTERNAL_ERROR", 500, "Something went wrong on our side.");
 }
+

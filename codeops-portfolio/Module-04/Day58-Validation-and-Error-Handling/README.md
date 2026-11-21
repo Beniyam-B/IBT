@@ -197,3 +197,29 @@ Applied to `priceEtb` when creating a menu item. It rejects zero, negatives and 
 `CreateOrderDto` implements `IValidatableObject` for the scheduled delivery: `scheduledFor` is required (and must be in the future) when `isScheduled` is true, and is not allowed when it is false. It runs after the property attributes and only if they all passed.
 
 Why it cannot be a property attribute: a property attribute only sees the value of the one property it sits on, and this rule needs `isScheduled` and `scheduledFor` together.
+
+## Exercise 5: Result<T>
+
+`OrderService` returns `Result<Order>` from every method. A failure carries a catalogue entry (code, status) and a detail message, so the status travels with the error and the controller never guesses. The controller only checks `IsSuccess` and calls `Fail(result)`.
+
+| Case | Status | Code |
+|---|---|---|
+| restaurant does not exist | 404 | RESTAURANT_NOT_FOUND |
+| restaurant is closed | 409 | RESTAURANT_CLOSED |
+| item is on another restaurant's menu | 422 | ITEM_NOT_ON_MENU |
+| total below the 150 ETB minimum | 422 | AMOUNT_INVALID |
+| a valid order | 201 | - |
+
+# Exercise 5: Result<T>
+
+`OrderService` returns `Result<Order>` from every method. A failure carries a catalogue entry (code, status) and a detail message, so the status travels with the error and the controller never guesses. The controller only checks `IsSuccess` and calls `Fail(result)`.
+
+| Case | Status | Code |
+|---|---|---|
+| restaurant does not exist | 404 | RESTAURANT_NOT_FOUND |
+| restaurant is closed | 409 | RESTAURANT_CLOSED |
+| item is on another restaurant's menu | 422 | ITEM_NOT_ON_MENU |
+| total below the 150 ETB minimum | 422 | AMOUNT_INVALID |
+| a valid order | 201 | - |
+PS L:\IBT\codeops-portfolio\Module-04\Day58-Validation-and-Error-Handling>
+

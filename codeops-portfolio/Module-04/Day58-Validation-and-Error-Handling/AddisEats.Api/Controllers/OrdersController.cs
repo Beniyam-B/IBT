@@ -1,7 +1,5 @@
 ﻿using AddisEats.Api.Dtos;
-using AddisEats.Api.Errors;
 using AddisEats.Api.Mappers;
-using AddisEats.Api.Models;
 using AddisEats.Api.Services.OrderServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,17 +21,17 @@ public class OrdersController : ApiControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public ActionResult<OrderDto> GetOne(int id)
     {
-        var order = _orders.GetById(id);
+        var result = _orders.GetById(id);
 
-        if (order is null)
+        if (!result.IsSuccess)
         {
-            return Fail(ErrorCatalogue.OrderNotFound, $"Order {id} does not exist.");
+            return Fail(result);
         }
 
-        return order.ToDto();
+        return result.Value!.ToDto();
     }
 
-    // POST api/v1/orders   body: { "restaurantId": 1, "menuItemId": 1, "quantity": 2 }
+    // POST api/v1/orders
     [HttpPost]
     [ProducesResponseType<OrderDto>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -42,32 +40,16 @@ public class OrdersController : ApiControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public ActionResult<OrderDto> Create([FromBody] CreateOrderDto request)
     {
+        // Layers 1 to 3 already passed, or we would not be here.
         var result = _orders.Place(request);
 
-        switch (result.Outcome)
+        if (!result.IsSuccess)
         {
-            case PlaceOrderOutcome.Placed:
-                // 201 Created, with a Location header that points at GET api/v1/orders/{id}
-                return CreatedAtAction(nameof(GetOne), new { id = result.Order!.Id }, result.Order.ToDto());
-
-            case PlaceOrderOutcome.AmountInvalid:
-                return Fail(ErrorCatalogue.AmountInvalid, "Quantity must be greater than zero.");
-
-            case PlaceOrderOutcome.RestaurantNotFound:
-                return Fail(ErrorCatalogue.RestaurantNotFound, $"Restaurant {request.RestaurantId} does not exist.");
-
-            case PlaceOrderOutcome.RestaurantClosed:
-                return Fail(ErrorCatalogue.RestaurantClosed, $"Restaurant {request.RestaurantId} is closed.");
-
-            case PlaceOrderOutcome.MenuItemNotFound:
-                return Fail(ErrorCatalogue.MenuItemNotFound, $"Menu item {request.MenuItemId} does not exist.");
-
-            case PlaceOrderOutcome.ItemNotOnMenu:
-                return Fail(ErrorCatalogue.ItemNotOnMenu, $"Menu item {request.MenuItemId} is not on restaurant {request.RestaurantId}'s menu.");
-
-            default:
-                return Fail(ErrorCatalogue.InternalError, "The order could not be placed.");
+            return Fail(result);
         }
+
+        // 201 Created, with a Location header that points at GET api/v1/orders/{id}
+        return CreatedAtAction(nameof(GetOne), new { id = result.Value!.Id }, result.Value.ToDto());
     }
 
     // PATCH api/v1/orders/2/status   body: { "status": "OnTheWay" }   (forward moves only)
@@ -77,27 +59,14 @@ public class OrdersController : ApiControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     public ActionResult<OrderDto> UpdateStatus(int id, [FromBody] UpdateOrderStatusDto request)
     {
-        if (!Enum.IsDefined(request.Status))
+        var result = _orders.ChangeStatus(id, request.Status);
+
+        if (!result.IsSuccess)
         {
-            var errors = new Dictionary<string, string[]> { ["status"] = new[] { "Unknown status." } };
-            return Fail(ErrorCatalogue.ValidationFailed, "One or more fields are missing or malformed.", errors);
+            return Fail(result);
         }
 
-        var order = _orders.GetById(id);
-
-        if (order is null)
-        {
-            return Fail(ErrorCatalogue.OrderNotFound, $"Order {id} does not exist.");
-        }
-
-        // 409: the request is well formed but clashes with the order's current state.
-        if (!_orders.TryChangeStatus(order, request.Status))
-        {
-            var hint = request.Status == OrderStatus.Cancelled ? " Use DELETE to cancel an order." : "";
-            return Fail(ErrorCatalogue.OrderStatusConflict, $"An order that is {order.Status} cannot move to {request.Status}.{hint}");
-        }
-
-        return order.ToDto();
+        return result.Value!.ToDto();
     }
 
     // DELETE api/v1/orders/2   (cancels the order)
@@ -107,19 +76,13 @@ public class OrdersController : ApiControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     public IActionResult Cancel(int id)
     {
-        switch (_orders.Cancel(id))
+        var result = _orders.Cancel(id);
+
+        if (!result.IsSuccess)
         {
-            case CancelOutcome.Cancelled:
-                return NoContent();   // 204: it worked and there is nothing to say
-
-            case CancelOutcome.NotFound:
-                return Fail(ErrorCatalogue.OrderNotFound, $"Order {id} does not exist.");
-
-            case CancelOutcome.AlreadyDelivered:
-                return Fail(ErrorCatalogue.OrderAlreadyDelivered, "A delivered order cannot be cancelled.");
-
-            default:
-                return Fail(ErrorCatalogue.OrderStatusConflict, "An order that is on its way cannot be cancelled.");
+            return Fail(result);
         }
+
+        return NoContent();   // 204: it worked and there is nothing to say
     }
 }
