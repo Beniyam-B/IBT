@@ -14,7 +14,7 @@ All paths are versioned under `/api/v1`. The failure column lists every status a
 | 3 | GET | `/api/v1/restaurants/{id}/menu` | That restaurant's menu, paged | 200 | 400, 404 |
 | 4 | GET | `/api/v1/menu-items` | The whole menu, filtered and paged | 200 | 400 |
 | 5 | GET | `/api/v1/menu-items/{id}` | Read one menu item | 200 | 404 |
-| 6 | POST | `/api/v1/menu-items` | Create a menu item | 201 | 400, 422 |
+| 6 | POST | `/api/v1/menu-items` | Create a menu item | 201 | 400 |
 | 7 | POST | `/api/v1/orders` | Place an order | 201 | 400, 404, 409, 422 |
 | 8 | GET | `/api/v1/orders/{id}` | Read one order | 200 | 404 |
 | 9 | PATCH | `/api/v1/orders/{id}/status` | Move an order forward | 200 | 400, 404, 409 |
@@ -90,9 +90,9 @@ Every failure the API can produce is listed here once. The code is for machines 
 | `RESTAURANT_CLOSED` | 409 | Ordering from a closed restaurant | This restaurant is closed |
 | `ORDER_STATUS_CONFLICT` | 409 | The move is not allowed from the order's current status | An order that is X cannot move to Y |
 | `ORDER_ALREADY_DELIVERED` | 409 | Cancelling a delivered order | This order cannot be cancelled |
-| `AMOUNT_INVALID` | 422 | A quantity or a price of zero or less | Must be greater than zero |
+| `AMOUNT_INVALID` | 422 | The order total (items plus delivery) is below the minimum order of 150 ETB | The order total must be at least 150.00 ETB |
 | `ITEM_NOT_ON_MENU` | 422 | The menu item does not belong to that restaurant | That item is not on this restaurant's menu |
-| `INTERNAL_ERROR` | 500 | An unhandled exception (made global on Day 58) | Something went wrong on our side |
+| `INTERNAL_ERROR` | 500 | An unhandled exception, caught by the exception middleware | Something went wrong on our side |
 
 ### One error shape
 Every error body is a ProblemDetails (RFC 7807) with an extra `code` field:
@@ -104,11 +104,12 @@ Every error body is a ProblemDetails (RFC 7807) with an extra `code` field:
   "status": 404,
   "detail": "Restaurant 9999 does not exist.",
   "instance": "/api/v1/restaurants/9999",
-  "code": "RESTAURANT_NOT_FOUND"
+  "code": "RESTAURANT_NOT_FOUND",
+  "traceId": "0HNB2K3M5L9QD:00000001"
 }
 ```
 
-Validation errors add an `errors` object, so a frontend can attach each message to a form field. No error body ever contains a stack trace.
+Validation errors add an `errors` object that lists every bad field at once, so a frontend can attach each message to a form field. Every error carries a `traceId`. No error body ever contains a stack trace or an exception message.
 
 ### 400 or 422
 400 means the request could not be parsed or is malformed. 422 means it parsed cleanly but breaks a business rule. This rule holds on every endpoint.
@@ -447,3 +448,10 @@ Request: `GET /api/v1/debug/throw`
 {"type":"https://addiseats.et/errors/internal-error","title":"Something went wrong on our side.","status":500,"detail":"An unexpected error occurred. Quote the trace id if you contact support.","instance":"/api/v1/debug/throw","code":"INTERNAL_ERROR","traceId":"0HNQ7ILF4R8SJ:00000001"}
 ```
 
+
+
+## What changed since Day 57
+- A zero or negative price is now a field-level rule (`EtbAmountAttribute`), so it returns 400 `VALIDATION_FAILED`.
+- `AMOUNT_INVALID` (422) is now the business rule "the order total must reach the minimum order", worked out on the server.
+- Every error body, from the controllers and from the exception middleware, has the same shape with a `code` and a `traceId`.
+- `Result<T>` is returned from every `OrderService` method that can fail. The two lookups (`GetById` on restaurants and menu items) still return `null` when nothing is found: that is a lookup, not a rule being broken.
