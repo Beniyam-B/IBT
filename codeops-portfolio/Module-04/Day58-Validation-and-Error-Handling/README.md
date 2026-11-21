@@ -163,3 +163,18 @@ Each layer is cheaper than the next and rejects a different kind of wrong. A rul
 | `RestaurantQuery` | `area`, `maxFeeEtb` | StringLength 50, Range 0 to 10,000 |
 
 Errors use camelCase field names so a frontend can bind them to form fields. A request with four bad fields reports all four at once.
+
+## Exercise 2: EthiopianMobileAttribute
+
+Shape only: `^(?:\+251|0)(?:9|7)\d{8}$`, compiled once. Whether the number is registered with TeleBirr is a business rule and belongs in layer 4.
+
+| Number | Case | Status |
+|---|---|---|
+| `0911234567` | valid: 09 form | 201 |
+| `0711234567` | valid: 07 form | 201 |
+| `+251911234567` | valid: +251 with 9 | 201 |
+| `+251711234567` | valid: +251 with 7 | 201 |
+| `0811234567` | invalid: 08 is not a mobile prefix | 400 |
+| `091123456` | invalid: too short | 400 |
+| `+25191123456` | invalid: +251 form too short | 400 |
+| `09112x4567` | invalid: contains a letter | 400 |

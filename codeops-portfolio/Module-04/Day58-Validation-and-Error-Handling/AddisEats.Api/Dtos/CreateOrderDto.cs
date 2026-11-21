@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AddisEats.Api.Validation;
 
 namespace AddisEats.Api.Dtos;
 
@@ -17,5 +18,7 @@ public class CreateOrderDto
     [Required(ErrorMessage = "A phone number is required.")]
     [MinLength(10, ErrorMessage = "A phone number has at least 10 characters.")]
     [StringLength(13, ErrorMessage = "A phone number has at most 13 characters.")]
+    [EthiopianMobile]
     public string Phone { get; set; } = "";
 }
+
