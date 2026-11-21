@@ -66,32 +66,9 @@ public class MenuItemsController : ApiControllerBase
     [HttpPost]
     [ProducesResponseType<MenuItemDto>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public ActionResult<MenuItemDto> Create([FromBody] CreateMenuItemDto request)
     {
-        var errors = new Dictionary<string, string[]>();
-
-        if (string.IsNullOrWhiteSpace(request.Name))
-        {
-            errors["name"] = new[] { "Name is required." };
-        }
-
-        if (string.IsNullOrWhiteSpace(request.Category))
-        {
-            errors["category"] = new[] { "Category is required." };
-        }
-
-        if (errors.Count > 0)
-        {
-            return Fail(ErrorCatalogue.ValidationFailed, "One or more fields are missing or malformed.", errors);
-        }
-
-        // Parsed fine but breaks a business rule: 422, not 400.
-        if (request.PriceEtb <= 0m)
-        {
-            return Fail(ErrorCatalogue.AmountInvalid, "PriceEtb must be greater than zero.");
-        }
-
+        // Layer 3 has already checked every field, or we would not be here.
         var created = _menu.Add(new MenuItem
         {
             Name = request.Name.Trim(),

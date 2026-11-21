@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AddisEats.Api.Validation;
 
 namespace AddisEats.Api.Dtos;
 
@@ -13,5 +14,6 @@ public class CreateMenuItemDto
     [StringLength(50, ErrorMessage = "Category can be at most 50 characters.")]
     public string Category { get; set; } = "";
 
+    [EtbAmount]
     public decimal PriceEtb { get; set; }
 }

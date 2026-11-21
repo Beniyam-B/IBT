@@ -178,3 +178,16 @@ Shape only: `^(?:\+251|0)(?:9|7)\d{8}$`, compiled once. Whether the number is re
 | `091123456` | invalid: too short | 400 |
 | `+25191123456` | invalid: +251 form too short | 400 |
 | `09112x4567` | invalid: contains a letter | 400 |
+
+## Exercise 3: EtbAmountAttribute
+
+Applied to `priceEtb` when creating a menu item. It rejects zero, negatives and more than two decimal places, on a `decimal` (never a `double`).
+
+| priceEtb | Case | Status |
+|---|---|---|
+| `480.50` | valid: two decimals | 201 |
+| `95` | valid: whole number | 201 |
+| `480.505` | invalid: three decimals | 400 |
+| `12.345` | invalid: three decimals | 400 |
+| `0` | invalid: zero | 400 |
+| `-5` | invalid: negative | 400 |
