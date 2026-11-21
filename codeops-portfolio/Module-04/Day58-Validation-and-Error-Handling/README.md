@@ -136,3 +136,30 @@ Decision: **reject**. A query parameter an endpoint does not declare returns `40
 
 It is one global filter (`RejectUnknownQueryParametersFilter`), so the same convention holds on `/restaurants`, `/menu-items` and `/orders`: each action accepts exactly the query parameters it declares. A path value such as `id` is not a query parameter, so `?id=1` on `/restaurants/1` is rejected too.
 
+
+## Validation layers
+
+Each layer is cheaper than the next and rejects a different kind of wrong. A rule lives in exactly one layer.
+
+| Layer | Asks | Failure | In this API |
+|---|---|---|---|
+| 1. Route constraint | Could this URL ever be valid? | 404 | `{id:int}` rejects `/orders/abc` |
+| 2. Model binding | Can the text become the declared type? | 400 `VALIDATION_FAILED` | `"restaurantId": "one"` |
+| 3. Data annotations | Is each field within its rules? | 400 `VALIDATION_FAILED`, every bad field at once | attributes on the request types |
+| 4. Business rules | Is this acceptable right now? | 404, 409 or 422 | the service returns a `Result` |
+| 5. Database constraints | The last defence | | Module 5 |
+
+## Exercise 1: annotations on every request type
+
+| Request type | Field | Rules (each with its own message) |
+|---|---|---|
+| `CreateOrderDto` | `restaurantId` | Range 1 or more |
+| | `menuItemId` | Range 1 or more |
+| | `quantity` | Range 1 to 50 |
+| | `phone` | Required, MinLength 10, StringLength 13 |
+| `CreateMenuItemDto` | `name` | Required, StringLength 2 to 100 |
+| | `category` | Required, StringLength 50 |
+| `UpdateOrderStatusDto` | `status` | EnumDataType (must be a real status) |
+| `RestaurantQuery` | `area`, `maxFeeEtb` | StringLength 50, Range 0 to 10,000 |
+
+Errors use camelCase field names so a frontend can bind them to form fields. A request with four bad fields reports all four at once.

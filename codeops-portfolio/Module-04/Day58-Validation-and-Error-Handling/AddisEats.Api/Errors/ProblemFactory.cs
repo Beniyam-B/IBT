@@ -9,7 +9,7 @@ public static class ProblemFactory
     {
         ProblemDetails problem = errors is null
             ? new ProblemDetails()
-            : new ValidationProblemDetails(errors);
+            : new ValidationProblemDetails(errors.ToDictionary(e => CamelCase(e.Key), e => e.Value));
 
         problem.Type = $"https://addiseats.et/errors/{error.Code.ToLowerInvariant().Replace('_', '-')}";
         problem.Title = error.Title;
@@ -24,4 +24,8 @@ public static class ProblemFactory
             ContentTypes = { "application/problem+json", "application/json" }
         };
     }
+
+    // Field names go out the way the JSON does: restaurantId, not RestaurantId.
+    private static string CamelCase(string key) =>
+        string.IsNullOrEmpty(key) || !char.IsUpper(key[0]) ? key : char.ToLowerInvariant(key[0]) + key[1..];
 }
