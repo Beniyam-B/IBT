@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using AddisEats.Api.Errors;
 using AddisEats.Api.Filters;
+using AddisEats.Api.Middleware;
 using AddisEats.Api.Options;
 using AddisEats.Api.Services.MenuServices;
 using AddisEats.Api.Services.OrderServices;
@@ -23,13 +24,17 @@ builder.Services.AddControllers(options => options.Filters.Add<RejectUnknownQuer
                 .ToDictionary(
                     entry => entry.Key,
                     entry => entry.Value!.Errors
-                        .Select(e => !string.IsNullOrWhiteSpace(e.ErrorMessage) ? e.ErrorMessage : e.Exception is JsonException ? "The request body is malformed, has a value of the wrong type, or has a field this endpoint does not accept." : "The value is invalid.")
+                        .Select(e => !string.IsNullOrWhiteSpace(e.ErrorMessage)
+                            ? e.ErrorMessage
+                            : e.Exception is JsonException
+                                ? "The request body is malformed, has a value of the wrong type, or has a field this endpoint does not accept."
+                                : "The value is invalid.")
                         .ToArray());
 
             return ProblemFactory.Create(
                 ErrorCatalogue.ValidationFailed,
                 "One or more fields are missing or malformed.",
-                context.HttpContext.Request.Path.Value ?? "",
+                context.HttpContext,
                 errors);
         };
     })
@@ -61,10 +66,17 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // ---- 2. Build the pipeline: what happens to each request
+// FIRST: the exception handler wraps everything registered after it.
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    // Development only: a deliberate throw, to prove the handler works. Hidden from Swagger.
+    app.MapGet("/api/v1/debug/throw", IResult () => throw new InvalidOperationException("boom: Server=secret-db;Password=hunter2"))
+       .ExcludeFromDescription();
 }
 
 app.UseHttpsRedirection();
@@ -73,6 +85,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-
-

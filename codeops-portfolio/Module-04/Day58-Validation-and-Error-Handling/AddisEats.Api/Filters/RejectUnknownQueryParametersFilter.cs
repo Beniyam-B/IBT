@@ -26,7 +26,7 @@ public class RejectUnknownQueryParametersFilter : IActionFilter
         context.Result = ProblemFactory.Create(
             ErrorCatalogue.UnknownParameter,
             $"Unknown query parameter(s): {string.Join(", ", unknown)}. This endpoint accepts: {list}.",
-            context.HttpContext.Request.Path.Value ?? "");
+            context.HttpContext);
     }
 
     public void OnActionExecuted(ActionExecutedContext context)
@@ -69,3 +69,4 @@ public class RejectUnknownQueryParametersFilter : IActionFilter
         type.IsPrimitive || type.IsEnum || type == typeof(string) || type == typeof(decimal)
         || type == typeof(DateTime) || type == typeof(Guid);
 }
+

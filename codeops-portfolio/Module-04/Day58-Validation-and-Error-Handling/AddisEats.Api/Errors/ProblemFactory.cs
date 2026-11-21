@@ -2,10 +2,11 @@
 
 namespace AddisEats.Api.Errors;
 
-// Builds the one error body every failure uses: a ProblemDetails (RFC 7807) plus a machine-readable "code".
+// Builds the one error body every failure uses: a ProblemDetails (RFC 7807) plus a machine-readable "code" and a traceId.
 public static class ProblemFactory
 {
-    public static ObjectResult Create(ApiError error, string detail, string instance, IDictionary<string, string[]>? errors = null)
+    // The ProblemDetails itself, so controllers and the exception middleware share exactly one shape.
+    public static ProblemDetails Build(ApiError error, string detail, HttpContext http, IDictionary<string, string[]>? errors = null)
     {
         ProblemDetails problem = errors is null
             ? new ProblemDetails()
@@ -15,15 +16,19 @@ public static class ProblemFactory
         problem.Title = error.Title;
         problem.Status = error.Status;
         problem.Detail = detail;
-        problem.Instance = instance;
+        problem.Instance = http.Request.Path.Value ?? "";
         problem.Extensions["code"] = error.Code;
+        problem.Extensions["traceId"] = http.TraceIdentifier;
 
-        return new ObjectResult(problem)
+        return problem;
+    }
+
+    public static ObjectResult Create(ApiError error, string detail, HttpContext http, IDictionary<string, string[]>? errors = null) =>
+        new(Build(error, detail, http, errors))
         {
             StatusCode = error.Status,
             ContentTypes = { "application/problem+json", "application/json" }
         };
-    }
 
     // Field names go out the way the JSON does: restaurantId, not RestaurantId.
     private static string CamelCase(string key) =>

@@ -245,3 +245,15 @@ Status 201
 ```
 
 The one amount a client does send is `priceEtb` when creating a menu item. That is the price being defined, not a total, and it goes through `EtbAmountAttribute`.
+
+## Exercise 7: the exception middleware
+
+`ExceptionHandlingMiddleware` is registered first, so it wraps everything after it. It logs the full exception once (with the method, path and trace id) and returns a `ProblemDetails` with a generic message. `GET /api/v1/debug/throw` exists only in Development and throws on purpose:
+
+Status 500
+
+```json
+{"type":"https://addiseats.et/errors/internal-error","title":"Something went wrong on our side.","status":500,"detail":"An unexpected error occurred. Quote the trace id if you contact support.","instance":"/api/v1/debug/throw","code":"INTERNAL_ERROR","traceId":"0HNQ7IJEU9DPP:00000001"}
+```
+
+The log line carries the same trace id, so support can find the failure from what the customer reads off the screen. The response contains no stack trace, no exception message, no table names and no connection strings.
