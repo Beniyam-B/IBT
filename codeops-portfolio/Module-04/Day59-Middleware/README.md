@@ -554,3 +554,100 @@ In the reordered pipeline authorization asks "may this user proceed?" before any
 ```
 
 **Why this could not be middleware:** middleware runs before routing has chosen an action and before model binding, so all it can see is the raw request stream, not the action name or the bound, validated arguments.
+
+## Exercise 8: the pipeline, line by line
+
+This is the pipeline half of `Program.cs`, copied from the code. A request travels down it, and the response travels back up. The order is dependency order, not alphabetical: each step needs something the previous one established.
+
+```csharp
+var app = builder.Build();
+
+// ---- 2. The pipeline, top to bottom. The order is the design.
+app.UseMiddleware<ExceptionHandlingMiddleware>();   // outermost: it can report a failure in anything below it
+app.UseMiddleware<CorrelationIdMiddleware>();       // the id exists before anything logs
+app.UseMiddleware<RequestTimingMiddleware>();       // measures everything below it, so it comes early
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
+    // Development only: a deliberate throw, to prove the handler works. Hidden from Swagger.
+    app.MapGet("/api/v1/debug/throw", IResult () => throw new InvalidOperationException("boom: Server=secret-db;Password=hunter2"))
+       .ExcludeFromDescription();
+
+    // Development only: a slow route, to see the Warning from the timing middleware.
+    app.MapGet("/api/v1/debug/slow", async (int? ms) =>
+    {
+        var wait = Math.Clamp(ms ?? 1500, 0, 5000);
+        await Task.Delay(wait);
+        return Results.Ok(new { waitedMs = wait });
+    }).ExcludeFromDescription();
+}
+
+app.UseHttpsRedirection();
+app.UseCors(FrontendPolicy);   // before routing, so a preflight request is answered
+
+// A branch: only requests whose path starts with /admin enter it. Everything else carries on down the main pipeline.
+app.Map("/admin", admin =>
+{
+    admin.UseMiddleware<ApiKeyMiddleware>();   // runs first inside the branch and stops the request if the key is wrong
+
+    // The terminal step of the branch. If the key middleware short-circuits, this line never appears in the log.
+    admin.Run(async ctx =>
+    {
+        var log = ctx.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("Admin");
+        log.LogInformation("admin handler ran");
+
+        await ctx.Response.WriteAsJsonAsync(new
+        {
+            restaurants = AddisEats.Api.Data.SeedData.Restaurants.Count,
+            menuItems = AddisEats.Api.Data.SeedData.MenuItems.Count,
+            orders = AddisEats.Api.Data.SeedData.Orders.Count
+        });
+    });
+});
+// Lab (exercise 5), never in Production: shows how a scoped service behaves inside middleware.
+if (app.Environment.IsDevelopment())
+{
+    app.Map("/lab", lab =>
+    {
+        lab.UseMiddleware<RequestScratchMiddleware>();
+        lab.Run(ctx => ctx.Response.WriteAsync("lab ok"));
+    });
+}
+
+app.UseRouting();              // decides which endpoint matches, without running it
+// app.UseRateLimiter();       // Day 63: after routing, so limits can differ per endpoint
+// app.UseAuthentication();    // Day 61: who is the caller
+// app.UseAuthorization();     // Day 62: may they proceed
+app.MapControllers();          // runs the endpoint: terminal, nothing after it ever executes
+
+app.Run();
+
+
+
+
+```
+
+Why each line sits where it does:
+
+| # | Step | Why it is here |
+|---|------|----------------|
+| 1 | `ExceptionHandlingMiddleware` | Outermost, so it wraps everything below it and is the only component that can report a failure in any of the others. If it were later, a crash in an earlier step would escape as a raw 500. |
+| 2 | `CorrelationIdMiddleware` | Before anything logs, so every later log line and every error body carries the id. Just inside the exception handler: the trace id is already on the request by the time an exception travels back up, and the header is added with `OnStarting` so it survives the handler clearing the response. |
+| 3 | `RequestTimingMiddleware` | Early, so it measures the whole pipeline below it and not only the controller. After the correlation id, so the timing line already carries it. Reversed, it would not. |
+| 4 | `UseSwagger`, `UseSwaggerUI` (Development) | Middleware that answers `/swagger` itself and short-circuits, so those requests never reach MVC. Development only. |
+| 5 | `/api/v1/debug/*` routes (Development) | A deliberate throw and a slow route, to prove the exception handler and the Warning threshold work. Never exposed outside Development. |
+| 6 | `UseHttpsRedirection` | Decided before anything reads the request in detail. |
+| 7 | `UseCors` | Before routing, so a browser preflight (OPTIONS) request is answered without needing an endpoint. |
+| 8 | `Map("/admin")` with `ApiKeyMiddleware` | A branch: only `/admin` requests enter it, so the key check never touches the public API. It sits after HTTPS and CORS so they still apply, and before routing because admin requests never need MVC. A wrong key short-circuits with 401 and nothing after it runs. |
+| 9 | `/lab` branch (Development) | The scoped-lifetime experiment (exercise 5), correct version. Development only. |
+| 10 | `UseRouting` | Selects the endpoint but does not run it. The gap between this and `MapControllers` is where rate limiting, authentication and authorization live. |
+| 11 | `// UseRateLimiter` (Day 63) | After routing, so limits can differ per endpoint, and before authentication so a flood is refused cheaply. |
+| 12 | `// UseAuthentication` (Day 61) | Establishes who the caller is. Must precede authorization: reversed, authorization sees an anonymous user and rejects valid credentials (exercise 6). |
+| 13 | `// UseAuthorization` (Day 62) | Decides whether that caller may proceed. Needs the endpoint (from routing) and the identity (from authentication). |
+| 14 | `MapControllers` | Terminal: runs the endpoint, and nothing registered after it ever executes. The action filters (unknown parameters, then audit) run inside it. |
+| 15 | `Run` | Starts listening. |
+
+**Static files** (step 3 in the usual canonical order) are not used, because this is an API with no files to serve. If they were added, `UseStaticFiles` would go after HTTPS redirection and before CORS, since a file needs no routing.
