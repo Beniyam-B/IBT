@@ -484,3 +484,63 @@ round 2 : ids = e48ffa88c7464bc2b5d9e92def4d8c2a, 175d2249ae194270b28a6870308ff9
 ```
 
 Different ids, and each request sees its own path. The rule: the constructor is for things that live as long as the app (`RequestDelegate`, `ILogger`, `IOptions`). Anything scoped arrives through `InvokeAsync`. The lab route exists only in Development.
+
+## Exercise 6: UseAuthorization above UseAuthentication (a scratch branch, since deleted)
+
+Authentication works out who the caller is and authorization decides what they may do, so authentication has to come first. I protected `GET /api/v1/secure` with `[Authorize]` and a demo login (a caller counts as logged in when it sends `X-Demo-User`), then ran the pipeline both ways.
+
+### Correct order (`UseAuthentication`, then `UseAuthorization`)
+
+```
+HTTP/1.1 401 Unauthorized
+Content-Length: 0
+Date: Mon, 23 Nov 2026 07:22:45 GMT
+Server: Kestrel
+X-Correlation-Id: 9d4eb88bd21c4f60aca1f9bdf38839c8
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Mon, 23 Nov 2026 07:22:45 GMT
+Server: Kestrel
+Transfer-Encoding: chunked
+X-Correlation-Id: d8658aaa1e874a86ab6a8006991fd519
+
+{"message":"You are in.","user":"almaz"}
+
+--- log
+
+10:22:46 warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3] => SpanId:4188535474f70a11, TraceId:b6377ca647569b0f966d4078acf16cf8, ParentId:0000000000000000 => ConnectionId:0HNQ96A965P66 => RequestPath:/api/v1/secure RequestId:0HNQ96A965P66:00000001 => CorrelationId:9d4eb88bd21c4f60aca1f9bdf38839c8 Failed to determine the https port for redirect.
+10:22:46 info: Microsoft.AspNetCore.Authorization.DefaultAuthorizationService[2] => SpanId:4188535474f70a11, TraceId:b6377ca647569b0f966d4078acf16cf8, ParentId:0000000000000000 => ConnectionId:0HNQ96A965P66 => RequestPath:/api/v1/secure RequestId:0HNQ96A965P66:00000001 => CorrelationId:9d4eb88bd21c4f60aca1f9bdf38839c8 Authorization failed. These requirements were not met: DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+10:22:46 info: AddisEats.Api.Auth.DemoHeaderAuthHandler[12] => SpanId:4188535474f70a11, TraceId:b6377ca647569b0f966d4078acf16cf8, ParentId:0000000000000000 => ConnectionId:0HNQ96A965P66 => RequestPath:/api/v1/secure RequestId:0HNQ96A965P66:00000001 => CorrelationId:9d4eb88bd21c4f60aca1f9bdf38839c8 AuthenticationScheme: DemoHeader was challenged.
+10:22:46 info: AddisEats.Api.Middleware.RequestTimingMiddleware[0] => SpanId:4188535474f70a11, TraceId:b6377ca647569b0f966d4078acf16cf8, ParentId:0000000000000000 => ConnectionId:0HNQ96A965P66 => RequestPath:/api/v1/secure RequestId:0HNQ96A965P66:00000001 => CorrelationId:9d4eb88bd21c4f60aca1f9bdf38839c8 GET /api/v1/secure -> 401 in 119ms
+10:22:46 info: AddisEats.Api.Middleware.RequestTimingMiddleware[0] => SpanId:214b56636c9952f3, TraceId:98185ab8fea6992202a9029b7b1f93ab, ParentId:0000000000000000 => ConnectionId:0HNQ96A965P67 => RequestPath:/api/v1/secure RequestId:0HNQ96A965P67:00000001 => CorrelationId:d8658aaa1e874a86ab6a8006991fd519 GET /api/v1/secure -> 200 in 65ms
+```
+
+### Reordered (`UseAuthorization`, then `UseAuthentication`)
+
+```
+HTTP/1.1 401 Unauthorized
+Content-Length: 0
+Date: Mon, 23 Nov 2026 07:23:34 GMT
+Server: Kestrel
+X-Correlation-Id: 400132ef4d754faa9a3173e178b1a4b9
+
+HTTP/1.1 401 Unauthorized
+Content-Length: 0
+Date: Mon, 23 Nov 2026 07:23:34 GMT
+Server: Kestrel
+X-Correlation-Id: 9cbfd7140cca447c8d7905e87b76e2c5
+
+
+--- log
+
+10:23:35 warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3] => SpanId:bb2971e050abddae, TraceId:774c59ad2741b1f2693ddd4ae9a59862, ParentId:0000000000000000 => ConnectionId:0HNQ96ANRB6MP => RequestPath:/api/v1/secure RequestId:0HNQ96ANRB6MP:00000001 => CorrelationId:400132ef4d754faa9a3173e178b1a4b9 Failed to determine the https port for redirect.
+10:23:35 info: Microsoft.AspNetCore.Authorization.DefaultAuthorizationService[2] => SpanId:bb2971e050abddae, TraceId:774c59ad2741b1f2693ddd4ae9a59862, ParentId:0000000000000000 => ConnectionId:0HNQ96ANRB6MP => RequestPath:/api/v1/secure RequestId:0HNQ96ANRB6MP:00000001 => CorrelationId:400132ef4d754faa9a3173e178b1a4b9 Authorization failed. These requirements were not met: DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+10:23:35 info: AddisEats.Api.Auth.DemoHeaderAuthHandler[12] => SpanId:bb2971e050abddae, TraceId:774c59ad2741b1f2693ddd4ae9a59862, ParentId:0000000000000000 => ConnectionId:0HNQ96ANRB6MP => RequestPath:/api/v1/secure RequestId:0HNQ96ANRB6MP:00000001 => CorrelationId:400132ef4d754faa9a3173e178b1a4b9 AuthenticationScheme: DemoHeader was challenged.
+10:23:35 info: AddisEats.Api.Middleware.RequestTimingMiddleware[0] => SpanId:bb2971e050abddae, TraceId:774c59ad2741b1f2693ddd4ae9a59862, ParentId:0000000000000000 => ConnectionId:0HNQ96ANRB6MP => RequestPath:/api/v1/secure RequestId:0HNQ96ANRB6MP:00000001 => CorrelationId:400132ef4d754faa9a3173e178b1a4b9 GET /api/v1/secure -> 401 in 110ms
+10:23:35 info: Microsoft.AspNetCore.Authorization.DefaultAuthorizationService[2] => SpanId:50e2486cdda99b95, TraceId:fb6783eb70c35c784e15f6dca0fa0d76, ParentId:0000000000000000 => ConnectionId:0HNQ96ANRB6MQ => RequestPath:/api/v1/secure RequestId:0HNQ96ANRB6MQ:00000001 => CorrelationId:9cbfd7140cca447c8d7905e87b76e2c5 Authorization failed. These requirements were not met: DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+10:23:35 info: AddisEats.Api.Auth.DemoHeaderAuthHandler[12] => SpanId:50e2486cdda99b95, TraceId:fb6783eb70c35c784e15f6dca0fa0d76, ParentId:0000000000000000 => ConnectionId:0HNQ96ANRB6MQ => RequestPath:/api/v1/secure RequestId:0HNQ96ANRB6MQ:00000001 => CorrelationId:9cbfd7140cca447c8d7905e87b76e2c5 AuthenticationScheme: DemoHeader was challenged.
+10:23:35 info: AddisEats.Api.Middleware.RequestTimingMiddleware[0] => SpanId:50e2486cdda99b95, TraceId:fb6783eb70c35c784e15f6dca0fa0d76, ParentId:0000000000000000 => ConnectionId:0HNQ96ANRB6MQ => RequestPath:/api/v1/secure RequestId:0HNQ96ANRB6MQ:00000001 => CorrelationId:9cbfd7140cca447c8d7905e87b76e2c5 GET /api/v1/secure -> 401 in 22ms
+```
+
+In the reordered pipeline authorization asks "may this user proceed?" before anything has identified the user, so it sees an anonymous caller and refuses. A caller with perfectly valid credentials is rejected, and the log says the request failed authorization, not that the credentials were wrong. This is the bug to remember: if every protected route returns 401 for a valid login, check the order of these two lines first.
