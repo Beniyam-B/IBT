@@ -4,6 +4,7 @@ using AddisEats.Api.Errors;
 using AddisEats.Api.Filters;
 using AddisEats.Api.Middleware;
 using AddisEats.Api.Options;
+using AddisEats.Api.Services;
 using AddisEats.Api.Services.MenuServices;
 using AddisEats.Api.Services.OrderServices;
 using AddisEats.Api.Services.RestaurantServices;
@@ -56,6 +57,7 @@ builder.Services.Configure<AdminOptions>(builder.Configuration.GetSection(AdminO
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IRequestScratch, RequestScratch>();
 
 // CORS: only the origins we trust (5173 = Vite, 3000 = Next.js / Create React App).
 builder.Services.AddCors(options =>
@@ -111,6 +113,16 @@ app.Map("/admin", admin =>
         });
     });
 });
+// Lab (exercise 5), never in Production: shows how a scoped service behaves inside middleware.
+if (app.Environment.IsDevelopment())
+{
+    app.Map("/lab", lab =>
+    {
+        lab.UseMiddleware<RequestScratchMiddleware>();
+        lab.Run(ctx => ctx.Response.WriteAsync("lab ok"));
+    });
+}
+
 app.UseRouting();              // decides which endpoint matches, without running it
 // app.UseRateLimiter();       // Day 63: after routing, so limits can differ per endpoint
 // app.UseAuthentication();    // Day 61: who is the caller
@@ -118,4 +130,6 @@ app.UseRouting();              // decides which endpoint matches, without runnin
 app.MapControllers();          // runs the endpoint: terminal, nothing after it ever executes
 
 app.Run();
+
+
 

@@ -456,3 +456,31 @@ Request: `GET /api/v1/debug/throw`
 - Every error body, from the controllers and from the exception middleware, has the same shape with a `code` and a `traceId`.
 - `Result<T>` is returned from every `OrderService` method that can fail. The two lookups (`GetById` on restaurants and menu items) still return `null` when nothing is found: that is a lookup, not a rule being broken.
 
+
+## Exercise 5: a scoped service in a middleware constructor
+
+Convention middleware is created **once**, when the pipeline is built, and the same instance then serves every request. A scoped service is meant to live for one request. Put it in the constructor and the first instance is captured and shared by every customer, forever.
+
+**In Development** the framework refuses it, because scope validation is on there:
+
+```
+dotnet : Unhandled exception. System.InvalidOperationException: Cannot resolve scoped service
+```
+
+**With validation off** (the Staging environment, and Production) it starts and works for the first request. Two requests sent at the same moment to `/lab/alpha` and `/lab/beta`, twice:
+
+```
+round 1 : ids = 1101c7af5f40404b84b29802293ece9a, 1101c7af5f40404b84b29802293ece9a | paths = /beta, /beta
+round 2 : ids = 1101c7af5f40404b84b29802293ece9a, 1101c7af5f40404b84b29802293ece9a | paths = /alpha, /alpha
+```
+
+The same id every time (one object for everyone), and both requests report the same path: one of them is shown the other customer's data. On a real API that is one customer seeing another's order.
+
+**The fix** is to take the scoped service as a parameter of `InvokeAsync`, which the framework resolves per request. The same experiment:
+
+```
+round 1 : ids = 0c7b09d8d8a146a5980f736d1d5a1fd4, e49f1d7ac8494d8bbda9cd28690b3c50 | paths = /beta, /alpha
+round 2 : ids = e48ffa88c7464bc2b5d9e92def4d8c2a, 175d2249ae194270b28a6870308ff9b9 | paths = /beta, /alpha
+```
+
+Different ids, and each request sees its own path. The rule: the constructor is for things that live as long as the app (`RequestDelegate`, `ILogger`, `IOptions`). Anything scoped arrives through `InvokeAsync`. The lab route exists only in Development.
