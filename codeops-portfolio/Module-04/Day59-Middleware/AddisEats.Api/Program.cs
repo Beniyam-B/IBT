@@ -52,6 +52,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<MenuOptions>(builder.Configuration.GetSection(MenuOptions.SectionName));
 builder.Services.Configure<OrderOptions>(builder.Configuration.GetSection(OrderOptions.SectionName));
+builder.Services.Configure<AdminOptions>(builder.Configuration.GetSection(AdminOptions.SectionName));
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
@@ -90,6 +91,26 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors(FrontendPolicy);   // before routing, so a preflight request is answered
+
+// A branch: only requests whose path starts with /admin enter it. Everything else carries on down the main pipeline.
+app.Map("/admin", admin =>
+{
+    admin.UseMiddleware<ApiKeyMiddleware>();   // runs first inside the branch and stops the request if the key is wrong
+
+    // The terminal step of the branch. If the key middleware short-circuits, this line never appears in the log.
+    admin.Run(async ctx =>
+    {
+        var log = ctx.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("Admin");
+        log.LogInformation("admin handler ran");
+
+        await ctx.Response.WriteAsJsonAsync(new
+        {
+            restaurants = AddisEats.Api.Data.SeedData.Restaurants.Count,
+            menuItems = AddisEats.Api.Data.SeedData.MenuItems.Count,
+            orders = AddisEats.Api.Data.SeedData.Orders.Count
+        });
+    });
+});
 app.UseRouting();              // decides which endpoint matches, without running it
 // app.UseRateLimiter();       // Day 63: after routing, so limits can differ per endpoint
 // app.UseAuthentication();    // Day 61: who is the caller
@@ -97,3 +118,4 @@ app.UseRouting();              // decides which endpoint matches, without runnin
 app.MapControllers();          // runs the endpoint: terminal, nothing after it ever executes
 
 app.Run();
+

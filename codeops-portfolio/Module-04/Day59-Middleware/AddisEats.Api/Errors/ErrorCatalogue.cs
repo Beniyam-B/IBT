@@ -14,6 +14,8 @@ public static class ErrorCatalogue
     public static readonly ApiError OrderAlreadyDelivered = new("ORDER_ALREADY_DELIVERED", 409, "This order cannot be cancelled.");
     public static readonly ApiError AmountInvalid        = new("AMOUNT_INVALID", 422, "The order total is below the minimum order.");
     public static readonly ApiError ItemNotOnMenu        = new("ITEM_NOT_ON_MENU", 422, "That item is not on this restaurant's menu.");
+    public static readonly ApiError Unauthenticated      = new("UNAUTHENTICATED", 401, "A valid API key is required.");
     public static readonly ApiError InternalError        = new("INTERNAL_ERROR", 500, "Something went wrong on our side.");
 }
+
 
