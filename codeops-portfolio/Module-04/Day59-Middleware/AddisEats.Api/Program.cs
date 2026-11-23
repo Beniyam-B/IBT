@@ -65,9 +65,10 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// ---- 2. Build the pipeline: what happens to each request
-// FIRST: the exception handler wraps everything registered after it.
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+// ---- 2. The pipeline, top to bottom. The order is the design.
+app.UseMiddleware<ExceptionHandlingMiddleware>();   // outermost: it can report a failure in anything below it
+app.UseMiddleware<CorrelationIdMiddleware>();       // the id exists before anything logs
+app.UseMiddleware<RequestTimingMiddleware>();       // measures everything below it, so it comes early
 
 if (app.Environment.IsDevelopment())
 {
@@ -77,11 +78,22 @@ if (app.Environment.IsDevelopment())
     // Development only: a deliberate throw, to prove the handler works. Hidden from Swagger.
     app.MapGet("/api/v1/debug/throw", IResult () => throw new InvalidOperationException("boom: Server=secret-db;Password=hunter2"))
        .ExcludeFromDescription();
+
+    // Development only: a slow route, to see the Warning from the timing middleware.
+    app.MapGet("/api/v1/debug/slow", async (int? ms) =>
+    {
+        var wait = Math.Clamp(ms ?? 1500, 0, 5000);
+        await Task.Delay(wait);
+        return Results.Ok(new { waitedMs = wait });
+    }).ExcludeFromDescription();
 }
 
 app.UseHttpsRedirection();
-app.UseCors(FrontendPolicy);   // before UseAuthorization and MapControllers
-app.UseAuthorization();
-app.MapControllers();
+app.UseCors(FrontendPolicy);   // before routing, so a preflight request is answered
+app.UseRouting();              // decides which endpoint matches, without running it
+// app.UseRateLimiter();       // Day 63: after routing, so limits can differ per endpoint
+// app.UseAuthentication();    // Day 61: who is the caller
+// app.UseAuthorization();     // Day 62: may they proceed
+app.MapControllers();          // runs the endpoint: terminal, nothing after it ever executes
 
 app.Run();
