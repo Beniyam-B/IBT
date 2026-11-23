@@ -14,7 +14,11 @@ const string FrontendPolicy = "frontend";
 var builder = WebApplication.CreateBuilder(args);
 
 // ---- 1. Register services: what the app CAN do
-builder.Services.AddControllers(options => options.Filters.Add<RejectUnknownQueryParametersFilter>())
+builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<RejectUnknownQueryParametersFilter>();   // first: a rejected request never reaches the audit
+        options.Filters.Add<AuditActionFilter>();
+    })
     .ConfigureApiBehaviorOptions(options =>
     {
         // Binding and parsing failures use the same error shape as every other failure.
@@ -130,6 +134,7 @@ app.UseRouting();              // decides which endpoint matches, without runnin
 app.MapControllers();          // runs the endpoint: terminal, nothing after it ever executes
 
 app.Run();
+
 
 
 

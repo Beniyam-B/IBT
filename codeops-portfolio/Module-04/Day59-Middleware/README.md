@@ -544,3 +544,13 @@ X-Correlation-Id: 9cbfd7140cca447c8d7905e87b76e2c5
 ```
 
 In the reordered pipeline authorization asks "may this user proceed?" before anything has identified the user, so it sees an anonymous caller and refuses. A caller with perfectly valid credentials is rejected, and the log says the request failed authorization, not that the credentials were wrong. This is the bug to remember: if every protected route returns 401 for a valid login, check the order of these two lines first.
+
+## Exercise 7: the audit action filter
+
+`AuditActionFilter` logs the name of the action that ran and its bound arguments, with phone numbers and other secrets replaced by `***`. It is registered after the unknown-parameter filter, so a request that filter rejects never reaches an action and is never audited. A real entry from the log (`POST /api/v1/orders`):
+
+```
+10:27:00 info: AddisEats.Api.Filters.AuditActionFilter[0] => SpanId:026a2aea2f06c084, TraceId:9d3369ba01df9a29b7b71c90d2e5ddb5, ParentId:0000000000000000 => ConnectionId:0HNQ96CKO9N2J => RequestPath:/api/v1/orders RequestId:0HNQ96CKO9N2J:00000001 => CorrelationId:audit-post => AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) Action AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) with {"request":{"restaurantId":1,"menuItemId":1,"quantity":2,"phone":"***","isScheduled":false,"scheduledFor":null}}
+```
+
+**Why this could not be middleware:** middleware runs before routing has chosen an action and before model binding, so all it can see is the raw request stream, not the action name or the bound, validated arguments.
