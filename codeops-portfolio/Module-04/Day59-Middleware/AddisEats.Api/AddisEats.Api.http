@@ -212,3 +212,32 @@ Content-Type: application/json
   "category": "Breakfast",
   "priceEtb": 95.50
 }
+
+### ---------- DAY 59: MIDDLEWARE ----------
+### Set adminKey to the value of your Admin__ApiKey environment variable. Never commit a real key.
+@adminKey = REPLACE-WITH-YOUR-KEY
+
+### 29 send your own correlation id: it comes back in the X-Correlation-Id response header and in the log
+GET {{host}}/api/v1/restaurants?limit=1
+X-Correlation-Id: bole-test-001
+
+### 30 no id sent: the server generates one and returns it
+GET {{host}}/api/v1/restaurants?limit=1
+
+### 31 an unsafe id is replaced, never echoed
+GET {{host}}/api/v1/restaurants?limit=1
+X-Correlation-Id: bad id; DROP TABLE
+
+### 32 an error body carries the same id as its traceId
+GET {{host}}/api/v1/restaurants/9999
+X-Correlation-Id: bole-test-002
+
+### 33 the admin branch without a key: 401 UNAUTHENTICATED, and the handler never runs
+GET {{host}}/admin/stats
+
+### 34 the admin branch with the right key: 200
+GET {{host}}/admin/stats
+X-Api-Key: {{adminKey}}
+
+### 35 a slow request (Development only): the timing middleware logs a Warning
+GET {{host}}/api/v1/debug/slow?ms=1500

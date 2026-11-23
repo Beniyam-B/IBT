@@ -19,6 +19,7 @@ All paths are versioned under `/api/v1`. The failure column lists every status a
 | 8 | GET | `/api/v1/orders/{id}` | Read one order | 200 | 404 |
 | 9 | PATCH | `/api/v1/orders/{id}/status` | Move an order forward | 200 | 400, 404, 409 |
 | 10 | DELETE | `/api/v1/orders/{id}` | Cancel an order | 204 | 404, 409 |
+| 11 | GET | `/admin/stats` | Counts of everything (needs the `X-Api-Key` header) | 200 | 401 |
 
 ## Status code rules
 - **200** a read succeeded, or an update returned the changed resource. An empty collection is still a 200 with an empty `data` array.
@@ -92,6 +93,7 @@ Every failure the API can produce is listed here once. The code is for machines 
 | `ORDER_ALREADY_DELIVERED` | 409 | Cancelling a delivered order | This order cannot be cancelled |
 | `AMOUNT_INVALID` | 422 | The order total (items plus delivery) is below the minimum order of 150 ETB | The order total must be at least 150.00 ETB |
 | `ITEM_NOT_ON_MENU` | 422 | The menu item does not belong to that restaurant | That item is not on this restaurant's menu |
+| `UNAUTHENTICATED` | 401 | The `/admin` API key is missing or wrong | A valid X-Api-Key header is required |
 | `INTERNAL_ERROR` | 500 | An unhandled exception, caught by the exception middleware | Something went wrong on our side |
 
 ### One error shape
@@ -651,3 +653,51 @@ Why each line sits where it does:
 | 15 | `Run` | Starts listening. |
 
 **Static files** (step 3 in the usual canonical order) are not used, because this is an API with no files to serve. If they were added, `UseStaticFiles` would go after HTTPS redirection and before CORS, since a file needs no routing.
+
+
+## Day 59 summary
+
+New this week:
+- `CorrelationIdMiddleware`: accepts a safe `X-Correlation-Id` or generates one, stores it as the request's trace id, returns it on every response (including errors) and attaches it to every log line.
+- `RequestTimingMiddleware`: logs method, path, status and milliseconds, at Warning above 1000 ms.
+- `ApiKeyMiddleware`: short-circuits with 401 on an `/admin` branch. The key comes from configuration (the `Admin__ApiKey` environment variable) and is never committed.
+- `AuditActionFilter`: logs the action and its arguments, with phone numbers redacted.
+- A fully ordered pipeline with `UseRouting` explicit and `UseRateLimiter`, `UseAuthentication` and `UseAuthorization` present but commented, ready for Days 61 to 63.
+
+Rules this week enforced:
+- No scoped service is ever injected into a middleware constructor. Scoped services arrive through `InvokeAsync`.
+- The exception middleware is registered before everything else.
+- Authentication comes before authorization.
+
+## Capstone verification (from a real run)
+
+Run on 2026-11-23 19:12 against the running API, with the admin key set in the environment. Every check passed:
+
+```
+PASS  error response carries the id (body and header): 404 not found
+PASS  error response carries the id (body and header): 400 validation
+PASS  error response carries the id (body and header): 400 unknown parameter
+PASS  error response carries the id (body and header): 401 admin key
+PASS  error response carries the id (body and header): 500 deliberate throw
+PASS  admin: no key and a wrong key are 401, the right key is 200
+PASS  admin: the handler ran for the right key only (exactly once)
+PASS  admin: the refused requests never reached the handler
+PASS  the correlation id is inside the timing log line
+PASS  a slow request is logged as warn
+PASS  audit: the order is audited with the phone redacted
+PASS  audit: the phone number is nowhere in the log
+PASS  audit: a rejected request is never audited
+PASS  no scoped service in any middleware constructor
+PASS  the exception middleware is registered before everything else
+PASS  the pipeline matches the canonical order, including the commented future lines
+```
+
+Log lines from the same run. The correlation id is inside the timing line, the slow request is a warning, and the audit entry has the phone redacted:
+
+```
+19:06:51 info: AddisEats.Api.Middleware.RequestTimingMiddleware[0] => SpanId:2763e61438ae3fe1, TraceId:969a8dfd800f5246bf999b9399e21375, ParentId:0000000000000000 => ConnectionId:0HNQ9FF4G9PPS => RequestPath:/api/v1/restaurants/9999 RequestId:0HNQ9FF4G9PPS:00000001 => CorrelationId:cap-404 GET /api/v1/restaurants/9999 -> 404 in 31ms
+
+19:06:55 warn: AddisEats.Api.Middleware.RequestTimingMiddleware[0] => SpanId:bbf0f5d9600c8e1e, TraceId:76dd75abd0966ae6744d5add8093259d, ParentId:0000000000000000 => ConnectionId:0HNQ9FF4G9PQ4 => RequestPath:/api/v1/debug/slow RequestId:0HNQ9FF4G9PQ4:00000001 => CorrelationId:cap-slow GET /api/v1/debug/slow -> 200 in 1548ms
+
+19:06:56 info: AddisEats.Api.Filters.AuditActionFilter[0] => SpanId:be211d957224ebbb, TraceId:7b6f625994fa9d853649d3b81aabdb6f, ParentId:0000000000000000 => ConnectionId:0HNQ9FF4G9PQ5 => RequestPath:/api/v1/orders RequestId:0HNQ9FF4G9PQ5:00000001 => CorrelationId:cap-audit => AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) Action AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) with {"request":{"restaurantId":1,"menuItemId":1,"quantity":2,"phone":"***","isScheduled":false,"scheduledFor":null}}
+```
