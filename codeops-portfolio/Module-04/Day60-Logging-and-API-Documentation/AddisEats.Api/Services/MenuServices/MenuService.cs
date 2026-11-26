@@ -8,8 +8,13 @@ public class MenuService : IMenuService
     private static readonly object Gate = new();
 
     // This is the shared SeedData list, not a copy. The service is scoped, so a new MenuService is built for every request.
-    // If each one copied the list, an item added by a POST would disappear before the next request.
     private readonly List<MenuItem> _items = SeedData.MenuItems;
+    private readonly ILogger<MenuService> _log;
+
+    public MenuService(ILogger<MenuService> log)
+    {
+        _log = log;
+    }
 
     public List<MenuItem> GetAll(string? category, decimal maxPrice, int page, int pageSize)
     {
@@ -51,6 +56,10 @@ public class MenuService : IMenuService
         {
             item.Id = _items.Count == 0 ? 1 : _items.Max(m => m.Id) + 1;
             _items.Add(item);
+
+            // A business event. The id only: the name is free text typed by a client.
+            _log.LogInformation("Menu item {MenuItemId} created", item.Id);
+
             return item;
         }
     }
@@ -68,5 +77,3 @@ public class MenuService : IMenuService
         }
     }
 }
-
-

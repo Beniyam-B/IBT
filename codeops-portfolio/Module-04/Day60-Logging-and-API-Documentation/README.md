@@ -702,3 +702,58 @@ Log lines from the same run. The correlation id is inside the timing line, the s
 19:06:56 info: AddisEats.Api.Filters.AuditActionFilter[0] => SpanId:be211d957224ebbb, TraceId:7b6f625994fa9d853649d3b81aabdb6f, ParentId:0000000000000000 => ConnectionId:0HNQ9FF4G9PQ5 => RequestPath:/api/v1/orders RequestId:0HNQ9FF4G9PQ5:00000001 => CorrelationId:cap-audit => AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) Action AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) with {"request":{"restaurantId":1,"menuItemId":1,"quantity":2,"phone":"***","isScheduled":false,"scheduledFor":null}}
 ```
 
+
+## Logging policy
+
+Six rules, decided once and applied by every service.
+
+1. **Templates, never concatenation.** Every log call uses named placeholders (`"Order {OrderId} placed"`). No `$` strings and no `+`, so logs can be searched by field and not only read.
+2. **One line per request**, written by `RequestTimingMiddleware`: method, path, status and duration. Services do not log entry and exit.
+3. **Business events at Information.** An order placed, moved or cancelled is countable later.
+4. **Rejections at Information.** A validation or business-rule failure is normal traffic: the API is working. Only the catalogue code is logged.
+5. **No personal data, ever.** No full phone numbers, addresses, tokens, API keys, connection strings or request bodies. Log the area and the ids.
+6. **Every line carries the correlation id.** It is added by the scope in `CorrelationIdMiddleware`. No service adds it itself.
+
+| Event | Level | Why |
+|---|---|---|
+| A request completed | Information | One line per request |
+| An order was placed, moved or cancelled | Information | A business event |
+| A request took over one second | Warning | Not broken, but worth investigating |
+| Validation or a business rule rejected a request | Information | Normal traffic |
+| A dependency was unreachable and a customer suffered | Error | Added when payments and a database exist |
+| An unhandled exception | Error | From the exception middleware |
+| A delivery fee was computed | Debug | Detail for development only |
+
+## Exercise 2: levels per category
+
+Levels are configured in `appsettings.json`, not in code, and the category is the filter: `ILogger<T>` puts the full type name in the category, so the prefix `AddisEats` controls every one of our own services at once.
+
+```json
+"LogLevel": {
+  "Default": "Information",
+  "Microsoft": "Warning",
+  "Microsoft.AspNetCore": "Warning",
+  "Microsoft.EntityFrameworkCore": "Warning",
+  "Microsoft.Hosting.Lifetime": "Information",
+  "AddisEats": "Debug"
+}
+```
+
+The same single `POST /api/v1/orders`, counted by its correlation id:
+
+| Configuration | Log lines for that one request |
+|---|---|
+| Everything at Debug (no policy) | 38 |
+| This policy (our code at Debug, the framework at Warning) | 5 |
+
+The lines left under the policy:
+
+```
+09:29:55 info: AddisEats.Api.Common.Filters.AuditActionFilter[0] => SpanId:04e92eedc80b0d11, TraceId:ef032905c7cdb83bcd1f2024b185284e, ParentId:0000000000000000 => ConnectionId:0HNQBGQNHALT0 => RequestPath:/api/v1/orders RequestId:0HNQBGQNHALT0:00000001 => CorrelationId:vol-test => AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) Action AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) with {"request":{"restaurantId":1,"menuItemId":1,"quantity":2,"phone":"***","isScheduled":false,"scheduledFor":null}}
+09:29:55 dbug: AddisEats.Api.Services.OrderServices.OrderService[0] => SpanId:04e92eedc80b0d11, TraceId:ef032905c7cdb83bcd1f2024b185284e, ParentId:0000000000000000 => ConnectionId:0HNQBGQNHALT0 => RequestPath:/api/v1/orders RequestId:0HNQBGQNHALT0:00000001 => CorrelationId:vol-test => AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) Delivery fee for Bole is 50 ETB
+09:29:55 info: AddisEats.Api.Services.OrderServices.OrderService[0] => SpanId:04e92eedc80b0d11, TraceId:ef032905c7cdb83bcd1f2024b185284e, ParentId:0000000000000000 => ConnectionId:0HNQBGQNHALT0 => RequestPath:/api/v1/orders RequestId:0HNQBGQNHALT0:00000001 => CorrelationId:vol-test => AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) Order 3 placed at restaurant 1 in Bole: 2 x item 1, total 370 ETB
+09:29:55 info: AddisEats.Api.Common.Filters.AuditActionFilter[0] => SpanId:04e92eedc80b0d11, TraceId:ef032905c7cdb83bcd1f2024b185284e, ParentId:0000000000000000 => ConnectionId:0HNQBGQNHALT0 => RequestPath:/api/v1/orders RequestId:0HNQBGQNHALT0:00000001 => CorrelationId:vol-test => AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) Action AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) finished with 201
+09:29:55 info: AddisEats.Api.Middleware.RequestTimingMiddleware[0] => SpanId:04e92eedc80b0d11, TraceId:ef032905c7cdb83bcd1f2024b185284e, ParentId:0000000000000000 => ConnectionId:0HNQBGQNHALT0 => RequestPath:/api/v1/orders RequestId:0HNQBGQNHALT0:00000001 => CorrelationId:vol-test POST /api/v1/orders -> 201 in 129ms
+```
+
+In Module 7 these logs go to an aggregator and storage becomes a line on a bill. The framework logs every routing decision and every filter it runs, which is rarely useful. `Microsoft.Hosting.Lifetime` stays at Information so the startup line (Now listening on...) is still printed.
