@@ -1,5 +1,5 @@
-﻿using AddisEats.Api.DTOs;
-using AddisEats.Api.Common;
+﻿using AddisEats.Api.Common;
+using AddisEats.Api.DTOs;
 using AddisEats.Api.Mappers;
 using AddisEats.Api.Services.MenuServices;
 using AddisEats.Api.Services.RestaurantServices;
@@ -24,7 +24,9 @@ public class RestaurantsController : ApiControllerBase
 
     // GET api/v1/restaurants?area=Bole&maxFeeEtb=55&page=1&limit=5
     [HttpGet]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<PagedResponse<RestaurantDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public ActionResult<PagedResponse<RestaurantDto>> GetAll([FromQuery] RestaurantQuery q)
     {
         if (q.Page < 1 || q.Limit < 1 || q.Limit > MaxLimit)
@@ -41,7 +43,10 @@ public class RestaurantsController : ApiControllerBase
 
     // GET api/v1/restaurants/7
     [HttpGet("{id:int}")]
+    [ProducesResponseType<RestaurantDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public ActionResult<RestaurantDto> GetOne(int id)
     {
         var found = _restaurants.GetById(id);
@@ -56,8 +61,10 @@ public class RestaurantsController : ApiControllerBase
 
     // GET api/v1/restaurants/7/menu?category=Drinks&page=1&limit=20
     [HttpGet("{id:int}/menu")]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<PagedResponse<MenuItemDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public ActionResult<PagedResponse<MenuItemDto>> GetMenu(
         int id,
         [FromQuery] string? category,
@@ -85,4 +92,3 @@ public class RestaurantsController : ApiControllerBase
         return Ok(new PagedResponse<MenuItemDto>(items, page, limit, all.Count));   // 200 even when empty
     }
 }
-

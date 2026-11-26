@@ -1,4 +1,5 @@
-﻿using AddisEats.Api.DTOs;
+﻿using AddisEats.Api.Common;
+using AddisEats.Api.DTOs;
 using AddisEats.Api.Mappers;
 using AddisEats.Api.Services.OrderServices;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,10 @@ public class OrdersController : ApiControllerBase
 
     // GET api/v1/orders/2
     [HttpGet("{id:int}")]
+    [ProducesResponseType<OrderDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public ActionResult<OrderDto> GetOne(int id)
     {
         var result = _orders.GetById(id);
@@ -34,10 +38,12 @@ public class OrdersController : ApiControllerBase
     // POST api/v1/orders
     [HttpPost]
     [ProducesResponseType<OrderDto>(StatusCodes.Status201Created)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public ActionResult<OrderDto> Create([FromBody] CreateOrderDto request)
     {
         // Layers 1 to 3 already passed, or we would not be here.
@@ -54,9 +60,12 @@ public class OrdersController : ApiControllerBase
 
     // PATCH api/v1/orders/2/status   body: { "status": "OnTheWay" }   (forward moves only)
     [HttpPatch("{id:int}/status")]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<OrderDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public ActionResult<OrderDto> UpdateStatus(int id, [FromBody] UpdateOrderStatusDto request)
     {
         var result = _orders.ChangeStatus(id, request.Status);
@@ -72,8 +81,10 @@ public class OrdersController : ApiControllerBase
     // DELETE api/v1/orders/2   (cancels the order)
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public IActionResult Cancel(int id)
     {
         var result = _orders.Cancel(id);
@@ -86,4 +97,3 @@ public class OrdersController : ApiControllerBase
         return NoContent();   // 204: it worked and there is nothing to say
     }
 }
-

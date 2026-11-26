@@ -1,8 +1,8 @@
-﻿using AddisEats.Api.DTOs;
-using AddisEats.Api.Common;
+﻿using AddisEats.Api.Common;
+using AddisEats.Api.Configuration;
+using AddisEats.Api.DTOs;
 using AddisEats.Api.Mappers;
 using AddisEats.Api.Models;
-using AddisEats.Api.Configuration;
 using AddisEats.Api.Services.MenuServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -26,7 +26,9 @@ public class MenuItemsController : ApiControllerBase
 
     // GET api/v1/menu-items?category=Drinks&maxPrice=100&page=1&limit=5
     [HttpGet]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<PagedResponse<MenuItemDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public ActionResult<PagedResponse<MenuItemDto>> GetAll(
         [FromQuery] string? category,
         [FromQuery] decimal? maxPrice,
@@ -49,7 +51,10 @@ public class MenuItemsController : ApiControllerBase
 
     // GET api/v1/menu-items/7
     [HttpGet("{id:int}")]
+    [ProducesResponseType<MenuItemDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public ActionResult<MenuItemDto> GetById(int id)
     {
         var item = _menu.GetById(id);
@@ -65,7 +70,9 @@ public class MenuItemsController : ApiControllerBase
     // POST api/v1/menu-items
     [HttpPost]
     [ProducesResponseType<MenuItemDto>(StatusCodes.Status201Created)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public ActionResult<MenuItemDto> Create([FromBody] CreateMenuItemDto request)
     {
         // Layer 3 has already checked every field, or we would not be here.
@@ -80,4 +87,3 @@ public class MenuItemsController : ApiControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created.ToDto());
     }
 }
-
