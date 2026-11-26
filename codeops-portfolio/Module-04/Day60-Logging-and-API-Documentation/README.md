@@ -757,3 +757,13 @@ The lines left under the policy:
 ```
 
 In Module 7 these logs go to an aggregator and storage becomes a line on a bill. The framework logs every routing decision and every filter it runs, which is rarely useful. `Microsoft.Hosting.Lifetime` stays at Information so the startup line (Now listening on...) is still printed.
+
+## Exercise 3: the correlation id inside OrderService
+
+A real line written by `OrderService`, with the id from the `X-Correlation-Id` header:
+
+```
+
+```
+
+**How it got there:** `CorrelationIdMiddleware` opens a logger scope (`BeginScope`) around the rest of the pipeline, and a scope follows the request through every call and `await` it makes (it travels in async-local state), so every log call made while that request is being handled picks it up automatically. `OrderService` receives nothing and passes nothing along.
