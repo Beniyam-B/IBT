@@ -1,4 +1,4 @@
-﻿using AddisEats.Api.Dtos;
+﻿using AddisEats.Api.DTOs;
 using AddisEats.Api.Mappers;
 using AddisEats.Api.Services.OrderServices;
 using Microsoft.AspNetCore.Mvc;
@@ -86,3 +86,4 @@ public class OrdersController : ApiControllerBase
         return NoContent();   // 204: it worked and there is nothing to say
     }
 }
+

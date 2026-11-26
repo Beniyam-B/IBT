@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using AddisEats.Api.Errors;
-using AddisEats.Api.Options;
+using AddisEats.Api.Common;
+using AddisEats.Api.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace AddisEats.Api.Middleware;
@@ -50,3 +50,4 @@ public class ApiKeyMiddleware
             Encoding.UTF8.GetBytes(supplied), Encoding.UTF8.GetBytes(_expectedKey));
     }
 }
+

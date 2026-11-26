@@ -1,8 +1,8 @@
-﻿using AddisEats.Api.Dtos;
-using AddisEats.Api.Errors;
+﻿using AddisEats.Api.DTOs;
+using AddisEats.Api.Common;
 using AddisEats.Api.Mappers;
 using AddisEats.Api.Models;
-using AddisEats.Api.Options;
+using AddisEats.Api.Configuration;
 using AddisEats.Api.Services.MenuServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -80,3 +80,4 @@ public class MenuItemsController : ApiControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created.ToDto());
     }
 }
+

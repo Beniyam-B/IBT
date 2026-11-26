@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AddisEats.Api.Validation;
 
-namespace AddisEats.Api.Dtos;
+namespace AddisEats.Api.DTOs;
 
 // The body a client sends to place an order. There is no total here: the server works it out.
 public class CreateOrderDto : IValidatableObject
@@ -49,3 +49,4 @@ public class CreateOrderDto : IValidatableObject
         }
     }
 }
+

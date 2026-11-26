@@ -1,7 +1,6 @@
-﻿using AddisEats.Api.Dtos;
-using AddisEats.Api.Errors;
+﻿using AddisEats.Api.DTOs;
+using AddisEats.Api.Common;
 using AddisEats.Api.Mappers;
-using AddisEats.Api.Queries;
 using AddisEats.Api.Services.MenuServices;
 using AddisEats.Api.Services.RestaurantServices;
 using Microsoft.AspNetCore.Mvc;
@@ -86,3 +85,4 @@ public class RestaurantsController : ApiControllerBase
         return Ok(new PagedResponse<MenuItemDto>(items, page, limit, all.Count));   // 200 even when empty
     }
 }
+

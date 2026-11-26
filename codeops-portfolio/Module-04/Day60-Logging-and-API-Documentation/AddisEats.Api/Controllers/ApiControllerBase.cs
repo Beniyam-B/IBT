@@ -1,4 +1,4 @@
-﻿using AddisEats.Api.Errors;
+﻿using AddisEats.Api.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AddisEats.Api.Controllers;
@@ -13,3 +13,4 @@ public abstract class ApiControllerBase : ControllerBase
     protected ObjectResult Fail<T>(Result<T> result) =>
         Fail(result.Error!, result.Detail ?? result.Error!.Title);
 }
+

@@ -1,4 +1,4 @@
-﻿namespace AddisEats.Api.Errors;
+﻿namespace AddisEats.Api.Common;
 
 // The error catalogue from the README, in code. The code is for machines, the title for people.
 public static class ErrorCatalogue
@@ -17,5 +17,6 @@ public static class ErrorCatalogue
     public static readonly ApiError Unauthenticated      = new("UNAUTHENTICATED", 401, "A valid API key is required.");
     public static readonly ApiError InternalError        = new("INTERNAL_ERROR", 500, "Something went wrong on our side.");
 }
+
 
 

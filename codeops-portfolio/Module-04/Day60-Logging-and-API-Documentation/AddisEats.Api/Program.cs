@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using AddisEats.Api.Errors;
-using AddisEats.Api.Filters;
+using AddisEats.Api.Common;
+using AddisEats.Api.Common.Filters;
 using AddisEats.Api.Middleware;
-using AddisEats.Api.Options;
+using AddisEats.Api.Configuration;
 using AddisEats.Api.Services;
 using AddisEats.Api.Services.MenuServices;
 using AddisEats.Api.Services.OrderServices;
@@ -134,6 +134,7 @@ app.UseRouting();              // decides which endpoint matches, without runnin
 app.MapControllers();          // runs the endpoint: terminal, nothing after it ever executes
 
 app.Run();
+
 
 
 

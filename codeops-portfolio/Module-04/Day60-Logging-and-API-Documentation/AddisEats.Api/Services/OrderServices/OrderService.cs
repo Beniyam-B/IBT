@@ -1,8 +1,8 @@
 ﻿using AddisEats.Api.Data;
-using AddisEats.Api.Dtos;
-using AddisEats.Api.Errors;
+using AddisEats.Api.DTOs;
+using AddisEats.Api.Common;
 using AddisEats.Api.Models;
-using AddisEats.Api.Options;
+using AddisEats.Api.Configuration;
 using AddisEats.Api.Services.MenuServices;
 using AddisEats.Api.Services.RestaurantServices;
 using Microsoft.Extensions.Options;
@@ -159,3 +159,4 @@ public class OrderService : IOrderService
 
     private static Result<Order> Fail(ApiError error, string detail) => Result<Order>.Fail(error, detail);
 }
+

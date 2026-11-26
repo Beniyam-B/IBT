@@ -12,3 +12,4 @@ public class Order
     public OrderStatus Status { get; set; } = OrderStatus.Placed;
     public DateTime PlacedOn { get; set; }
 }
+

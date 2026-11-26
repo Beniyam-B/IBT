@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AddisEats.Api.Validation;
 
-namespace AddisEats.Api.Dtos;
+namespace AddisEats.Api.DTOs;
 
 // The body a client sends to create a menu item. It has no Id: the server chooses it.
 public class CreateMenuItemDto
@@ -17,3 +17,4 @@ public class CreateMenuItemDto
     [EtbAmount]
     public decimal PriceEtb { get; set; }
 }
+

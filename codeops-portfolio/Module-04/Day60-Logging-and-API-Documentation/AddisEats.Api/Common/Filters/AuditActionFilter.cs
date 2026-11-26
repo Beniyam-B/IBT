@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace AddisEats.Api.Filters;
+namespace AddisEats.Api.Common.Filters;
 
 // Logs which action ran and what it was given. It must be a filter, not middleware, because the action name
 // and the bound, validated arguments only exist after routing and model binding.
@@ -97,3 +97,4 @@ public class AuditActionFilter : IActionFilter
         }
     }
 }
+

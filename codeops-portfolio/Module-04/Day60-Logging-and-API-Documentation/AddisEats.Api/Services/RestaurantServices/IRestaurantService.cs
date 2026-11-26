@@ -1,5 +1,5 @@
 ﻿using AddisEats.Api.Models;
-using AddisEats.Api.Queries;
+using AddisEats.Api.DTOs;
 
 namespace AddisEats.Api.Services.RestaurantServices;
 
@@ -11,3 +11,4 @@ public interface IRestaurantService
 
     int CountAll(RestaurantQuery q);
 }
+

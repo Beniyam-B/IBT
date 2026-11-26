@@ -8,3 +8,4 @@ public class MenuItem
     public string Category { get; set; } = "";
     public decimal PriceEtb { get; set; }
 }
+

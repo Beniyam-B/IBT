@@ -1,4 +1,4 @@
-﻿using AddisEats.Api.Errors;
+﻿using AddisEats.Api.Common;
 
 namespace AddisEats.Api.Middleware;
 
@@ -46,3 +46,4 @@ public class ExceptionHandlingMiddleware
         }
     }
 }
+

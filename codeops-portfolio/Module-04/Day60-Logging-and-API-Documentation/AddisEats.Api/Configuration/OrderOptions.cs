@@ -1,4 +1,4 @@
-﻿namespace AddisEats.Api.Options;
+﻿namespace AddisEats.Api.Configuration;
 
 // Bound from the "Orders" section of appsettings.json.
 public class OrderOptions
@@ -7,3 +7,4 @@ public class OrderOptions
 
     public decimal MinimumOrderEtb { get; set; } = 150m;   // items plus delivery
 }
+

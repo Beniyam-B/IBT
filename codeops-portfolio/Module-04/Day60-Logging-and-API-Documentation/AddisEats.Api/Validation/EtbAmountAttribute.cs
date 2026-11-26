@@ -25,3 +25,4 @@ public class EtbAmountAttribute : ValidationAttribute
         return ValidationResult.Success;
     }
 }
+

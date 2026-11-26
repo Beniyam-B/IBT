@@ -6,3 +6,4 @@ public interface IRequestScratch
     Guid Id { get; }
     string Path { get; set; }
 }
+

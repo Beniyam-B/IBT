@@ -10,3 +10,4 @@ public class Restaurant
     public decimal DeliveryFeeEtb { get; set; }
     public string OwnerAddress { get; set; } = "";   // private: deliberately not in the DTO
 }
+

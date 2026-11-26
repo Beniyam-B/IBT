@@ -1,4 +1,4 @@
-﻿using AddisEats.Api.Dtos;
+﻿using AddisEats.Api.DTOs;
 using AddisEats.Api.Models;
 
 namespace AddisEats.Api.Mappers;
@@ -9,3 +9,4 @@ public static class OrderMapper
         new(order.Id, order.RestaurantId, order.MenuItemId, order.Quantity, order.TotalEtb,
             order.Status, order.PlacedOn, order.CustomerPhone, order.ScheduledFor);
 }
+

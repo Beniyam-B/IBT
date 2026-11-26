@@ -22,3 +22,4 @@ public class RequestScratchMiddleware
         await _next(ctx);
     }
 }
+

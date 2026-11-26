@@ -1,4 +1,4 @@
-﻿namespace AddisEats.Api.Errors;
+﻿namespace AddisEats.Api.Common;
 
 // A service says "this can fail" in its signature. The failure carries a catalogue entry and a detail message.
 public class Result<T>
@@ -12,3 +12,4 @@ public class Result<T>
 
     public static Result<T> Fail(ApiError error, string detail) => new() { Error = error, Detail = detail };
 }
+

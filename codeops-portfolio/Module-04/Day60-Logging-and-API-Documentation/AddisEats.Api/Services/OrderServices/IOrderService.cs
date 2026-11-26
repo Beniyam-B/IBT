@@ -1,5 +1,5 @@
-﻿using AddisEats.Api.Dtos;
-using AddisEats.Api.Errors;
+﻿using AddisEats.Api.DTOs;
+using AddisEats.Api.Common;
 using AddisEats.Api.Models;
 
 namespace AddisEats.Api.Services.OrderServices;
@@ -15,3 +15,4 @@ public interface IOrderService
 
     Result<Order> Cancel(int id);
 }
+

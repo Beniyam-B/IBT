@@ -1,9 +1,9 @@
-﻿using AddisEats.Api.Errors;
+﻿using AddisEats.Api.Common;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace AddisEats.Api.Filters;
+namespace AddisEats.Api.Common.Filters;
 
 // Runs before every action. A query parameter the action does not declare is a 400, not silently ignored.
 public class RejectUnknownQueryParametersFilter : IActionFilter
@@ -69,4 +69,5 @@ public class RejectUnknownQueryParametersFilter : IActionFilter
         type.IsPrimitive || type.IsEnum || type == typeof(string) || type == typeof(decimal)
         || type == typeof(DateTime) || type == typeof(Guid);
 }
+
 

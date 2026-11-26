@@ -1,6 +1,6 @@
 ﻿using AddisEats.Api.Data;
 using AddisEats.Api.Models;
-using AddisEats.Api.Queries;
+using AddisEats.Api.DTOs;
 
 namespace AddisEats.Api.Services.RestaurantServices;
 
@@ -31,4 +31,5 @@ public class RestaurantService : IRestaurantService
     private static bool MatchesArea(Restaurant r, string? area) =>
         string.IsNullOrWhiteSpace(area) || r.Address.Equals(area, StringComparison.OrdinalIgnoreCase);
 }
+
 

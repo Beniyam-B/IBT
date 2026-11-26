@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace AddisEats.Api.Errors;
+namespace AddisEats.Api.Common;
 
 // Builds the one error body every failure uses: a ProblemDetails (RFC 7807) plus a machine-readable "code" and a traceId.
 public static class ProblemFactory
@@ -34,3 +34,4 @@ public static class ProblemFactory
     private static string CamelCase(string key) =>
         string.IsNullOrEmpty(key) || !char.IsUpper(key[0]) ? key : char.ToLowerInvariant(key[0]) + key[1..];
 }
+

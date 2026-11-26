@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AddisEats.Api.Queries;
+namespace AddisEats.Api.DTOs;
 
 // Everything a client can ask of the restaurant list.
 public class RestaurantQuery
@@ -16,3 +16,4 @@ public class RestaurantQuery
     public int Page { get; set; } = 1;
     public int Limit { get; set; } = 20;
 }
+
