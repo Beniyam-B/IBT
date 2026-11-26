@@ -1,0 +1,243 @@
+﻿@host = http://localhost:5217
+
+### ---------- LAYER 1: route constraint ----------
+
+### 1 not a number: 404, no route matches
+GET {{host}}/api/v1/orders/abc
+
+### ---------- LAYER 2 and 3: binding and annotations ----------
+
+### 2 a body that cannot be parsed: 400 VALIDATION_FAILED
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{ "restaurantId": "one" }
+
+### 3 every bad field reported at once: 400 with errors on four fields
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 0,
+  "menuItemId": 0,
+  "quantity": 99,
+  "phone": "12345"
+}
+
+### 4 a phone that is not an Ethiopian mobile: 400 errors.phone
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "menuItemId": 1,
+  "quantity": 1,
+  "phone": "0811234567"
+}
+
+### 5 scheduled with no time (a rule across two fields): 400 errors.scheduledFor
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "menuItemId": 1,
+  "quantity": 1,
+  "phone": "0911234567",
+  "isScheduled": true
+}
+
+### 6 a total sent by the client: 400, an unknown field is never accepted
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "menuItemId": 1,
+  "quantity": 2,
+  "phone": "0911234567",
+  "totalEtb": 1
+}
+
+### 7 three decimal places: 400 errors.priceEtb
+POST {{host}}/api/v1/menu-items
+Content-Type: application/json
+
+{
+  "name": "Genfo",
+  "category": "Breakfast",
+  "priceEtb": 480.505
+}
+
+### 8 a price of zero: 400 errors.priceEtb
+POST {{host}}/api/v1/menu-items
+Content-Type: application/json
+
+{
+  "name": "Genfo",
+  "category": "Breakfast",
+  "priceEtb": 0
+}
+
+### 9 a blank name: 400 errors.name
+POST {{host}}/api/v1/menu-items
+Content-Type: application/json
+
+{
+  "name": "",
+  "category": "Drinks",
+  "priceEtb": 50
+}
+
+### 10 a status that does not exist: 400 errors.status
+PATCH {{host}}/api/v1/orders/2/status
+Content-Type: application/json
+
+{ "status": "Flying" }
+
+### 11 limit out of range: 400 INVALID_PAGING
+GET {{host}}/api/v1/restaurants?limit=0
+
+### 12 a typo in a parameter name: 400 UNKNOWN_PARAMETER
+GET {{host}}/api/v1/restaurants?aera=Bole
+
+### 13 not a number: 400 VALIDATION_FAILED
+GET {{host}}/api/v1/restaurants?page=abc
+
+### ---------- LAYER 4: business rules (Result) ----------
+
+### 14 no such restaurant: 404 RESTAURANT_NOT_FOUND
+GET {{host}}/api/v1/restaurants/9999
+
+### 15 no such menu item: 404 MENU_ITEM_NOT_FOUND
+GET {{host}}/api/v1/menu-items/9999
+
+### 16 no such order: 404 ORDER_NOT_FOUND
+GET {{host}}/api/v1/orders/999
+
+### 17 a closed restaurant: 409 RESTAURANT_CLOSED
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 2,
+  "menuItemId": 7,
+  "quantity": 1,
+  "phone": "0911234567"
+}
+
+### 18 a move the order cannot make (order 1 is Delivered): 409 ORDER_STATUS_CONFLICT
+PATCH {{host}}/api/v1/orders/1/status
+Content-Type: application/json
+
+{ "status": "Preparing" }
+
+### 19 PATCH does not cancel: 409 ORDER_STATUS_CONFLICT
+PATCH {{host}}/api/v1/orders/2/status
+Content-Type: application/json
+
+{ "status": "Cancelled" }
+
+### 20 cancelling a delivered order: 409 ORDER_ALREADY_DELIVERED
+DELETE {{host}}/api/v1/orders/1
+
+### 21 the order total is below the 150 ETB minimum: 422 AMOUNT_INVALID
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 4,
+  "menuItemId": 19,
+  "quantity": 1,
+  "phone": "0911234567"
+}
+
+### 22 an item from another restaurant's menu: 422 ITEM_NOT_ON_MENU
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "menuItemId": 13,
+  "quantity": 1,
+  "phone": "0911234567"
+}
+
+### ---------- GLOBAL HANDLER ----------
+
+### 23 a deliberate throw (Development only): 500 INTERNAL_ERROR with a traceId and no stack trace
+GET {{host}}/api/v1/debug/throw
+
+### ---------- THE HAPPY PATHS ----------
+
+### 24 place an order: 201 and a Location header. The total is worked out by the server
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "menuItemId": 1,
+  "quantity": 2,
+  "phone": "+251911234567"
+}
+
+### 25 a scheduled order: 201
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "menuItemId": 1,
+  "quantity": 1,
+  "phone": "0711234567",
+  "isScheduled": true,
+  "scheduledFor": "2030-01-01T10:00:00Z"
+}
+
+### 26 move an order forward: 200
+PATCH {{host}}/api/v1/orders/2/status
+Content-Type: application/json
+
+{ "status": "OnTheWay" }
+
+### 27 cancel an order created above (use its id): 204 with no body
+DELETE {{host}}/api/v1/orders/3
+
+### 28 create a menu item: 201
+POST {{host}}/api/v1/menu-items
+Content-Type: application/json
+
+{
+  "name": "Genfo",
+  "category": "Breakfast",
+  "priceEtb": 95.50
+}
+
+### ---------- DAY 59: MIDDLEWARE ----------
+### Set adminKey to the value of your Admin__ApiKey environment variable. Never commit a real key.
+@adminKey = REPLACE-WITH-YOUR-KEY
+
+### 29 send your own correlation id: it comes back in the X-Correlation-Id response header and in the log
+GET {{host}}/api/v1/restaurants?limit=1
+X-Correlation-Id: bole-test-001
+
+### 30 no id sent: the server generates one and returns it
+GET {{host}}/api/v1/restaurants?limit=1
+
+### 31 an unsafe id is replaced, never echoed
+GET {{host}}/api/v1/restaurants?limit=1
+X-Correlation-Id: bad id; DROP TABLE
+
+### 32 an error body carries the same id as its traceId
+GET {{host}}/api/v1/restaurants/9999
+X-Correlation-Id: bole-test-002
+
+### 33 the admin branch without a key: 401 UNAUTHENTICATED, and the handler never runs
+GET {{host}}/admin/stats
+
+### 34 the admin branch with the right key: 200
+GET {{host}}/admin/stats
+X-Api-Key: {{adminKey}}
+
+### 35 a slow request (Development only): the timing middleware logs a Warning
+GET {{host}}/api/v1/debug/slow?ms=1500
