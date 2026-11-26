@@ -767,3 +767,13 @@ A real line written by `OrderService`, with the id from the `X-Correlation-Id` h
 ```
 
 **How it got there:** `CorrelationIdMiddleware` opens a logger scope (`BeginScope`) around the rest of the pipeline, and a scope follows the request through every call and `await` it makes (it travels in async-local state), so every log call made while that request is being handled picks it up automatically. `OrderService` receives nothing and passes nothing along.
+
+## Exercise 3: the correlation id inside OrderService
+
+A real line written by `OrderService`, with the id from the `X-Correlation-Id` header:
+
+```
+09:32:11 info: AddisEats.Api.Services.OrderServices.OrderService[0] => SpanId:f4f42f9a8d27d0ef, TraceId:150473bcca60ebe3e66dddaa7778a19e, ParentId:0000000000000000 => ConnectionId:0HNQBGRATD28K => RequestPath:/api/v1/orders RequestId:0HNQBGRATD28K:00000001 => CorrelationId:corr-in-service => AddisEats.Api.Controllers.OrdersController.Create (AddisEats.Api) Order 3 placed at restaurant 1 in Bole: 2 x item 1, total 370 ETB
+```
+
+**How it got there:** `CorrelationIdMiddleware` opens a logger scope (`BeginScope`) around the rest of the pipeline, and a scope follows the request through every call and `await` it makes (it travels in async-local state), so every log call made while that request is being handled picks it up automatically. `OrderService` receives nothing and passes nothing along.
