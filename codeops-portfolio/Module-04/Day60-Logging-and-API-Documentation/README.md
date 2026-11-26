@@ -777,3 +777,18 @@ A real line written by `OrderService`, with the id from the `X-Correlation-Id` h
 ```
 
 **How it got there:** `CorrelationIdMiddleware` opens a logger scope (`BeginScope`) around the rest of the pipeline, and a scope follows the request through every call and `await` it makes (it travels in async-local state), so every log call made while that request is being handled picks it up automatically. `OrderService` receives nothing and passes nothing along.
+
+## Exercise 4: a log audit for personal data
+
+I sent a realistic mix of traffic (orders with phone numbers, a scheduled order, invalid orders, a typo in a query parameter, a fake bearer token, the admin key, a deliberate crash, and a person's name typed into a query) and scanned the log for anything that identifies a person or lets someone act as them. Lines found per category, before and after the fixes:
+
+| Looking for | Before | After |
+|---|---|---|
+
+**What I found and how I fixed each one**
+
+1. **Request bodies and a name typed by a client, in the audit log.** `AuditActionFilter` logged every bound argument as JSON. The phone number was redacted, but the rest of each request body was still written, and the restaurant query object carried whatever text the client typed into `area`. Fixed: the filter now logs only numeric, boolean and enum arguments (ids and paging) and names the others as withheld, so no body and no free text is ever written.
+2. **A connection string and password in an exception message.** The deliberate-throw route put `Server=...;Password=...` in an exception message, and the exception middleware logs the exception. The client never saw it (Day 58), but the log did. Fixed: our code never puts secrets in an exception message, and the test route now says only `deliberate failure for testing`. A framework exception can still carry a message we did not write, so the rule for Day 63, when a database exists, is that the connection string only lives in configuration.
+3. **Query strings in framework logs.** The framework logs the full URL, query string included, at Information. This is why `Microsoft.AspNetCore` is set to Warning (exercise 2).
+
+Not found, and why: the phone number, the admin key and the bearer token were never logged. `RequestTimingMiddleware` writes the path only (never the query string), and the correlation id accepts only a short, safe value from the caller.

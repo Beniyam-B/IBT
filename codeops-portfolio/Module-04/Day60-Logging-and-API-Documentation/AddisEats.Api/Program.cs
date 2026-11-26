@@ -83,7 +83,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 
     // Development only: a deliberate throw, to prove the handler works. Hidden from Swagger.
-    app.MapGet("/api/v1/debug/throw", IResult () => throw new InvalidOperationException("boom: Server=secret-db;Password=hunter2"))
+    app.MapGet("/api/v1/debug/throw", IResult () => throw new InvalidOperationException("deliberate failure for testing"))
        .ExcludeFromDescription();
 
     // Development only: a slow route, to see the Warning from the timing middleware.
@@ -134,6 +134,7 @@ app.UseRouting();              // decides which endpoint matches, without runnin
 app.MapControllers();          // runs the endpoint: terminal, nothing after it ever executes
 
 app.Run();
+
 
 
 
